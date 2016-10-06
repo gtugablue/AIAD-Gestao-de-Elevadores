@@ -5,6 +5,13 @@
     <artifactId>Gestao-de-Elevadores</artifactId>
     <groupId>AIAD</groupId>
 
+    <repositories>
+        <repository>
+            <id>tilab</id>
+            <url>http://jade.tilab.com/maven/</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>org.opensimulationsystems.cabsf</groupId>
@@ -19,6 +26,11 @@
             <version>0.9b2</version>
             <scope>system</scope>
             <systemPath>${basedir}/libs/SAJaS.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.tilab.jade</groupId>
+            <artifactId>jade</artifactId>
+            <version>4.4.0</version>
         </dependency>
     </dependencies>
 
