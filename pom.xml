@@ -7,11 +7,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.opensimulationsystems.cabsf</groupId>
-            <artifactId>repast.simphony.bin_and_src</artifactId>
-            <version>2.3.1</version>
-        </dependency>
-        <dependency>
             <groupId>hlc</groupId>
             <artifactId>SAJaS</artifactId>
             <version>0.9b2</version>
