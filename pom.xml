@@ -1,6 +1,23 @@
 <project>
     <modelVersion>4.0.0</modelVersion>
-    <name>Maven Default Project</name>
-    <artifactId>AIAD-Gestao-de-Elevadores</artifactId>
+    <name>AIAD - Gestão de Elevadores</name>
+    <version>1.0.0</version>
+    <artifactId>Gestao-de-Elevadores</artifactId>
+    <groupId>AIAD</groupId>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.opensimulationsystems.cabsf</groupId>
+            <artifactId>repast.simphony.bin_and_src</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>hlc</groupId>
+            <artifactId>SAJaS</artifactId>
+            <version>0.9b2</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/libs/SAJaS.jar</systemPath>
+        </dependency>
+    </dependencies>
 
 </project>
