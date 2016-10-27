@@ -27,10 +27,4 @@ public class LiftManagementLauncher extends RepastSLauncher {
         Profile p1 = new ProfileImpl();
         mainContainer = rt.createMainContainer(p1);
     }
-
-	@Override
-	public String[] getInitParam() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }
