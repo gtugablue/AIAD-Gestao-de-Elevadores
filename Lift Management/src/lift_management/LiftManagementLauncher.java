@@ -2,9 +2,7 @@ package lift_management;
 
 import jade.core.Profile;
 import jade.core.ProfileImpl;
-import sajas.core.Agent;
 import sajas.core.Runtime;
-import sajas.sim.repast3.Repast3Launcher;
 import sajas.sim.repasts.RepastSLauncher;
 import sajas.wrapper.ContainerController;
 
