@@ -1,4 +1,4 @@
-package lift_management.agents.styles;
+package lift_management.gui;
 
 import java.awt.Color;
 import java.io.IOException;
@@ -14,7 +14,8 @@ public class LiftStyle extends DefaultStyleOGL2D {
 	@Override
 	public VSpatial getVSpatial(Object agent, VSpatial spatial) {
 		if (agent instanceof Lift) {
-			Lift lift = (Lift)agent;
+			return shapeFactory.createRectangle(1, 1);
+			/*Lift lift = (Lift)agent;
 			DoorState doorState = lift.getDoorState();
 			try {
 				if (doorState == DoorState.CLOSED) {
@@ -25,11 +26,11 @@ public class LiftStyle extends DefaultStyleOGL2D {
 			} catch (IOException e) {
 				spatial = shapeFactory.createRectangle(200, 342);
 				e.printStackTrace();
-			}
+			}*/
 		} else {
 			if (spatial == null) {
 				try {
-					spatial = shapeFactory.createImage("icons/elevator_closed.jpg");
+					spatial = shapeFactory.createImage("icons/lift_closed.jpg");
 				} catch (IOException e) {
 					spatial = shapeFactory.createRectangle(200, 342);
 					e.printStackTrace();

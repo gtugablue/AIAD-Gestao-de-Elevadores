@@ -6,6 +6,7 @@ import java.util.List;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.wrapper.StaleProxyException;
+import lift_management.agents.Building;
 import lift_management.agents.Lift;
 import repast.simphony.context.Context;
 import repast.simphony.context.space.continuous.ContinuousSpaceFactory;
@@ -24,7 +25,8 @@ import sajas.wrapper.ContainerController;
  */
 public class LiftManagementLauncher extends RepastSLauncher {
     private ContainerController mainContainer;
-    private List<Lift> lifts = new ArrayList<Lift>();
+    private Building building;
+    private List<Lift> lifts;
 
     public static void main(String[] args) {
         return;
@@ -49,6 +51,7 @@ public class LiftManagementLauncher extends RepastSLauncher {
     }
     
     private void launchAgents() throws StaleProxyException {
+    	mainContainer.acceptNewAgent("Building", building).start();
     	for (Lift a : lifts)
     		mainContainer.acceptNewAgent("Lift", a).start();
 	}
@@ -58,11 +61,17 @@ public class LiftManagementLauncher extends RepastSLauncher {
     	ContinuousAdder<Object> adder = new SimpleCartesianAdder<Object>();
     	PointTranslator translator = new StrictBorders();
     	ContinuousSpaceFactory factory = ContinuousSpaceFactoryFinder.createContinuousSpaceFactory(null);
-    	ContinuousSpace<Object> space = factory.createContinuousSpace("space", context, adder, translator, 10.0, 10.0);
+    	int numLifts = 4;
+    	int numFloors = 15;
+    	ContinuousSpace<Object> space = factory.createContinuousSpace("space", context, adder, translator, numLifts, Building.floorHeight * numFloors);
+    	building = new Building(numLifts, numFloors);
+    	context.add(building);
+    	space.moveTo(building, 0, 0);
+    	lifts = new ArrayList<Lift>();
     	Lift lift = new Lift(space);
     	lifts.add(lift);
     	context.add(lift);
-    	space.moveTo(lift, 5, 5);
+    	space.moveTo(lift, 1, 0);
     	return super.build(context);
     }
 }

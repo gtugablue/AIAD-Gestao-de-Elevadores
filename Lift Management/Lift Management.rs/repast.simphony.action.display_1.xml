@@ -4,7 +4,11 @@
   <styles>
     <entry>
       <string>lift_management.agents.Lift</string>
-      <string>lift_management.agents.styles.LiftStyle</string>
+      <string>lift_management.gui.LiftStyle</string>
+    </entry>
+    <entry>
+      <string>lift_management.agents.Building</string>
+      <string>lift_management.gui.BuildingStyle</string>
     </entry>
   </styles>
   <netStyles/>
