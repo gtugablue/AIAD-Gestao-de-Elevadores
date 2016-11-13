@@ -3,13 +3,13 @@
   <type>2D</type>
   <styles>
     <entry>
-      <string>agents.Lift</string>
+      <string>lift_management.agents.Lift</string>
       <string>repast.simphony.visualizationOGL2D.DefaultStyleOGL2D</string>
     </entry>
   </styles>
   <editedStyles>
     <entry>
-      <string>agents.Lift</string>
+      <string>lift_management.agents.Lift</string>
       <null/>
     </entry>
   </editedStyles>
@@ -18,19 +18,19 @@
   <frequency>ON_MOVE</frequency>
   <schedParams>
     <start>0.0</start>
-    <interval>1.0</interval>
+    <interval>0.1</interval>
     <priority>-Infinity</priority>
     <pType>LAST</pType>
     <duration>-1.0</duration>
     <frequency>REPEAT</frequency>
-    <hashCode>-1006667935</hashCode>
+    <hashCode>1328133315</hashCode>
   </schedParams>
   <layoutClassName>foo.bar.baz</layoutClassName>
   <layoutProjection>space</layoutProjection>
   <layoutInterval>0</layoutInterval>
   <layerOrder>
     <entry>
-      <string>agents.Lift</string>
+      <string>lift_management.agents.Lift</string>
       <int>0</int>
     </entry>
   </layerOrder>
