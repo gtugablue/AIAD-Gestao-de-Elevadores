@@ -1,6 +1,8 @@
 package lift_management;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import agents.Lift;
 import jade.core.AID;
@@ -16,6 +18,7 @@ import repast.simphony.space.continuous.ContinuousSpace;
 import repast.simphony.space.continuous.PointTranslator;
 import repast.simphony.space.continuous.SimpleCartesianAdder;
 import repast.simphony.space.continuous.StrictBorders;
+import sajas.core.Agent;
 import sajas.core.Runtime;
 import sajas.sim.repasts.RepastSLauncher;
 import sajas.wrapper.ContainerController;
@@ -25,15 +28,18 @@ import sajas.wrapper.ContainerController;
  */
 public class LiftManagementLauncher extends RepastSLauncher {
     private ContainerController mainContainer;
+    private List<Lift> lifts = new ArrayList<Lift>();
 
     public static void main(String[] args) {
         return;
     }
 
+    @Override
     public String getName() {
-        return null;
+        return "Lift Management";
     }
 
+    @Override
     protected void launchJADE() {
         Runtime rt = Runtime.instance();
         Profile p1 = new ProfileImpl();
@@ -47,12 +53,20 @@ public class LiftManagementLauncher extends RepastSLauncher {
     }
     
     private void launchAgents() throws StaleProxyException {
-    	Context<Object> context = Contexts.createContext(Object.class, "context");
+    	for (Lift a : lifts)
+    		mainContainer.acceptNewAgent("Lift", a).start();
+	}
+    
+    @Override
+    public Context build(Context<Object> context) {
     	ContinuousAdder<Object> adder = new SimpleCartesianAdder<Object>();
     	PointTranslator translator = new StrictBorders();
     	ContinuousSpaceFactory factory = ContinuousSpaceFactoryFinder.createContinuousSpaceFactory(null);
-    	ContinuousSpace<Object> space = factory.createContinuousSpace("Building", context, adder, translator, 100.0, 100.0);
+    	ContinuousSpace<Object> space = factory.createContinuousSpace("space", context, adder, translator, 10.0, 10.0);
     	Lift lift = new Lift(space);
-		mainContainer.acceptNewAgent("Lift", lift).start();
-	}
+    	lifts.add(lift);
+    	context.add(lift);
+    	space.moveTo(lift, 5, 5);
+    	return super.build(context);
+    }
 }
