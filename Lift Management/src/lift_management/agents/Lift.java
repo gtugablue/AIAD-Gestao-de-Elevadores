@@ -12,6 +12,11 @@ import sajas.core.Agent;
  */
 public class Lift extends Agent {
 	private ContinuousSpace<Object> space;
+	public enum DoorState {
+		OPEN,
+		CLOSED
+	};
+	private DoorState doorState = DoorState.CLOSED;
 	
 	public Lift(ContinuousSpace<Object> space) {
 		this.space = space;
@@ -39,5 +44,9 @@ public class Lift extends Agent {
 		} catch (FIPAException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public DoorState getDoorState() {
+		return doorState;
 	}
 }
