@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import agents.Lift;
 import jade.core.AID;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.wrapper.StaleProxyException;
+import lift_management.agents.Lift;
 import repast.simphony.context.Context;
 import repast.simphony.context.Contexts;
 import repast.simphony.context.space.continuous.ContinuousSpaceFactory;

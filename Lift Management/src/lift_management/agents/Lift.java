@@ -1,4 +1,4 @@
-package agents;
+package lift_management.agents;
 
 import sajas.domain.DFService;
 import jade.domain.FIPAException;
