@@ -1,6 +1,5 @@
 package lift_management.agents;
 
-import repast.simphony.space.continuous.ContinuousSpace;
 import sajas.core.Agent;
 
 public class Building extends Agent {
