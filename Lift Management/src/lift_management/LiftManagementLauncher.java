@@ -52,8 +52,8 @@ public class LiftManagementLauncher extends RepastSLauncher {
     
     private void launchAgents() throws StaleProxyException {
     	mainContainer.acceptNewAgent("Building", building).start();
-    	for (Lift a : lifts)
-    		mainContainer.acceptNewAgent("Lift", a).start();
+    	for (int i = 0; i < lifts.size(); i++)
+    		mainContainer.acceptNewAgent("Lift " + i, lifts.get(i)).start();
 	}
     
     @Override
@@ -74,7 +74,7 @@ public class LiftManagementLauncher extends RepastSLauncher {
     private List<Lift> createLifts(int numLifts, ContinuousSpace<Object> space, Context<Object> context) {
     	ArrayList<Lift> lifts = new ArrayList<Lift>();
     	for (int i = 0; i < numLifts; i++) {
-    		Lift lift = new Lift(space);
+    		Lift lift = new Lift(space, 420f);
     		lifts.add(lift);
     		context.add(lift);
     		space.moveTo(lift, i + 1, 0);
