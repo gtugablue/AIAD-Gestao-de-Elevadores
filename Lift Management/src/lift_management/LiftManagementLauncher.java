@@ -63,7 +63,7 @@ public class LiftManagementLauncher extends RepastSLauncher {
     	ContinuousSpaceFactory factory = ContinuousSpaceFactoryFinder.createContinuousSpaceFactory(null);
     	int numLifts = 4;
     	int numFloors = 15;
-    	ContinuousSpace<Object> space = factory.createContinuousSpace("space", context, adder, translator, numLifts, Building.floorHeight * numFloors);
+    	ContinuousSpace<Object> space = factory.createContinuousSpace("space", context, adder, translator, numLifts + 1, Building.floorHeight * numFloors);
     	building = new Building(numLifts, numFloors);
     	context.add(building);
     	space.moveTo(building, 0, 0);
@@ -71,7 +71,7 @@ public class LiftManagementLauncher extends RepastSLauncher {
     	Lift lift = new Lift(space);
     	lifts.add(lift);
     	context.add(lift);
-    	space.moveTo(lift, 1, 0);
+    	space.moveTo(lift, 1, 2);
     	return super.build(context);
     }
 }

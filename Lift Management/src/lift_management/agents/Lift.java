@@ -5,6 +5,7 @@ import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import repast.simphony.space.continuous.ContinuousSpace;
+import repast.simphony.space.continuous.NdPoint;
 import sajas.core.Agent;
 
 /**
@@ -48,5 +49,9 @@ public class Lift extends Agent {
 
 	public DoorState getDoorState() {
 		return doorState;
+	}
+	
+	public NdPoint getPosition() {
+		return space.getLocation(this);
 	}
 }

@@ -26,8 +26,8 @@ public class BuildingStyle extends DefaultStyleOGL2D {
 			try {
 				for (int i = 0; i < building.getNumLifts(); i++) {
 					for (int j = 0; j < building.getNumFloors(); j++) {
-						VImage2D liftImage = shapeFactory.createImage("icons/lift_open.jpg");
-						liftImage.translate(scale * (i + 0.5f), scale * (j * Building.floorHeight + 0.8f * Building.floorHeight / 2), 0);
+						VImage2D liftImage = shapeFactory.createImage("icons/lift_closed.jpg");
+						liftImage.translate(scale * (i + 1f), scale * (j * Building.floorHeight + 0.8f * Building.floorHeight / 2), 0);
 						liftImage.scale(scale * 0.8f * Building.floorHeight / liftDoorImageHeight);
 						composite.addChild(liftImage);
 					}

@@ -29,6 +29,10 @@
   <layerOrder>
     <entry>
       <string>lift_management.agents.Lift</string>
+      <int>1</int>
+    </entry>
+    <entry>
+      <string>lift_management.agents.Building</string>
       <int>0</int>
     </entry>
   </layerOrder>
