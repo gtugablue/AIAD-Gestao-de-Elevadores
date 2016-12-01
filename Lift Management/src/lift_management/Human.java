@@ -2,17 +2,19 @@ package lift_management;
 
 public class Human {
 	public static int currentId = 0;
-	protected float weight=0;
+	protected double weight=0;
 	protected int destinyFloor=0;
+	protected int originFloor=0;
 	protected final int id = ++currentId;
 	
 	
-	public Human(float weight, int floor){
+	public Human(double weight, int originFloor, int destinyFloor){
 		this.weight = weight;
-		this.destinyFloor = floor;
+		this.originFloor = originFloor;
+		this.destinyFloor = destinyFloor;
 	}
 	
-	public float getWeight() {
+	public double getWeight() {
 		return weight;
 	}
 	public void setWeight(float weight) {
