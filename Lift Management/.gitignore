@@ -3,3 +3,4 @@
 /Repast.settings
 /velocity.log
 *.log4j.properties
+*.log
