@@ -13,14 +13,16 @@ import sajas.core.Agent;
  */
 public class Lift extends Agent {
 	private ContinuousSpace<Object> space;
+	private float maxWeight;
 	public enum DoorState {
 		OPEN,
 		CLOSED
 	};
 	private DoorState doorState = DoorState.CLOSED;
 	
-	public Lift(ContinuousSpace<Object> space) {
+	public Lift(ContinuousSpace<Object> space, float maxWeight) {
 		this.space = space;
+		this.maxWeight = maxWeight;
 	}
 	
 	@Override
@@ -53,5 +55,9 @@ public class Lift extends Agent {
 	
 	public NdPoint getPosition() {
 		return space.getLocation(this);
+	}
+	
+	public float getMaxWeight() {
+		return this.maxWeight;
 	}
 }
