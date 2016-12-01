@@ -67,11 +67,18 @@ public class LiftManagementLauncher extends RepastSLauncher {
     	building = new Building(numLifts, numFloors);
     	context.add(building);
     	space.moveTo(building, 0, 0);
-    	lifts = new ArrayList<Lift>();
-    	Lift lift = new Lift(space);
-    	lifts.add(lift);
-    	context.add(lift);
-    	space.moveTo(lift, 1, 2);
+    	lifts = createLifts(numLifts, space, context);
     	return super.build(context);
+    }
+    
+    private List<Lift> createLifts(int numLifts, ContinuousSpace<Object> space, Context<Object> context) {
+    	ArrayList<Lift> lifts = new ArrayList<Lift>();
+    	for (int i = 0; i < numLifts; i++) {
+    		Lift lift = new Lift(space);
+    		lifts.add(lift);
+    		context.add(lift);
+    		space.moveTo(lift, i + 1, 0);
+    	}
+    	return lifts;
     }
 }
