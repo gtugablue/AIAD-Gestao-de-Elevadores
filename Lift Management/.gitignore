@@ -1,6 +1,8 @@
 /bin/
 /debug.log
 /Repast.settings
-/velocity.log
+/velocity.log*
 *.log4j.properties
 *.log
+/MTPs-Main-Container.txt
+/APDescription.txt
