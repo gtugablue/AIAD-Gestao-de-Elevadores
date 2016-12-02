@@ -5,11 +5,13 @@ import java.util.Vector;
 import jade.content.lang.Codec;
 import jade.content.lang.sl.SLCodec;
 import jade.content.onto.Ontology;
+import jade.domain.FIPAException;
 import jade.domain.FIPANames;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import lift_management.onto.ServiceOntology;
+import sajas.core.AID;
 import sajas.core.Agent;
 import sajas.domain.DFService;
 import sajas.proto.ContractNetInitiator;
@@ -85,7 +87,23 @@ public class Building extends Agent {
 
 		@Override
 		public Vector prepareCfps(ACLMessage cfp) {
-			// TODO
+			// search provider
+			DFAgentDescription template = new DFAgentDescription();
+			ServiceDescription sd = new ServiceDescription();
+			sd.setType("lift");
+			template.addServices(sd);
+			DFAgentDescription[] dfads = null;
+			try {
+				dfads = DFService.search(myAgent, template);
+			} catch (FIPAException e) {
+				e.printStackTrace();
+			}
+			if(dfads != null && dfads.length > 0) {
+				for (int i = 0; i < dfads.length; i++) {
+					AID aid = (AID) dfads[i].getName();
+					cfp.addReceiver(aid);
+				}
+			}
 			return super.prepareCfps(cfp);
 		}
 
