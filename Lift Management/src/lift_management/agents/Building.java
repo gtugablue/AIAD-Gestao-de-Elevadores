@@ -3,14 +3,17 @@ package lift_management.agents;
 import java.util.Vector;
 
 import jade.content.lang.Codec;
+import jade.content.lang.Codec.CodecException;
 import jade.content.lang.sl.SLCodec;
 import jade.content.onto.Ontology;
+import jade.content.onto.OntologyException;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import lift_management.onto.ServiceOntology;
+import lift_management.onto.ServiceProposalRequest;
 import sajas.core.AID;
 import sajas.core.Agent;
 import sajas.domain.DFService;
@@ -59,8 +62,12 @@ public class Building extends Agent {
 		myCfp.setLanguage(codec.getName());
 		myCfp.setOntology(serviceOntology.getName());
 		myCfp.setProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET);
-
-		addBehaviour(new CNetInit(this, myCfp));
+		try {
+			getContentManager().fillContent(myCfp, new ServiceProposalRequest("attend-request"));
+			addBehaviour(new CNetInit(this, myCfp));
+		} catch (CodecException | OntologyException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private class DFSubscInit extends SubscriptionInitiator {
@@ -113,6 +120,7 @@ public class Building extends Agent {
 
 		@Override
 		protected void handlePropose(ACLMessage propose, Vector acceptances) {
+			System.out.println(propose);
 		}
 
 		@Override

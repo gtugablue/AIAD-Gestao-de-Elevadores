@@ -108,10 +108,15 @@ public class Lift extends Agent {
 
 		@Override
 		protected ACLMessage handleCfp(ACLMessage cfp) {
-			System.out.println("MESSAGE RECEIVED");
+			System.out.println(cfp);
 			ACLMessage reply = cfp.createReply();
 			reply.setPerformative(ACLMessage.PROPOSE);
-			//getContentManager().fillContent(reply, null);
+			try {
+				getContentManager().fillContent(reply, new ServiceProposal("attend-request", 100));
+			} catch (CodecException | OntologyException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
 			return reply;
 		}
