@@ -13,6 +13,7 @@ import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import lift_management.onto.ServiceOntology;
+import lift_management.onto.ServiceProposal;
 import lift_management.onto.ServiceProposalRequest;
 import sajas.core.AID;
 import sajas.core.Agent;
@@ -125,15 +126,47 @@ public class Building extends Agent {
 
 		@Override
 		protected void handleAllResponses(Vector responses, Vector acceptances) {
-
+			double servicePrice;
+			double bestServicePrice = Double.MAX_VALUE;
 			ACLMessage response;
+			ACLMessage bestServiceProposalMessage = null;
 			for(Object obj : responses) {
 				response = (ACLMessage) obj;
 				if (response.getPerformative() == ACLMessage.PROPOSE) {
-					// TODO
+					
+					try {
+						servicePrice = ((ServiceProposal) getContentManager().extractContent(response)).getPrice();
+						if(servicePrice < bestServicePrice) {
+							// new best proposal
+							if(bestServiceProposalMessage != null) {
+								// reject previous best
+								ACLMessage reject = bestServiceProposalMessage.createReply();
+								reject.setPerformative(ACLMessage.REJECT_PROPOSAL);
+								acceptances.add(reject);
+							}
+							// update best
+							bestServicePrice = servicePrice;
+							bestServiceProposalMessage = response;
+						} else {
+							// reject proposal
+							ACLMessage reject = response.createReply();
+							reject.setPerformative(ACLMessage.REJECT_PROPOSAL);
+							acceptances.add(reject);
+						}
+					} catch (CodecException | OntologyException e) {
+						e.printStackTrace();
+					}
 				}
 			}
-			// TODO
+
+			if(bestServiceProposalMessage != null) {
+				// accept winner
+				ACLMessage accept = bestServiceProposalMessage.createReply();
+				accept.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
+				acceptances.add(accept);
+			} else {
+				System.err.println(myAgent.getLocalName() + ": no proposal received");
+			}
 		}
 
 		@Override

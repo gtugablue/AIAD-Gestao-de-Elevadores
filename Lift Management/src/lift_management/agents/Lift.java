@@ -123,20 +123,17 @@ public class Lift extends Agent {
 
 		@Override
 		protected ACLMessage handleAcceptProposal(ACLMessage cfp, ACLMessage propose, ACLMessage accept) {
+			System.out.println(myAgent.getLocalName() + ": proposal accepted");
 			ACLMessage result = accept.createReply();
-
-			// random service execution
-			if(expectedSuccessfulExecution) {
-				result.setPerformative(ACLMessage.INFORM);
-			} else {
-				result.setPerformative(ACLMessage.FAILURE);
-			}
-
+	
+			// result.setPerformative(ACLMessage.INFORM); // TODO
+			
 			return result;
 		}
 
 		@Override
 		protected void handleRejectProposal(ACLMessage cfp, ACLMessage propose, ACLMessage accept) {
+			System.out.println(myAgent.getLocalName() + ": proposal rejected");
 		}
 
 	}
