@@ -1,18 +1,18 @@
 package lift_management.onto;
 
 import jade.content.Predicate;
+import lift_management.Call;
 
 public class ServiceProposalRequest implements Predicate {
 	
 	private static final long serialVersionUID = 1L;
 	
 	private String serviceName;
+	private Call call;
 
-	public ServiceProposalRequest() {
-	}
-	
-	public ServiceProposalRequest(String serviceName) {
+	public ServiceProposalRequest(String serviceName, Call call) {
 		this.serviceName = serviceName;
+		this.call = call;
 	}
 
 	public String getServiceName() {
@@ -23,4 +23,11 @@ public class ServiceProposalRequest implements Predicate {
 		this.serviceName = serviceName;
 	}
 
+	public Call getCall() {
+		return call;
+	}
+
+	public void setCall(Call call) {
+		this.call = call;
+	}
 }

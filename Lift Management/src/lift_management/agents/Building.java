@@ -12,6 +12,7 @@ import jade.domain.FIPANames;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
+import lift_management.Call;
 import lift_management.CallSystem;
 import lift_management.DirectionCallSystem;
 import lift_management.HumanGenerator;
@@ -70,12 +71,8 @@ public class Building extends Agent {
 		myCfp.setLanguage(codec.getName());
 		myCfp.setOntology(serviceOntology.getName());
 		myCfp.setProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET);
-		try {
-			getContentManager().fillContent(myCfp, new ServiceProposalRequest("attend-request"));
-			addBehaviour(new CNetInit(this, myCfp));
-		} catch (CodecException | OntologyException e) {
-			e.printStackTrace();
-		}
+		
+		//addBehaviour(new CNetInit(this, myCfp));
 		addBehaviour(new HumanGenerator(this));
 	}
 
@@ -96,8 +93,9 @@ public class Building extends Agent {
 	private class CNetInit extends ContractNetInitiator {
 
 		private static final long serialVersionUID = 1L;
+		private Call call;
 
-		public CNetInit(Agent owner, ACLMessage cfp) {
+		public CNetInit(Agent owner, ACLMessage cfp, Call call) {
 			super(owner, cfp);
 		}
 
@@ -108,17 +106,23 @@ public class Building extends Agent {
 			ServiceDescription sd = new ServiceDescription();
 			sd.setType("lift");
 			template.addServices(sd);
-			DFAgentDescription[] dfads = null;
 			try {
-				dfads = DFService.search(myAgent, template);
-			} catch (FIPAException e) {
-				e.printStackTrace();
-			}
-			if(dfads != null && dfads.length > 0) {
-				for (int i = 0; i < dfads.length; i++) {
-					AID aid = (AID) dfads[i].getName();
-					cfp.addReceiver(aid);
+				getContentManager().fillContent(cfp, new ServiceProposalRequest("attend-request", call));
+
+				DFAgentDescription[] dfads = null;
+				try {
+					dfads = DFService.search(myAgent, template);
+				} catch (FIPAException e) {
+					e.printStackTrace();
 				}
+				if(dfads != null && dfads.length > 0) {
+					for (int i = 0; i < dfads.length; i++) {
+						AID aid = (AID) dfads[i].getName();
+						cfp.addReceiver(aid);
+					}
+				}
+			} catch (CodecException | OntologyException e) {
+				e.printStackTrace();
 			}
 			return super.prepareCfps(cfp);
 		}
@@ -141,7 +145,7 @@ public class Building extends Agent {
 			for(Object obj : responses) {
 				response = (ACLMessage) obj;
 				if (response.getPerformative() == ACLMessage.PROPOSE) {
-					
+
 					try {
 						servicePrice = ((ServiceProposal) getContentManager().extractContent(response)).getPrice();
 						if(servicePrice < bestServicePrice) {

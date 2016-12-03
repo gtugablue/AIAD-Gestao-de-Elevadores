@@ -4,6 +4,10 @@ import sajas.domain.DFService;
 import sajas.proto.ContractNetResponder;
 import sajas.proto.SSContractNetResponder;
 import sajas.proto.SSResponderDispatcher;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import jade.content.lang.Codec;
 import jade.content.lang.Codec.CodecException;
 import jade.content.lang.sl.SLCodec;
@@ -15,6 +19,7 @@ import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import javafx.util.Pair;
 import lift_management.onto.ServiceOntology;
 import lift_management.onto.ServiceProposal;
 import lift_management.onto.ServiceProposalRequest;
@@ -33,7 +38,7 @@ public class Lift extends Agent {
 	private Ontology serviceOntology;
 	private ContinuousSpace<Object> space;
 	private float maxWeight;
-	private int targetFloor;
+	private List<Pair<Integer, Boolean>> tasks;
 	public enum DoorState {
 		OPEN,
 		CLOSED
@@ -43,13 +48,11 @@ public class Lift extends Agent {
 	public Lift(ContinuousSpace<Object> space, float maxWeight) {
 		this.space = space;
 		this.maxWeight = maxWeight;
+		this.tasks = new ArrayList<Pair<Integer, Boolean>>();
 	}
 
 	@Override
 	protected void setup() {
-		NdPoint point = space.getLocation(this);
-		this.targetFloor = (point == null ? 0 : ((int) Math.round(point.getY())));
-		
 		// register language and ontology
 		codec = new SLCodec();
 		serviceOntology = ServiceOntology.getInstance();
@@ -71,6 +74,7 @@ public class Lift extends Agent {
 
 		// behaviours
 		addBehaviour(new CNetResponderDispatcher(this));
+		addBehaviour(new TickHandler(this, 17));
 	}
 
 	@Override
@@ -130,6 +134,8 @@ public class Lift extends Agent {
 		protected ACLMessage handleAcceptProposal(ACLMessage cfp, ACLMessage propose, ACLMessage accept) {
 			System.out.println(myAgent.getLocalName() + ": proposal accepted");
 			ACLMessage result = accept.createReply();
+			
+			
 	
 			// result.setPerformative(ACLMessage.INFORM); // TODO
 			
@@ -151,8 +157,8 @@ public class Lift extends Agent {
 
 		@Override
 		protected void onTick() {
-			// TODO Auto-generated method stub
 			
+			space.moveByDisplacement(myAgent, 0, 0.01f);
 		}
 		
 	}
@@ -167,5 +173,14 @@ public class Lift extends Agent {
 
 	public float getMaxWeight() {
 		return this.maxWeight;
+	}
+	
+	public void assignTask(int originFloor, boolean up) {
+		this.tasks.add(new Pair<Integer, Boolean>(originFloor, up));
+		// TODO place in the correct position
+	}
+	
+	public void assignTask(int originFloor, int destinyFloor) {
+		// TODO
 	}
 }
