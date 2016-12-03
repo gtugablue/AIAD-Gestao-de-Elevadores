@@ -109,7 +109,8 @@ public class HumanGenerator extends TickerBehaviour {
 		List<Human> humans = generateRandomHumans(building.getNumFloors(), generateGroupSize());
 		for (int i = 0; i < humans.size(); i++) {
 			Human human = humans.get(i);
-			building.getCallSystem().callFloor(human.getOriginFloor(), human.getDestinyFloor());
+			//TODO the type of call depends the algorithm
+			building.addCall(new DirectionalCall(human.getOriginFloor(), human.getOriginFloor() < human.getDestinyFloor()));
 		}
 		reset(generateRandomTime(building.getNumFloors()));
 	}

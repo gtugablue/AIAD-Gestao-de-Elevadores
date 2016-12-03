@@ -7,9 +7,11 @@ public class FloorIndicatorCallSystem extends CallSystem {
 	}
 
 	@Override
-	public void callFloor(int originFloor, int destinyFloor) {
-		// TODO Auto-generated method stub
-		
+	public void callFloor(Call call) throws Exception {
+		if (!(call != null && call instanceof FloorIndicatorCall)) {
+			throw new Exception("Expected DirectionalCall object instaed got " + call.getClass());
+		}
+		//TODO add call to the system
 	}
 
 }

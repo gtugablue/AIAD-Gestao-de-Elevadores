@@ -75,6 +75,21 @@ public class Building extends Agent {
 		//addBehaviour(new CNetInit(this, myCfp));
 		addBehaviour(new HumanGenerator(this));
 	}
+	
+	public void addCall(Call call) {
+		try {
+			getCallSystem().callFloor(call);
+			
+			ACLMessage cfp = new ACLMessage(ACLMessage.CFP);
+			cfp.setLanguage(codec.getName());
+			cfp.setOntology(serviceOntology.getName());
+			cfp.setProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET);
+
+			addBehaviour(new CNetInit(this, cfp, call));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 	private class DFSubscInit extends SubscriptionInitiator {
 

@@ -1,5 +1,8 @@
 package lift_management;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public abstract class CallSystem {
 	private int numFloors;
 	
@@ -12,5 +15,6 @@ public abstract class CallSystem {
 		return numFloors;
 	}
 	
-	public abstract void callFloor(int originFloor, int destinyFloor);
+	public abstract void callFloor(Call call) throws Exception;
+
 }
