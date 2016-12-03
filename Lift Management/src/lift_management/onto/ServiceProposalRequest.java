@@ -9,6 +9,10 @@ public class ServiceProposalRequest implements Predicate {
 	
 	private String serviceName;
 	private Call call;
+	
+	public ServiceProposalRequest() {
+		
+	}
 
 	public ServiceProposalRequest(String serviceName, Call call) {
 		this.serviceName = serviceName;

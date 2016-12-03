@@ -2,6 +2,11 @@ package lift_management;
 
 public class DirectionalCall extends Call {
 	protected boolean up;
+	
+	public DirectionalCall() {
+		
+	}
+	
 	public DirectionalCall(int origin, boolean up) {
 		super(origin);
 		this.up = up;

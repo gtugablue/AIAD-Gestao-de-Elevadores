@@ -19,7 +19,9 @@ import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import jade.lang.acl.UnreadableException;
 import javafx.util.Pair;
+import lift_management.DirectionalCall;
 import lift_management.onto.ServiceOntology;
 import lift_management.onto.ServiceProposal;
 import lift_management.onto.ServiceProposalRequest;
@@ -134,11 +136,17 @@ public class Lift extends Agent {
 		protected ACLMessage handleAcceptProposal(ACLMessage cfp, ACLMessage propose, ACLMessage accept) {
 			System.out.println(myAgent.getLocalName() + ": proposal accepted");
 			ACLMessage result = accept.createReply();
-			
-			
-	
-			// result.setPerformative(ACLMessage.INFORM); // TODO
-			
+
+			DirectionalCall call;
+			try {
+				call = (DirectionalCall) ((ServiceProposalRequest) getContentManager().extractContent(cfp)).getCall();
+				tasks.add(new Pair<Integer, Boolean>(call.getOrigin(), call.isAscending()));
+				// result.setPerformative(ACLMessage.INFORM); // TODO
+			} catch (CodecException | OntologyException e) {
+				e.printStackTrace();
+				result.setPerformative(ACLMessage.FAILURE);
+			}
+
 			return result;
 		}
 
@@ -148,7 +156,7 @@ public class Lift extends Agent {
 		}
 
 	}
-	
+
 	public class TickHandler extends TickerBehaviour {
 
 		public TickHandler(Lift lift, long period) {
@@ -157,10 +165,21 @@ public class Lift extends Agent {
 
 		@Override
 		protected void onTick() {
-			
-			space.moveByDisplacement(myAgent, 0, 0.01f);
+			if (tasks.isEmpty())
+				return;
+
+			Pair<Integer, Boolean> task = tasks.get(0);
+			int destinyFloor = task.getKey();
+			boolean up = task.getValue();
+			double location = space.getLocation(myAgent).getY();
+			System.out.println(destinyFloor + " " + location);
+			if (destinyFloor > location && location < 14.989d)
+				space.moveByDisplacement(myAgent, 0, 0.01f);
+			else if (destinyFloor < location && location > 0.011d)
+				space.moveByDisplacement(myAgent, 0, -0.01f);
+
 		}
-		
+
 	}
 
 	public DoorState getDoorState() {
@@ -174,12 +193,12 @@ public class Lift extends Agent {
 	public float getMaxWeight() {
 		return this.maxWeight;
 	}
-	
+
 	public void assignTask(int originFloor, boolean up) {
 		this.tasks.add(new Pair<Integer, Boolean>(originFloor, up));
 		// TODO place in the correct position
 	}
-	
+
 	public void assignTask(int originFloor, int destinyFloor) {
 		// TODO
 	}
