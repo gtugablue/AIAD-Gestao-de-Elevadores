@@ -12,6 +12,8 @@ import jade.domain.FIPANames;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
+import lift_management.CallSystem;
+import lift_management.DirectionCallSystem;
 import lift_management.onto.ServiceOntology;
 import lift_management.onto.ServiceProposal;
 import lift_management.onto.ServiceProposalRequest;
@@ -23,16 +25,16 @@ import sajas.proto.SubscriptionInitiator;
 
 public class Building extends Agent {
 	public static float floorHeight = 1f;
-	protected int numLifts;
-	protected int numFloors;
-	protected ACLMessage myCfp;
-
+	private int numLifts;
+	private int numFloors;
+	private CallSystem callSystem;
+	private ACLMessage myCfp;
 	private Codec codec;
 	private Ontology serviceOntology;
-
 	public Building(int numLifts, int numFloors) {
 		this.numLifts = numLifts;
 		this.numFloors = numFloors;
+		this.callSystem = new DirectionCallSystem(this.numFloors);
 	}
 
 	public int getNumLifts() {
@@ -41,6 +43,10 @@ public class Building extends Agent {
 
 	public int getNumFloors() {
 		return numFloors;
+	}
+
+	public CallSystem getCallSystem() {
+		return callSystem;
 	}
 
 	@Override
