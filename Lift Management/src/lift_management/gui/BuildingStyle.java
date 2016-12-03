@@ -17,9 +17,10 @@ import saf.v3d.scene.VNode;
 import saf.v3d.scene.VSpatial;
 
 public class BuildingStyle extends DefaultStyleOGL2D {
-	public static final float scale = 15;
-	public static final int liftDoorImageWidth = 200;
-	public static final int liftDoorImageHeight = 342;
+	private static final float LIFT_HEIGHT = 0.8f;
+	private static final float SCALE = 15; // Value found by trial and error
+	private static final int LIFT_DOOR_IMAGE_WIDTH = 200;
+	private static final int LIFT_DOOR_IMAGE_HEIGHT = 342;
 	private enum LiftButton { UP, DOWN };
 
 	@Override
@@ -46,8 +47,8 @@ public class BuildingStyle extends DefaultStyleOGL2D {
 							else
 								liftDownButtonImage = shapeFactory.createImage("icons/up_deactivated.png");
 							
-							liftImage.translate(scale * (i + 1f), scale * (j * Building.floorHeight + 0.8f * Building.floorHeight / 2), 0);
-							liftImage.scale(scale * 0.8f * Building.floorHeight / liftDoorImageHeight);
+							liftImage.translate(SCALE * (i + 1f), SCALE * (j * Building.floorHeight + LIFT_HEIGHT * Building.floorHeight / 2), 0);
+							liftImage.scale(SCALE * 0.8f * Building.floorHeight / LIFT_DOOR_IMAGE_HEIGHT);
 							composite.addChild(translateButtonLiftImage(i, j, liftUpButtonImage, LiftButton.UP));
 							composite.addChild(translateButtonLiftImage(i, j, liftDownButtonImage, LiftButton.DOWN));
 							composite.addChild(liftImage);
@@ -66,14 +67,14 @@ public class BuildingStyle extends DefaultStyleOGL2D {
 	}
 
 	private VSpatial translateButtonLiftImage(int i, int j, VImage2D liftButtonImage, LiftButton direction) {
-		float buttonScale = scale * 0.3f * Building.floorHeight / liftDoorImageHeight;
+		float buttonScale = SCALE * 0.3f * Building.floorHeight / LIFT_DOOR_IMAGE_HEIGHT;
 		switch (direction) {
 		case UP:
-			liftButtonImage.translate(scale * (i + 0.65f), scale * (j * Building.floorHeight + 0.5f * Building.floorHeight), 0);
+			liftButtonImage.translate(SCALE * (i + 0.65f), SCALE * (j * Building.floorHeight + 0.5f * Building.floorHeight), 0);
 			liftButtonImage.scale(buttonScale);
 			break;
 		case DOWN:
-			liftButtonImage.translate(scale * (i + 0.65f), scale * (j * Building.floorHeight + 0.3f * Building.floorHeight), 0);
+			liftButtonImage.translate(SCALE * (i + 0.65f), SCALE * (j * Building.floorHeight + 0.3f * Building.floorHeight), 0);
 			liftButtonImage.scale(-buttonScale);
 			break;
 		default:
