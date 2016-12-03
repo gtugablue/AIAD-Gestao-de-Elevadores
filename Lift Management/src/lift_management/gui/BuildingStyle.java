@@ -67,15 +67,14 @@ public class BuildingStyle extends DefaultStyleOGL2D {
 		switch (direction) {
 		case UP:
 			liftButtonImage.translate(SCALE * (i + 0.65f), SCALE * (j * Building.floorHeight + 0.5f * Building.floorHeight), 0);
-			liftButtonImage.scale(buttonScale);
 			break;
 		case DOWN:
 			liftButtonImage.translate(SCALE * (i + 0.65f), SCALE * (j * Building.floorHeight + 0.3f * Building.floorHeight), 0);
-			liftButtonImage.scale(buttonScale);
 			break;
 		default:
-			break;
+			return liftButtonImage;
 		}
+		liftButtonImage.scale(buttonScale);
 		return liftButtonImage;
 	}
 }
