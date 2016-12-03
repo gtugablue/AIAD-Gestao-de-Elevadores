@@ -32,6 +32,7 @@ public class Lift extends Agent {
 	private Ontology serviceOntology;
 	private ContinuousSpace<Object> space;
 	private float maxWeight;
+	private int targetFloor;
 	public enum DoorState {
 		OPEN,
 		CLOSED
@@ -45,6 +46,9 @@ public class Lift extends Agent {
 
 	@Override
 	protected void setup() {
+		NdPoint point = space.getLocation(this);
+		this.targetFloor = (point == null ? 0 : ((int) Math.round(point.getY())));
+		
 		// register language and ontology
 		codec = new SLCodec();
 		serviceOntology = ServiceOntology.getInstance();
