@@ -23,6 +23,7 @@ import repast.simphony.space.continuous.NdPoint;
 import sajas.core.AID;
 import sajas.core.Agent;
 import sajas.core.behaviours.Behaviour;
+import sajas.core.behaviours.TickerBehaviour;
 
 /**
  * Created by Gustavo on 06/10/2016.
@@ -140,6 +141,20 @@ public class Lift extends Agent {
 			System.out.println(myAgent.getLocalName() + ": proposal rejected");
 		}
 
+	}
+	
+	public class TickHandler extends TickerBehaviour {
+
+		public TickHandler(Lift lift, long period) {
+			super(lift, period);
+		}
+
+		@Override
+		protected void onTick() {
+			// TODO Auto-generated method stub
+			
+		}
+		
 	}
 
 	public DoorState getDoorState() {
