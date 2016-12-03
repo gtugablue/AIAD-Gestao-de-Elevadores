@@ -112,6 +112,7 @@ public class Building extends Agent {
 
 		public CNetInit(Agent owner, ACLMessage cfp, Call call) {
 			super(owner, cfp);
+			this.call = call;
 		}
 
 		@Override
