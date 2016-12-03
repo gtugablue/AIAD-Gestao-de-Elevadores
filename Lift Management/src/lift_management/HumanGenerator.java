@@ -1,4 +1,6 @@
-package lift_management.agents;
+package lift_management;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
@@ -8,12 +10,22 @@ import org.apache.commons.math3.linear.LUDecomposition;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
 
-import lift_management.Human;
-import sajas.core.Agent;
+import lift_management.agents.Building;
+import sajas.core.behaviours.TickerBehaviour;
  
 
-public class HumanGenerator extends Agent {
+public class HumanGenerator extends TickerBehaviour {
+	private static final long serialVersionUID = 6602617123027622789L;
+	private Building building;
+	public HumanGenerator(Building building) {
+		this(building, 1);
+	}
 	
+	public HumanGenerator(Building building, long period) {
+		super(building, period);
+		this.building = building;
+	}
+
 	/**
 	 * ALL UNITS IN lbs
 	 */
@@ -42,9 +54,9 @@ public class HumanGenerator extends Agent {
 		return getKgToLbs(weight);
 	}
 	
-	protected static int generateFloor(int maxBuildingFloor){
+	protected static int generateFloor(int numFloors){
 		double rate = 1.25;
-		double n = maxBuildingFloor + 1;
+		double n = numFloors;
 		
 		RealMatrix coefficients =
 			    new Array2DRowRealMatrix(new double[][] { { (rate)/(n-1) + 1, 0}, { 1/(n-1), 1} },
@@ -79,10 +91,37 @@ public class HumanGenerator extends Agent {
 		return new Human(weight,originFloor, destinyFloor);
 	}
 	
+	public static List<Human> generateRandomHumans(int maxBuildingFloor, int numHumans) {
+		int originFloor = generateFloor(maxBuildingFloor);
+		int destinyFloor = 0;
+		ArrayList<Human> humans = new ArrayList<Human>();
+		for (int i = 0; i < numHumans; i++) {
+			double weight = generateWeigth();
+			Human human = new Human(weight, originFloor, destinyFloor);
+			humans.add(human);
+		}
+		return humans;
+	}
+	
 	public static void main(String[] args){
 		System.out.println("Floor: "+generateFloor(5));
-		
-		
-		
+	}
+
+	@Override
+	protected void onTick() {
+		List<Human> humans = generateRandomHumans(building.getNumFloors(), generateGroupSize());
+		for (int i = 0; i < humans.size(); i++) {
+			Human human = humans.get(i);
+			building.getCallSystem().callFloor(human.getOriginFloor(), human.getDestinyFloor());
+		}
+		reset(generateRandomTime(building.getNumFloors()));
+	}
+	
+	private static int generateGroupSize() {
+		  return (int) Math.ceil(Math.pow(2 * Math.random(), 2));
+	}
+	
+	private static long generateRandomTime(int numFloors) {
+		return (long) Math.ceil(10000 * Math.random() / numFloors);
 	}
 }

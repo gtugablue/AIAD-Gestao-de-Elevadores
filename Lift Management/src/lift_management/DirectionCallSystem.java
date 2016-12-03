@@ -16,4 +16,13 @@ public class DirectionCallSystem extends CallSystem {
 	public boolean toDescend(int numFloor) {
 		return downs[numFloor];
 	}
+
+	@Override
+	public void callFloor(int originFloor, int destinyFloor) {
+		System.out.println(originFloor + " -> " + destinyFloor);
+		if (destinyFloor > originFloor)
+			ups[originFloor] = true;
+		else if (destinyFloor < originFloor)
+			downs[originFloor] = true;
+	}
 }

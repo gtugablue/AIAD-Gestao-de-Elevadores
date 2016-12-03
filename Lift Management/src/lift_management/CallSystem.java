@@ -1,6 +1,6 @@
 package lift_management;
 
-public class CallSystem {
+public abstract class CallSystem {
 	private int numFloors;
 	
 	public CallSystem(int numFloors)
@@ -11,4 +11,6 @@ public class CallSystem {
 	public int getNumFloors() {
 		return numFloors;
 	}
+	
+	public abstract void callFloor(int originFloor, int destinyFloor);
 }

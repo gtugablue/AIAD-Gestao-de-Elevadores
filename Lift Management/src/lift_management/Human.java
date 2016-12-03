@@ -20,13 +20,21 @@ public class Human {
 	public void setWeight(float weight) {
 		this.weight = weight;
 	}
-	public int getDestinydFloor() {
+	public int getDestinyFloor() {
 		return destinyFloor;
 	}
 	public void setDestinyFloor(int desiredFloor) {
 		this.destinyFloor = desiredFloor;
 	}
 	
+	public int getOriginFloor() {
+		return originFloor;
+	}
+
+	public void setOriginFloor(int originFloor) {
+		this.originFloor = originFloor;
+	}
+
 	public int getId(){
 		return id;
 	}

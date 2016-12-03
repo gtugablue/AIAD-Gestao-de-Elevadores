@@ -6,4 +6,10 @@ public class FloorIndicatorCallSystem extends CallSystem {
 		super(numFloors);
 	}
 
+	@Override
+	public void callFloor(int originFloor, int destinyFloor) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

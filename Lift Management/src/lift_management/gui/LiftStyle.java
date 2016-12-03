@@ -5,7 +5,6 @@ import java.io.IOException;
 
 import lift_management.agents.Building;
 import lift_management.agents.Lift;
-import lift_management.agents.Lift.DoorState;
 import repast.simphony.space.continuous.NdPoint;
 import repast.simphony.visualizationOGL2D.DefaultStyleOGL2D;
 import saf.v3d.scene.TextureLayer;

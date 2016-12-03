@@ -6,14 +6,10 @@ import lift_management.CallSystem;
 import lift_management.DirectionCallSystem;
 import lift_management.FloorIndicatorCallSystem;
 import lift_management.agents.Building;
-import lift_management.agents.Lift;
-import lift_management.agents.Lift.DoorState;
 import repast.simphony.visualizationOGL2D.DefaultStyleOGL2D;
 import saf.v3d.scene.TextureLayer;
 import saf.v3d.scene.VComposite;
 import saf.v3d.scene.VImage2D;
-import saf.v3d.scene.VLayer;
-import saf.v3d.scene.VNode;
 import saf.v3d.scene.VSpatial;
 
 public class BuildingStyle extends DefaultStyleOGL2D {
@@ -43,9 +39,9 @@ public class BuildingStyle extends DefaultStyleOGL2D {
 								liftUpButtonImage = shapeFactory.createImage("icons/up_deactivated.png");
 							
 							if (directionCallSystem.toDescend(j))
-								liftDownButtonImage = shapeFactory.createImage("icons/up_activated.png");
+								liftDownButtonImage = shapeFactory.createImage("icons/down_activated.png");
 							else
-								liftDownButtonImage = shapeFactory.createImage("icons/up_deactivated.png");
+								liftDownButtonImage = shapeFactory.createImage("icons/down_deactivated.png");
 							
 							liftImage.translate(SCALE * (i + 1f), SCALE * (j * Building.floorHeight + LIFT_HEIGHT * Building.floorHeight / 2), 0);
 							liftImage.scale(SCALE * 0.8f * Building.floorHeight / LIFT_DOOR_IMAGE_HEIGHT);
@@ -75,7 +71,7 @@ public class BuildingStyle extends DefaultStyleOGL2D {
 			break;
 		case DOWN:
 			liftButtonImage.translate(SCALE * (i + 0.65f), SCALE * (j * Building.floorHeight + 0.3f * Building.floorHeight), 0);
-			liftButtonImage.scale(-buttonScale);
+			liftButtonImage.scale(buttonScale);
 			break;
 		default:
 			break;

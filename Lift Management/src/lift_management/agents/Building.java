@@ -14,6 +14,7 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import lift_management.CallSystem;
 import lift_management.DirectionCallSystem;
+import lift_management.HumanGenerator;
 import lift_management.onto.ServiceOntology;
 import lift_management.onto.ServiceProposal;
 import lift_management.onto.ServiceProposalRequest;
@@ -75,6 +76,7 @@ public class Building extends Agent {
 		} catch (CodecException | OntologyException e) {
 			e.printStackTrace();
 		}
+		addBehaviour(new HumanGenerator(this));
 	}
 
 	private class DFSubscInit extends SubscriptionInitiator {
