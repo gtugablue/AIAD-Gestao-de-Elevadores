@@ -85,15 +85,12 @@ public class HumanGenerator extends TickerBehaviour {
 	}
 	
 	public static Human generateRandomHuman(int maxBuildingFloor){
-		double weight = generateWeigth();
-		int originFloor = generateFloor(maxBuildingFloor);
-		int destinyFloor = 0;
-		return new Human(weight,originFloor, destinyFloor);
+		return generateRandomHumans(maxBuildingFloor, 1).get(0);
 	}
 	
 	public static List<Human> generateRandomHumans(int maxBuildingFloor, int numHumans) {
 		int originFloor = generateFloor(maxBuildingFloor);
-		int destinyFloor = 0;
+		int destinyFloor = generateFloor(maxBuildingFloor);
 		ArrayList<Human> humans = new ArrayList<Human>();
 		for (int i = 0; i < numHumans; i++) {
 			double weight = generateWeigth();
