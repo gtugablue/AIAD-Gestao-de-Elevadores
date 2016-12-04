@@ -54,7 +54,7 @@ public class HumanGenerator extends TickerBehaviour {
 		return getKgToLbs(weight);
 	}
 	
-	protected static int generateFloor(int numFloors){
+	protected static int generateOriginFloor(int numFloors){
 		double rate = 1.25;
 		double n = numFloors;
 		
@@ -65,21 +65,14 @@ public class HumanGenerator extends TickerBehaviour {
 		RealVector constants = new ArrayRealVector(new double[] { rate/(n-1), 1/(n-1)}, false);
 		RealVector solution = solver.solve(constants);
 		
-		double zeroFloorRate = solution.getEntry(0);
+		double groundFloorRate = solution.getEntry(0);
 		double nFloorRate = solution.getEntry(1);
-		double x = random.nextDouble();
+		double x = random.nextDouble();		
 		
-		/*
-		System.out.println("a: "+solution.getEntry(0));
-		System.out.println("b: "+solution.getEntry(1));
-		System.out.println("x: "+x);
-		*/
-		
-		
-		if(x <= zeroFloorRate){
+		if(x <= groundFloorRate){
 			return 0;
 		}else{
-			return (int) Math.ceil((x-zeroFloorRate)/nFloorRate);
+			return (int) Math.ceil((x-groundFloorRate)/nFloorRate);
 		}
 		
 	}
@@ -88,20 +81,46 @@ public class HumanGenerator extends TickerBehaviour {
 		return generateRandomHumans(maxBuildingFloor, 1).get(0);
 	}
 	
+	protected static int generateDestinyFloor(int originFloor, int maxBuildingFloors){
+		double nFloorRate, groundFloorRate;
+		
+		if(originFloor == 0){
+			groundFloorRate = 1/(maxBuildingFloors-1);
+			nFloorRate = groundFloorRate;
+		}else{
+			groundFloorRate = 0.9d;
+			nFloorRate = (1-groundFloorRate)/(maxBuildingFloors-2);
+		}
+		
+		double x = random.nextDouble();		
+		int destinyFloor;
+		if(x <= groundFloorRate){
+			destinyFloor = 0;
+		}else{
+			destinyFloor = (int) Math.ceil((x-groundFloorRate)/nFloorRate);
+		}
+		
+		if(destinyFloor >= originFloor){
+			destinyFloor++;
+		}
+		
+		return destinyFloor;
+	}
 	public static List<Human> generateRandomHumans(int maxBuildingFloor, int numHumans) {
-		int originFloor = generateFloor(maxBuildingFloor);
-		int destinyFloor = generateFloor(maxBuildingFloor);
+		int originFloor = generateOriginFloor(maxBuildingFloor);
+		int destinyFloor = generateDestinyFloor(originFloor, maxBuildingFloor);
 		ArrayList<Human> humans = new ArrayList<Human>();
+		Human human;
 		for (int i = 0; i < numHumans; i++) {
 			double weight = generateWeigth();
-			Human human = new Human(weight, originFloor, destinyFloor);
+			human = new Human(weight, originFloor, destinyFloor);
 			humans.add(human);
 		}
 		return humans;
 	}
 	
 	public static void main(String[] args){
-		System.out.println("Floor: "+generateFloor(5));
+		System.out.println("Floor: "+generateOriginFloor(5));
 	}
 	
 	public static int generateRandomFloor(int currentFloor, boolean up) {
