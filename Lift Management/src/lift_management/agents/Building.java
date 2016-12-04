@@ -78,7 +78,7 @@ public class Building extends Agent {
 	
 	public void addCall(Call call) {
 		try {
-			getCallSystem().callFloor(call);
+			getCallSystem().makeCall(call);
 			
 			ACLMessage cfp = new ACLMessage(ACLMessage.CFP);
 			cfp.setLanguage(codec.getName());
@@ -204,7 +204,14 @@ public class Building extends Agent {
 
 		@Override
 		protected void handleInform(ACLMessage inform) {
-			// TODO
+			System.out.println("INFORM");
+			try {
+				Call call = (Call)getContentManager().extractContent(inform);
+				((Building)getAgent()).getCallSystem().resetCall(call);
+				System.out.println("DONE");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 
 		@Override

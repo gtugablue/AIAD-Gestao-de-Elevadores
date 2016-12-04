@@ -15,6 +15,7 @@ public abstract class CallSystem {
 		return numFloors;
 	}
 	
-	public abstract void callFloor(Call call) throws Exception;
+	public abstract void makeCall(Call call) throws Exception;
 
+	public abstract void resetCall(Call call) throws Exception;
 }

@@ -12,9 +12,9 @@ public class DirectionCallSystem extends CallSystem {
 	}
 
 	@Override
-	public void callFloor(Call call) throws Exception {
+	public void makeCall(Call call) throws Exception {
 		if (!(call != null && call instanceof DirectionalCall)) {
-			throw new Exception("Expected DirectionalCall object instaed got " + call.getClass());
+			throw new Exception("Expected DirectionalCall object instead got " + call.getClass());
 		}
 		DirectionalCall directionCall = (DirectionalCall) call;
 		calls[directionCall.getOrigin()][directionCall.isAscending() ? 0 : 1] = true;
@@ -26,5 +26,14 @@ public class DirectionCallSystem extends CallSystem {
 
 	public boolean toDescend(int floor) {
 		return calls[floor][1];
+	}
+
+	@Override
+	public void resetCall(Call call) throws Exception {
+		if (!(call != null && call instanceof DirectionalCall)) {
+			throw new Exception("Expected DirectionalCall object instead got " + call.getClass());
+		}
+		DirectionalCall directionCall = (DirectionalCall) call;
+		calls[directionCall.getOrigin()][directionCall.isAscending() ? 0 : 1] = false;
 	}
 }
