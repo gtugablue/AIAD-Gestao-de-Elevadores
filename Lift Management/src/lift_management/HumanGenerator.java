@@ -103,6 +103,15 @@ public class HumanGenerator extends TickerBehaviour {
 	public static void main(String[] args){
 		System.out.println("Floor: "+generateFloor(5));
 	}
+	
+	public static int generateRandomFloor(int currentFloor, boolean up) {
+		if (up) {
+			int diff = LiftManagementLauncher.getNumfloors() - currentFloor;
+			return (int) ((Math.random()*1000) % diff) + currentFloor;
+		}
+		
+		return (int) ((Math.random()*1000) % currentFloor);
+	}
 
 	@Override
 	protected void onTick() {

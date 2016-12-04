@@ -27,8 +27,13 @@ public class LiftManagementLauncher extends RepastSLauncher {
     private ContainerController mainContainer;
     private Building building;
     private List<Lift> lifts;
+    private static final int numFloors = 15;
 
-    public static void main(String[] args) {
+    public static int getNumfloors() {
+		return numFloors;
+	}
+
+	public static void main(String[] args) {
         return;
     }
 
@@ -62,7 +67,7 @@ public class LiftManagementLauncher extends RepastSLauncher {
     	PointTranslator translator = new StrictBorders();
     	ContinuousSpaceFactory factory = ContinuousSpaceFactoryFinder.createContinuousSpaceFactory(null);
     	int numLifts = 4;
-    	int numFloors = 15;
+    	//int numFloors = 15;
     	ContinuousSpace<Object> space = factory.createContinuousSpace("space", context, adder, translator, numLifts + 1, Building.floorHeight * numFloors);
     	building = new Building(numLifts, numFloors);
     	context.add(building);

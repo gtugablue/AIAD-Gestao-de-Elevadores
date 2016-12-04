@@ -149,7 +149,7 @@ public class Building extends Agent {
 
 		@Override
 		protected void handlePropose(ACLMessage propose, Vector acceptances) {
-			System.out.println(propose);
+			//System.out.println(propose);
 		}
 
 		@Override

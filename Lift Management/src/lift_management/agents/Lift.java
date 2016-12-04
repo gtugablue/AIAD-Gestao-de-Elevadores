@@ -6,6 +6,7 @@ import sajas.proto.SSContractNetResponder;
 import sajas.proto.SSResponderDispatcher;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import jade.content.lang.Codec;
@@ -22,6 +23,8 @@ import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 import javafx.util.Pair;
 import lift_management.DirectionalCall;
+import lift_management.HumanGenerator;
+import lift_management.LiftManagementLauncher;
 import lift_management.onto.ServiceOntology;
 import lift_management.onto.ServiceProposal;
 import lift_management.onto.ServiceProposalRequest;
@@ -40,6 +43,8 @@ public class Lift extends Agent {
 	private Ontology serviceOntology;
 	private ContinuousSpace<Object> space;
 	private float maxWeight;
+	//TODO improve data structures for stops and tasks
+	private List<Integer> stops = new ArrayList<Integer>();
 	private List<Pair<Integer, Boolean>> tasks;
 	public enum DoorState {
 		OPEN,
@@ -119,7 +124,7 @@ public class Lift extends Agent {
 
 		@Override
 		protected ACLMessage handleCfp(ACLMessage cfp) {
-			System.out.println(cfp);
+			//System.out.println(cfp);
 			ACLMessage reply = cfp.createReply();
 			reply.setPerformative(ACLMessage.PROPOSE);
 			try {
@@ -134,14 +139,14 @@ public class Lift extends Agent {
 
 		@Override
 		protected ACLMessage handleAcceptProposal(ACLMessage cfp, ACLMessage propose, ACLMessage accept) {
-			System.out.println(myAgent.getLocalName() + ": proposal accepted");
+			//System.out.println(myAgent.getLocalName() + ": proposal accepted");
 			ACLMessage result = accept.createReply();
 
 			DirectionalCall call;
 			try {
+				//TODO generalize to different calls
 				call = (DirectionalCall) ((ServiceProposalRequest) getContentManager().extractContent(cfp)).getCall();
-				tasks.add(new Pair<Integer, Boolean>(call.getOrigin(), call.isAscending()));
-				// result.setPerformative(ACLMessage.INFORM); // TODO
+				addRequest(call);
 			} catch (CodecException | OntologyException e) {
 				e.printStackTrace();
 				result.setPerformative(ACLMessage.FAILURE);
@@ -149,10 +154,19 @@ public class Lift extends Agent {
 
 			return result;
 		}
+		
+		private void addRequest(DirectionalCall call) {
+			for (int i = 0; i < tasks.size(); i++) {
+				if (tasks.get(i).getKey() == call.getOrigin() && tasks.get(i).getValue() == call.isAscending())
+					return;
+			}
+			tasks.add(new Pair<Integer, Boolean>(call.getOrigin(), call.isAscending()));
+			// result.setPerformative(ACLMessage.INFORM); // TODO
+		}
 
 		@Override
 		protected void handleRejectProposal(ACLMessage cfp, ACLMessage propose, ACLMessage accept) {
-			System.out.println(myAgent.getLocalName() + ": proposal rejected");
+			//System.out.println(myAgent.getLocalName() + ": proposal rejected");
 		}
 
 	}
@@ -165,17 +179,45 @@ public class Lift extends Agent {
 
 		@Override
 		protected void onTick() {
-			if (tasks.isEmpty())
+			if (tasks.isEmpty() && stops.isEmpty())
+				return;
+			
+			double delta = 0.01;
+			double y = space.getLocation(myAgent).getY();
+			int destinyFloor = (int) Math.round(y);
+
+			if (!stops.isEmpty() && stops.get(0) > y - delta && stops.get(0) < y + delta) {
+				stops.remove(0);
+			}
+			
+			if (!tasks.isEmpty() && tasks.get(0).getKey() > y - delta && tasks.get(0).getKey() < y + delta) {
+				int randomFloor = HumanGenerator.generateRandomFloor(tasks.get(0).getKey(), tasks.get(0).getValue());
+				boolean found = false;
+				for (int i = 0; i < stops.size() && !found; i++) {
+					if (stops.get(i) == randomFloor)
+						found = true;
+				}
+				if (!found) {
+					stops.add(randomFloor);
+					//TODO ordering algorithm (it depends on the current position)
+					//Collections.sort(stops);
+				}
+				tasks.remove(0);
+			}
+			
+			if (!stops.isEmpty()) {
+				destinyFloor = stops.get(0);
+			} else if (!tasks.isEmpty()) {
+				destinyFloor = tasks.get(0).getKey();
+			}
+			
+			if (destinyFloor > y - delta && destinyFloor < y + delta)
 				return;
 
-			Pair<Integer, Boolean> task = tasks.get(0);
-			int destinyFloor = task.getKey();
-			boolean up = task.getValue();
 			double location = space.getLocation(myAgent).getY();
-			System.out.println(destinyFloor + " " + location);
-			if (destinyFloor > location && location < 14.989d)
+			if (destinyFloor - location > 0)
 				space.moveByDisplacement(myAgent, 0, 0.01f);
-			else if (destinyFloor < location && location > 0.011d)
+			else if (destinyFloor < location)
 				space.moveByDisplacement(myAgent, 0, -0.01f);
 
 		}
