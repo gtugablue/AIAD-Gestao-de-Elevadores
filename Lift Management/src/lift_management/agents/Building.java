@@ -15,6 +15,7 @@ import jade.lang.acl.ACLMessage;
 import lift_management.Call;
 import lift_management.CallSystem;
 import lift_management.DirectionCallSystem;
+import lift_management.DirectionalCall;
 import lift_management.HumanGenerator;
 import lift_management.onto.ServiceOntology;
 import lift_management.onto.ServiceProposal;
@@ -206,14 +207,13 @@ public class Building extends Agent {
 		protected void handleInform(ACLMessage inform) {
 			System.out.println("INFORM");
 			try {
-				Call call = (Call)getContentManager().extractContent(inform);
 				((Building)getAgent()).getCallSystem().resetCall(call);
 				System.out.println("DONE");
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
-
+		
 		@Override
 		protected void handleAllResultNotifications(Vector resultNotifications) {
 		}

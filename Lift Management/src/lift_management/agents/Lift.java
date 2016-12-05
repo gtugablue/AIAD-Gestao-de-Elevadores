@@ -46,7 +46,7 @@ public class Lift extends Agent {
 	//TODO improve data structures for stops and tasks
 	private List<Integer> stops = new ArrayList<Integer>();
 	private List<Pair<Integer, Boolean>> tasks;
-	private List<ACLMessage> cfps;
+	private List<ACLMessage> accepts;
 	public enum DoorState {
 		OPEN,
 		CLOSED
@@ -57,7 +57,7 @@ public class Lift extends Agent {
 		this.space = space;
 		this.maxWeight = maxWeight;
 		this.tasks = new ArrayList<Pair<Integer, Boolean>>();
-		this.cfps = new ArrayList<ACLMessage>();
+		this.accepts = new ArrayList<ACLMessage>();
 	}
 
 	@Override
@@ -149,7 +149,7 @@ public class Lift extends Agent {
 				//TODO generalize to different calls
 				call = (DirectionalCall) ((ServiceProposalRequest) getContentManager().extractContent(cfp)).getCall();
 				addRequest(call);
-				cfps.add(cfp);
+				accepts.add(accept);
 				return null;
 			} catch (CodecException | OntologyException e) {
 				e.printStackTrace();
@@ -192,12 +192,6 @@ public class Lift extends Agent {
 
 			if (!stops.isEmpty() && stops.get(0) > y - delta && stops.get(0) < y + delta) {
 				stops.remove(0);
-				ACLMessage reply = cfps.get(0).createReply();
-				reply.setPerformative(ACLMessage.INFORM);
-				getAgent().send(reply);
-				cfps.remove(0);
-				System.out.println("SENT DONE");
-				System.out.println(reply);
 			}
 			
 			if (!tasks.isEmpty() && tasks.get(0).getKey() > y - delta && tasks.get(0).getKey() < y + delta) {
@@ -213,6 +207,11 @@ public class Lift extends Agent {
 					//Collections.sort(stops);
 				}
 				tasks.remove(0);
+				ACLMessage inform = accepts.get(0).createReply();
+				accepts.remove(0);
+				inform.setPerformative(ACLMessage.INFORM);
+				getAgent().send(inform);
+				System.out.println("SENT INFORM");
 			}
 			
 			if (!stops.isEmpty()) {

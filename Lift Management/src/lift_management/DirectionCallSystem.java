@@ -35,5 +35,6 @@ public class DirectionCallSystem extends CallSystem {
 		}
 		DirectionalCall directionCall = (DirectionalCall) call;
 		calls[directionCall.getOrigin()][directionCall.isAscending() ? 0 : 1] = false;
+		System.out.println("Reseting: " + call);
 	}
 }

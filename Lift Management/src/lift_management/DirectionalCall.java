@@ -14,4 +14,9 @@ public class DirectionalCall extends Call {
 	public boolean isAscending() {
 		return up;
 	}
+	
+	@Override
+	public String toString() {
+		return origin + " " + (this.up ? "UP" : "DOWN");
+	}
 }
