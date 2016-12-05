@@ -3,12 +3,12 @@
   <type>2D</type>
   <styles>
     <entry>
-      <string>lift_management.agents.Lift</string>
-      <string>lift_management.gui.LiftStyle</string>
-    </entry>
-    <entry>
       <string>lift_management.agents.Building</string>
       <string>lift_management.gui.BuildingStyle</string>
+    </entry>
+    <entry>
+      <string>lift_management.agents.Lift</string>
+      <string>lift_management.gui.LiftStyle</string>
     </entry>
   </styles>
   <netStyles/>
@@ -28,12 +28,12 @@
   <layoutInterval>0</layoutInterval>
   <layerOrder>
     <entry>
-      <string>lift_management.agents.Lift</string>
-      <int>1</int>
-    </entry>
-    <entry>
       <string>lift_management.agents.Building</string>
       <int>0</int>
+    </entry>
+    <entry>
+      <string>lift_management.agents.Lift</string>
+      <int>1</int>
     </entry>
   </layerOrder>
   <projections>
