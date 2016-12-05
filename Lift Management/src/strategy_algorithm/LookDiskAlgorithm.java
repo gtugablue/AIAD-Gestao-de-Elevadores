@@ -18,7 +18,7 @@ public class LookDiskAlgorithm {
 	 * @return Retorna a quantidade de pisos percorridos até parar o requestedFloor e atender o pedido do Human
 	 * @throws Exception 
 	 */
-	public static int analyze(List<Pair<Integer, Task>> tasks, int requestedFloor, Task requestedTask, int maxBuildingFloor, int currentPosition) throws Exception{
+	public static int evaluate(List<Pair<Integer, Task>> tasks, int requestedFloor, Task requestedTask, int maxBuildingFloor, int currentPosition) throws Exception{
 		if(requestedTask.equals(Task.STOP)){
 			throw new Exception("requestedTask cannot be STOP. Only UP or DOWN");
 		}
