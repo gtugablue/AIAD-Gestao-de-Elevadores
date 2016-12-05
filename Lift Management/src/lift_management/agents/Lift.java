@@ -201,17 +201,6 @@ public class Lift extends Agent {
 			}
 			
 			if (!tasks.isEmpty() && tasks.get(0).getKey() > y - delta && tasks.get(0).getKey() < y + delta) {
-				int randomFloor = HumanGenerator.generateRandomFloor(tasks.get(0).getKey(), tasks.get(0).getValue());
-				boolean found = false;
-				for (int i = 0; i < stops.size() && !found; i++) {
-					if (stops.get(i) == randomFloor)
-						found = true;
-				}
-				if (!found) {
-					stops.add(randomFloor);
-					//TODO ordering algorithm (it depends on the current position)
-					//Collections.sort(stops);
-				}
 				tasks.remove(0);
 				ACLMessage inform = accepts.get(0).createReply();
 				accepts.remove(0);
