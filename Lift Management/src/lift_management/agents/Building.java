@@ -53,27 +53,37 @@ public class Building extends Agent {
 
 	@Override
 	public void setup() {
-		// register language and ontology
-		codec = new SLCodec();
-		serviceOntology = ServiceOntology.getInstance();
-		getContentManager().registerLanguage(codec);
-		getContentManager().registerOntology(serviceOntology);
+		register();
+		subscribeDf();
+		prepareCfpMessage();
+		
+		//addBehaviour(new CNetInit(this, myCfp));
+		addBehaviour(new HumanGenerator(this));
+	}
 
-		// subscribe DF
+	private void prepareCfpMessage() {
+		myCfp = new ACLMessage(ACLMessage.CFP);
+		myCfp.setLanguage(codec.getName());
+		myCfp.setOntology(serviceOntology.getName());
+		myCfp.setProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET);
+	}
+
+	private void subscribeDf() {
 		DFAgentDescription template = new DFAgentDescription();
 		ServiceDescription sd = new ServiceDescription();
 		sd.setType("building");
 		template.addServices(sd);
 		addBehaviour(new DFSubscInit(this, template));
+	}
 
-		// prepare cfp message
-		myCfp = new ACLMessage(ACLMessage.CFP);
-		myCfp.setLanguage(codec.getName());
-		myCfp.setOntology(serviceOntology.getName());
-		myCfp.setProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET);
-		
-		//addBehaviour(new CNetInit(this, myCfp));
-		addBehaviour(new HumanGenerator(this));
+	/**
+	 * Register Language and ontology
+	 */
+	private void register() {
+		codec = new SLCodec();
+		serviceOntology = ServiceOntology.getInstance();
+		getContentManager().registerLanguage(codec);
+		getContentManager().registerOntology(serviceOntology);
 	}
 	
 	public void addCall(Call call) {
