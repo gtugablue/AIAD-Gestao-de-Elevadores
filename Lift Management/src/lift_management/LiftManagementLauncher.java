@@ -66,7 +66,7 @@ public class LiftManagementLauncher extends RepastSLauncher {
     	ContinuousAdder<Object> adder = new SimpleCartesianAdder<Object>();
     	PointTranslator translator = new StrictBorders();
     	ContinuousSpaceFactory factory = ContinuousSpaceFactoryFinder.createContinuousSpaceFactory(null);
-    	int numLifts = 4;
+    	int numLifts = 1;
     	//int numFloors = 15;
     	ContinuousSpace<Object> space = factory.createContinuousSpace("space", context, adder, translator, numLifts + 1, Building.floorHeight * numFloors);
     	building = new Building(numLifts, numFloors);

@@ -56,7 +56,7 @@ public class HumanGenerator extends TickerBehaviour {
 	
 	protected static int generateOriginFloor(int numFloors){
 		double rate = 1.25;
-		double n = numFloors;
+		double n = numFloors + 1;
 		
 		RealMatrix coefficients =
 			    new Array2DRowRealMatrix(new double[][] { { (rate)/(n-1) + 1, 0}, { 1/(n-1), 1} },
@@ -83,13 +83,14 @@ public class HumanGenerator extends TickerBehaviour {
 	
 	protected static int generateDestinyFloor(int originFloor, int maxBuildingFloors){
 		double nFloorRate, groundFloorRate;
+		double n = maxBuildingFloors + 1;
 		
 		if(originFloor == 0){
-			groundFloorRate = 1/(maxBuildingFloors-1);
+			groundFloorRate = 1/(n-1);
 			nFloorRate = groundFloorRate;
 		}else{
 			groundFloorRate = 0.9d;
-			nFloorRate = (1-groundFloorRate)/(maxBuildingFloors-2);
+			nFloorRate = (1-groundFloorRate)/(n-2);
 		}
 		
 		double x = random.nextDouble();		
@@ -109,6 +110,7 @@ public class HumanGenerator extends TickerBehaviour {
 	public static List<Human> generateRandomHumans(int maxBuildingFloor, int numHumans) {
 		int originFloor = generateOriginFloor(maxBuildingFloor);
 		int destinyFloor = generateDestinyFloor(originFloor, maxBuildingFloor);
+		System.out.println(originFloor + " -> " + destinyFloor);
 		ArrayList<Human> humans = new ArrayList<Human>();
 		Human human;
 		for (int i = 0; i < numHumans; i++) {
@@ -134,7 +136,7 @@ public class HumanGenerator extends TickerBehaviour {
 
 	@Override
 	protected void onTick() {
-		List<Human> humans = generateRandomHumans(building.getNumFloors(), generateGroupSize());
+		List<Human> humans = generateRandomHumans(building.getNumFloors() - 1, generateGroupSize());
 		for (int i = 0; i < humans.size(); i++) {
 			Human human = humans.get(i);
 			//TODO the type of call depends the algorithm
@@ -148,6 +150,6 @@ public class HumanGenerator extends TickerBehaviour {
 	}
 	
 	private static long generateRandomTime(int numFloors) {
-		return (long) Math.ceil(10000 * Math.random() / numFloors);
+		return (long) Math.ceil(100000 * Math.random() / numFloors);
 	}
 }
