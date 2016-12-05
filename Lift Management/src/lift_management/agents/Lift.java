@@ -62,11 +62,7 @@ public class Lift extends Agent {
 
 	@Override
 	protected void setup() {
-		// register language and ontology
-		codec = new SLCodec();
-		serviceOntology = ServiceOntology.getInstance();
-		getContentManager().registerLanguage(codec);
-		getContentManager().registerOntology(serviceOntology);
+		register();
 
 		DFAgentDescription dfd = new DFAgentDescription();
 		dfd.setName(getAID());
@@ -84,6 +80,16 @@ public class Lift extends Agent {
 		// behaviours
 		addBehaviour(new CNetResponderDispatcher(this));
 		addBehaviour(new TickHandler(this, 17));
+	}
+
+	/**
+	 * Register language and ontology
+	 */
+	private void register() {
+		codec = new SLCodec();
+		serviceOntology = ServiceOntology.getInstance();
+		getContentManager().registerLanguage(codec);
+		getContentManager().registerOntology(serviceOntology);
 	}
 
 	@Override
