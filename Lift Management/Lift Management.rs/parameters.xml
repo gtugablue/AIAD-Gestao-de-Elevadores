@@ -9,4 +9,8 @@
 	<parameter name="numLifts" displayName="Number of lifts"
 		type="int" defaultValue="4" isReadOnly="false"
 		converter="repast.simphony.parameter.StringConverterFactory$IntConverter" />
+	<parameter name="maxWeights" displayName="Max weight per lift"
+		type="java.lang.String" defaultValue="500 450 400 350" isReadOnly="false"
+		converter="repast.simphony.parameter.StringConverterFactory$StringStringConverter" />
+		
 </parameters>
