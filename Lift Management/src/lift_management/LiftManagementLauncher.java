@@ -1,5 +1,7 @@
 package lift_management;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +35,7 @@ public class LiftManagementLauncher extends RepastSLauncher {
     private Building building;
     private List<Lift> lifts;
     private Config config;
-
+    
 	public static void main(String[] args) {
         return;
     }
@@ -85,7 +87,7 @@ public class LiftManagementLauncher extends RepastSLauncher {
     private List<Lift> createLifts(int numLifts, ContinuousSpace<Object> space, Context<Object> context) {
     	ArrayList<Lift> lifts = new ArrayList<Lift>();
     	for (int i = 0; i < numLifts; i++) {
-    		Lift lift = new Lift(space, 420f);
+    		Lift lift = new Lift(space, config.maxWeights[i]);
     		lifts.add(lift);
     		context.add(lift);
     		space.moveTo(lift, i + 1, 0);
