@@ -3,40 +3,30 @@ package lift_management.algorithms.strategy_algorithm;
 import java.util.List;
 
 import javafx.util.Pair;
+import lift_management.agents.Lift.Direction;
 
-public class LookDiskAlgorithm {
-	public enum Task {UP, DOWN, STOP}
-	
-	/**
-	 * Dada a lista de tarafas de um elevador, a sua posição actual, o número de pisos do edifício e um pedido , analisa qual é o custo de atender o pedido.
-	 * 
-	 * @param tasks
-	 * @param requestedFloor
-	 * @param requestedTask
-	 * @param maxBuildingFloor
-	 * @param currentPosition
-	 * @return Retorna a quantidade de pisos percorridos até parar o requestedFloor e atender o pedido do Human
-	 * @throws Exception 
-	 */
-	public static int evaluate(List<Pair<Integer, Task>> tasks, int requestedFloor, Task requestedTask, int maxBuildingFloor, int currentPosition) throws Exception{
-		if(requestedTask.equals(Task.STOP)){
+public class LookDiskAlgorithm implements LiftAlgorithm {
+
+	@Override
+	public int evaluate(List<Pair<Integer, Direction>> tasks, int requestedFloor, Direction requestedTask, int maxBuildingFloor, double currentPosition) throws Exception {
+		if(requestedTask.equals(Direction.STOP)){
 			throw new Exception("requestedTask cannot be STOP. Only UP or DOWN");
 		}
 		if(tasks.isEmpty()){
-			return Math.abs(currentPosition-requestedFloor);
+			return Math.abs((int)Math.round(currentPosition)-requestedFloor);
 		}
 		
-		int previousStop = currentPosition;
-		Task previousTask = Task.STOP;
+		int previousStop = (int)Math.round(currentPosition);
+		Direction previousTask = Direction.STOP;
 		int floorsTraveled=0;
 		boolean assigned = false;
 		
 		int nextStop;
-		Task nextTask;
-		Task direction;
+		Direction nextTask;
+		Direction direction;
 		
 		//Percorrer todo o caminho do elevador e tentar encaixar a paragem no caminho
-		for(Pair<Integer, Task> task : tasks){
+		for(Pair<Integer, Direction> task : tasks){
 			nextStop = task.getKey().intValue();
 			nextTask = task.getValue();
 			direction = getDirection(tasks,tasks.indexOf(task), previousStop);
@@ -74,8 +64,8 @@ public class LookDiskAlgorithm {
 		return floorsTraveled; 
 	}
 	
-	protected static int getEstimatedDestiny(int previousStop, Task previousTask, int maxBuildingFloor) {
-		if(previousTask.equals(Task.DOWN)){
+	protected static int getEstimatedDestiny(int previousStop, Direction previousTask, int maxBuildingFloor) {
+		if(previousTask.equals(Direction.DOWN)){
 			return 0;
 		}else{
 			return (int) Math.ceil((maxBuildingFloor+1 - previousStop)/2);
@@ -87,16 +77,16 @@ public class LookDiskAlgorithm {
 		return (previous < n && n <= next) || (previous > n && n >= next);
 	}
 	
-	protected static Task getDirection(List<Pair<Integer, Task>> tasks,int i, int previousStop){		
-		Task direction;
+	protected static Direction getDirection(List<Pair<Integer, Direction>> tasks,int i, int previousStop){		
+		Direction direction;
 		while(previousStop == tasks.get(i).getKey().intValue() && i < tasks.size()){
 			i++;
 		}
 		int nextStop = tasks.get(i).getKey().intValue();
 		if(previousStop > nextStop) {
-			direction = Task.UP;
+			direction = Direction.UP;
 		}else if(previousStop < nextStop){
-			direction = Task.DOWN;
+			direction = Direction.DOWN;
 		}else{
 			direction = tasks.get(i).getValue();
 		}
