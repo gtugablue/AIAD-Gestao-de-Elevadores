@@ -1,4 +1,4 @@
-package strategy_algorithm;
+package lift_management.algorithms.strategy_algorithm;
 
 import java.util.List;
 
