@@ -124,24 +124,15 @@ public class HumanGenerator extends TickerBehaviour {
 	public static void main(String[] args){
 		System.out.println("Floor: "+generateOriginFloor(5));
 	}
-	
-	public static int generateRandomFloor(int currentFloor, boolean up) {
-		if (up) {
-			int diff = LiftManagementLauncher.getNumfloors() - currentFloor;
-			return (int) ((Math.random()*1000) % diff) + currentFloor;
-		}
-		
-		return (int) ((Math.random()*1000) % currentFloor);
-	}
 
 	@Override
 	protected void onTick() {
 		List<Human> humans = generateRandomHumans(building.getNumFloors() - 1, generateGroupSize());
-		for (int i = 0; i < humans.size(); i++) {
-			Human human = humans.get(i);
-			//TODO the type of call depends the algorithm
-			building.addCall(new DirectionalCall(human.getOriginFloor(), human.getOriginFloor() < human.getDestinyFloor()));
-		}
+		Human human = humans.get(0);
+		
+		//TODO the type of call depends the algorithm
+		building.addCall(new DirectionalCall(human.getOriginFloor(), human.getOriginFloor() < human.getDestinyFloor()));
+		
 		reset(generateRandomTime(building.getNumFloors()));
 	}
 	
@@ -150,6 +141,6 @@ public class HumanGenerator extends TickerBehaviour {
 	}
 	
 	private static long generateRandomTime(int numFloors) {
-		return (long) Math.ceil(100000 * Math.random() / numFloors);
+		return (long) Math.ceil(10000 * Math.random() / numFloors);
 	}
 }

@@ -1,7 +1,11 @@
 package lift_management;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.JFrame;
 
 import jade.core.Profile;
 import jade.core.ProfileImpl;
@@ -11,11 +15,14 @@ import lift_management.agents.Lift;
 import repast.simphony.context.Context;
 import repast.simphony.context.space.continuous.ContinuousSpaceFactory;
 import repast.simphony.context.space.continuous.ContinuousSpaceFactoryFinder;
+import repast.simphony.engine.environment.RunEnvironment;
+import repast.simphony.parameter.IllegalParameterException;
 import repast.simphony.space.continuous.ContinuousAdder;
 import repast.simphony.space.continuous.ContinuousSpace;
 import repast.simphony.space.continuous.PointTranslator;
 import repast.simphony.space.continuous.SimpleCartesianAdder;
 import repast.simphony.space.continuous.StrictBorders;
+import repast.simphony.ui.RSApplication;
 import sajas.core.Runtime;
 import sajas.sim.repasts.RepastSLauncher;
 import sajas.wrapper.ContainerController;
@@ -27,12 +34,8 @@ public class LiftManagementLauncher extends RepastSLauncher {
     private ContainerController mainContainer;
     private Building building;
     private List<Lift> lifts;
-    private static final int numFloors = 15;
-
-    public static int getNumfloors() {
-		return numFloors;
-	}
-
+    private Config config;
+    
 	public static void main(String[] args) {
         return;
     }
@@ -63,23 +66,27 @@ public class LiftManagementLauncher extends RepastSLauncher {
     
     @Override
     public Context build(Context<Object> context) {
-    	ContinuousAdder<Object> adder = new SimpleCartesianAdder<Object>();
-    	PointTranslator translator = new StrictBorders();
-    	ContinuousSpaceFactory factory = ContinuousSpaceFactoryFinder.createContinuousSpaceFactory(null);
-    	int numLifts = 1;
-    	//int numFloors = 15;
-    	ContinuousSpace<Object> space = factory.createContinuousSpace("space", context, adder, translator, numLifts + 1, Building.floorHeight * numFloors);
-    	building = new Building(numLifts, numFloors);
-    	context.add(building);
-    	space.moveTo(building, 0, 0);
-    	lifts = createLifts(numLifts, space, context);
-    	return super.build(context);
+    	try {
+    		config = new Config(RunEnvironment.getInstance().getParameters());
+    		ContinuousAdder<Object> adder = new SimpleCartesianAdder<Object>();
+        	PointTranslator translator = new StrictBorders();
+        	ContinuousSpaceFactory factory = ContinuousSpaceFactoryFinder.createContinuousSpaceFactory(null);
+        	ContinuousSpace<Object> space = factory.createContinuousSpace("space", context, adder, translator, config.numLifts + 1, Building.floorHeight * config.numFloors);
+        	building = new Building(config.numLifts, config.numFloors);
+        	context.add(building);
+        	space.moveTo(building, 0, 0);
+        	lifts = createLifts(config.numLifts, space, context);
+        	return super.build(context);
+    	} catch (IllegalParameterException e) {
+    		e.printStackTrace();
+    		return null;
+    	}
     }
     
     private List<Lift> createLifts(int numLifts, ContinuousSpace<Object> space, Context<Object> context) {
     	ArrayList<Lift> lifts = new ArrayList<Lift>();
     	for (int i = 0; i < numLifts; i++) {
-    		Lift lift = new Lift(space, 420f);
+    		Lift lift = new Lift(space, config.maxWeights[i], config.numFloors);
     		lifts.add(lift);
     		context.add(lift);
     		space.moveTo(lift, i + 1, 0);

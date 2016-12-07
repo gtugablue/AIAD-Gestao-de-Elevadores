@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <parameters>
-
-	<parameter name="randomSeed" displayName="Default Random Seed" type="int" defaultValue="__NULL__" />
-
+	<parameter name="randomSeed" displayName="Default Random Seed"
+		type="int" defaultValue="__NULL__" isReadOnly="false"
+		converter="repast.simphony.parameter.StringConverterFactory$IntConverter" />
+	<parameter name="numFloors" displayName="Number of floors"
+		type="int" defaultValue="15" isReadOnly="false"
+		converter="repast.simphony.parameter.StringConverterFactory$IntConverter" />
+	<parameter name="numLifts" displayName="Number of lifts"
+		type="int" defaultValue="4" isReadOnly="false"
+		converter="repast.simphony.parameter.StringConverterFactory$IntConverter" />
+	<parameter name="maxWeights" displayName="Max weight per lift"
+		type="java.lang.String" defaultValue="500 450 400 350" isReadOnly="false"
+		converter="repast.simphony.parameter.StringConverterFactory$StringStringConverter" />
+		
 </parameters>
