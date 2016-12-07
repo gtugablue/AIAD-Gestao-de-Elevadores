@@ -20,15 +20,14 @@ import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import jade.lang.acl.UnreadableException;
 import javafx.util.Pair;
 import lift_management.DirectionalCall;
-import lift_management.HumanGenerator;
-import lift_management.LiftManagementLauncher;
 import lift_management.behaviours.LiftBehaviour;
+import lift_management.algorithms.strategy_algorithm.ClosestAttendsAlgorithm;
 import lift_management.onto.ServiceOntology;
 import lift_management.onto.ServiceProposal;
 import lift_management.onto.ServiceProposalRequest;
+import repast.simphony.engine.schedule.ScheduledMethod;
 import repast.simphony.space.continuous.ContinuousSpace;
 import repast.simphony.space.continuous.NdPoint;
 import sajas.core.AID;
@@ -44,26 +43,24 @@ public class Lift extends Agent {
 	private Ontology serviceOntology;
 	private ContinuousSpace<Object> space;
 	private float maxWeight;
-	//TODO improve data structures for stops and tasks
-	private List<Pair<Integer, Boolean>> tasks;
-	public List<Pair<Integer, Boolean>> getTasks() {
-		return tasks;
-	}
-
+	private List<Pair<Integer, Direction>> tasks;
 	private List<ACLMessage> accepts;
+	private int numFloors;
 	public enum DoorState {
 		OPEN,
 		CLOSED
 	};
+	public enum Direction {UP, DOWN, STOP};
 	private DoorState doorState = DoorState.CLOSED;
 
-	public Lift(ContinuousSpace<Object> space, float maxWeight) {
+	public Lift(ContinuousSpace<Object> space, int numFloors, float maxWeight) {
 		this.space = space;
+		this.numFloors = numFloors;
 		this.maxWeight = maxWeight;
-		this.tasks = new ArrayList<Pair<Integer, Boolean>>();
+		this.tasks = new ArrayList<Pair<Integer, Direction>>();
 		this.accepts = new ArrayList<ACLMessage>();
 	}
-
+	
 	@Override
 	protected void setup() {
 		register();
@@ -81,6 +78,7 @@ public class Lift extends Agent {
 			e.printStackTrace();
 		}
 
+		// Behaviours
 		addBehaviour(new CNetResponderDispatcher(this));
 		addBehaviour(new LiftBehaviour(this));
 	}
@@ -93,6 +91,7 @@ public class Lift extends Agent {
 		serviceOntology = ServiceOntology.getInstance();
 		getContentManager().registerLanguage(codec);
 		getContentManager().registerOntology(serviceOntology);
+		
 	}
 
 	@Override
@@ -108,7 +107,7 @@ public class Lift extends Agent {
 
 		private static final long serialVersionUID = 1L;
 
-		public CNetResponderDispatcher(Agent agent) {
+		public CNetResponderDispatcher(Lift agent) {
 			super(agent, 
 					MessageTemplate.and(
 							ContractNetResponder.createMessageTemplate(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET),
@@ -117,7 +116,7 @@ public class Lift extends Agent {
 
 		@Override
 		protected Behaviour createResponder(ACLMessage cfp) {
-			return new CNetResp(myAgent, cfp);
+			return new CNetResp((Lift)myAgent, cfp);
 		}
 
 	}
@@ -129,7 +128,7 @@ public class Lift extends Agent {
 
 		private boolean expectedSuccessfulExecution;
 
-		public CNetResp(Agent a, ACLMessage cfp) {
+		public CNetResp(Lift a, ACLMessage cfp) {
 			super(a, cfp);
 		}
 
@@ -139,8 +138,11 @@ public class Lift extends Agent {
 			ACLMessage reply = cfp.createReply();
 			reply.setPerformative(ACLMessage.PROPOSE);
 			try {
-				getContentManager().fillContent(reply, new ServiceProposal("attend-request", 100));
-			} catch (CodecException | OntologyException e) {
+				Lift lift = (Lift)myAgent;
+				DirectionalCall call = (DirectionalCall)((ServiceProposalRequest)getContentManager().extractContent(cfp)).getCall();
+				int price = new ClosestAttendsAlgorithm().evaluate(lift.tasks, call.getOrigin(), call.isAscending() ? Direction.UP : Direction.DOWN, numFloors, lift.getPosition().getY());
+				getContentManager().fillContent(reply, new ServiceProposal("attend-request", price));
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -170,11 +172,10 @@ public class Lift extends Agent {
 		
 		private void addRequest(DirectionalCall call) {
 			for (int i = 0; i < tasks.size(); i++) {
-				if (tasks.get(i).getKey() == call.getOrigin() && tasks.get(i).getValue() == call.isAscending())
+				if (tasks.get(i).getKey() == call.getOrigin() && tasks.get(i).getValue().equals(call.getDirection()))
 					return;
 			}
-			tasks.add(new Pair<Integer, Boolean>(call.getOrigin(), call.isAscending()));
-			// result.setPerformative(ACLMessage.INFORM); // TODO
+			tasks.add(new Pair<Integer, Direction>(call.getOrigin(), call.getDirection())); // TODO insert in the right place
 		}
 
 		@Override
@@ -209,8 +210,8 @@ public class Lift extends Agent {
 		return this.maxWeight;
 	}
 
-	public void assignTask(int originFloor, boolean up) {
-		this.tasks.add(new Pair<Integer, Boolean>(originFloor, up));
+	public void assignTask(int originFloor, Direction direction) {
+		this.tasks.add(new Pair<Integer, Direction>(originFloor, direction));
 		// TODO place in the correct position
 	}
 
@@ -224,5 +225,9 @@ public class Lift extends Agent {
 	
 	public void descend() {
 		space.moveByDisplacement(this, 0, -0.01f);
+	}
+
+	public List<Pair<Integer, Direction>> getTasks() {
+		return tasks;
 	}
 }

@@ -1,5 +1,7 @@
 package lift_management;
 
+import lift_management.agents.Lift.Direction;
+
 public class DirectionalCall extends Call {
 	protected boolean up;
 	
@@ -15,8 +17,15 @@ public class DirectionalCall extends Call {
 		return up;
 	}
 	
+	public Direction getDirection() {
+		if (up)
+			return Direction.UP;
+		else
+			return Direction.DOWN;
+	}
+	
 	@Override
 	public String toString() {
-		return origin + " " + (this.up ? "UP" : "DOWN");
+		return origin + " " + (this.up ? "^" : "v");
 	}
 }

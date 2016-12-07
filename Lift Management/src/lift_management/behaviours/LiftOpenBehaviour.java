@@ -4,7 +4,7 @@ import lift_management.agents.Lift;
 import sajas.core.behaviours.WakerBehaviour;
 
 public class LiftOpenBehaviour extends WakerBehaviour {
-	private static final long DURATION = 2000;
+	private static final long DURATION = 500;
 	
 	public LiftOpenBehaviour(Lift lift) {
 		super(lift, DURATION);

@@ -1,5 +1,7 @@
 package lift_management.agents;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 
 import jade.content.lang.Codec;
@@ -22,6 +24,7 @@ import lift_management.onto.ServiceProposal;
 import lift_management.onto.ServiceProposalRequest;
 import sajas.core.AID;
 import sajas.core.Agent;
+import sajas.core.behaviours.WakerBehaviour;
 import sajas.domain.DFService;
 import sajas.proto.ContractNetInitiator;
 import sajas.proto.SubscriptionInitiator;
@@ -57,7 +60,7 @@ public class Building extends Agent {
 		register();
 		subscribeDf();
 		prepareCfpMessage();
-		
+
 		//addBehaviour(new CNetInit(this, myCfp));
 		addBehaviour(new HumanGenerator(this));
 	}
@@ -86,11 +89,11 @@ public class Building extends Agent {
 		getContentManager().registerLanguage(codec);
 		getContentManager().registerOntology(serviceOntology);
 	}
-	
+
 	public void addCall(Call call) {
 		try {
 			getCallSystem().makeCall(call);
-			
+
 			ACLMessage cfp = new ACLMessage(ACLMessage.CFP);
 			cfp.setLanguage(codec.getName());
 			cfp.setOntology(serviceOntology.getName());
@@ -215,15 +218,14 @@ public class Building extends Agent {
 
 		@Override
 		protected void handleInform(ACLMessage inform) {
-			System.out.println("INFORM");
+			System.out.println("INFORM " + call);
 			try {
 				((Building)getAgent()).getCallSystem().resetCall(call);
-				System.out.println("DONE");
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
-		
+
 		@Override
 		protected void handleAllResultNotifications(Vector resultNotifications) {
 		}
