@@ -30,5 +30,4 @@ public class LiftIdleBehaviour extends Behaviour {
 		else
 			return LiftBehaviour.Transitions.TASK_DIFF_FLOOR.ordinal();
 	}
-
 }
