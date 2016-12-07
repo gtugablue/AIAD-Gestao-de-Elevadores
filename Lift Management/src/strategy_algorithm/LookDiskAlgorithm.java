@@ -1,7 +1,6 @@
 package strategy_algorithm;
 
 import java.util.List;
-
 import javafx.util.Pair;
 
 public class LookDiskAlgorithm {
@@ -43,7 +42,7 @@ public class LookDiskAlgorithm {
 			nextTask = task.getValue();
 			direction = getDirection(tasks,tasks.indexOf(task), previousStop);
 			
-			if( floorInBetween(previousStop, nextStop, requestedFloor) && (direction.equals(requestedTask) || )){
+			if( floorInBetween(previousStop, nextStop, requestedFloor) && (direction.equals(requestedTask))){
 				
 				if(!(previousTask.equals(direction) || previousTask.equals(Task.STOP))){	//Se a direção do elevador é não for igual à direção de próxima tarefa e não for STOP, quer dizer que o elevador vai fazer uma paragem entre esta tarefa e a próxima tarefa que involve andar no sentido oposto.													
 					int estimatedDestiny = getEstimatedDestiny(previousStop, previousTask, maxBuildingFloor);
