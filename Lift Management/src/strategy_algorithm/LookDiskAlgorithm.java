@@ -1,5 +1,6 @@
 package strategy_algorithm;
 
+import java.util.ArrayList;
 import java.util.List;
 import javafx.util.Pair;
 
@@ -61,8 +62,7 @@ public class LookDiskAlgorithm {
 			previousStop = nextStop;
 			nextTask = previousTask;
 		}
-		
-		
+				
 		//Percorreu toda a lista de tasks e ainda assim não foi atribuido a uma posição
 		if(assigned == false){		
 			int estimatedDestiny = getEstimatedDestiny(previousStop, previousTask, maxBuildingFloor);
@@ -110,6 +110,53 @@ public class LookDiskAlgorithm {
 		}
 		
 		return direction;
+	}
+	
+	/**
+	 * Alters the given tasks param and inserts the new task in the ordered list of tasks
+	 * 
+	 * @param tasks
+	 * @param requestedFloor
+	 * @param requestedTask
+	 * @param maxBuildingFloor
+	 * @param currentPosition
+	 * @return position of the new task
+	 * @throws Exception
+	 */
+	protected static int addNewTask(List<Pair<Integer, Task>> tasks, int requestedFloor, Task requestedTask, int maxBuildingFloor, int currentPosition) throws Exception{
+		if(requestedTask.equals(Task.STOP)){
+			throw new Exception("requestedTask cannot be STOP. Only UP or DOWN");
+		}
+		
+		int previousStop = currentPosition;
+		Task previousTask = Task.STOP;
+		
+		int nextStop;
+		Task nextTask;
+		Task direction;
+		
+		//Percorrer todo o caminho do elevador e tentar encaixar a paragem no caminho
+		for(Pair<Integer, Task> task : tasks){
+			nextStop = task.getKey().intValue();
+			nextTask = task.getValue();
+			direction = getDirection(tasks,tasks.indexOf(task), previousStop);
+			
+			if( floorInBetween(previousStop, nextStop, requestedFloor) && (direction.equals(requestedTask))){
+				int i = tasks.indexOf(task);
+				tasks.add(i, new Pair<Integer, Task>(requestedFloor, requestedTask));
+				return i;
+			}
+			
+			previousStop = nextStop;
+			nextTask = previousTask;
+		}
+		
+		
+		//Percorreu toda a lista de tasks e ainda assim não foi atribuido a uma posição				
+		tasks.add(new Pair<Integer, Task>(requestedFloor, requestedTask));
+		return tasks.size()-1;
+
+		
 	}
 }
 
