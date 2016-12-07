@@ -29,6 +29,7 @@ import lift_management.algorithms.strategy_algorithm.ClosestAttendsAlgorithm;
 import lift_management.onto.ServiceOntology;
 import lift_management.onto.ServiceProposal;
 import lift_management.onto.ServiceProposalRequest;
+import repast.simphony.engine.schedule.ScheduledMethod;
 import repast.simphony.space.continuous.ContinuousSpace;
 import repast.simphony.space.continuous.NdPoint;
 import sajas.core.AID;
@@ -64,7 +65,7 @@ public class Lift extends Agent {
 		this.tasks = new ArrayList<Pair<Integer, Direction>>();
 		this.accepts = new ArrayList<ACLMessage>();
 	}
-
+	
 	@Override
 	protected void setup() {
 		register();
@@ -81,7 +82,7 @@ public class Lift extends Agent {
 		} catch (FIPAException e) {
 			e.printStackTrace();
 		}
-
+		
 		// behaviours
 		addBehaviour(new CNetResponderDispatcher(this));
 		addBehaviour(new TickHandler(this, 17));
@@ -95,6 +96,7 @@ public class Lift extends Agent {
 		serviceOntology = ServiceOntology.getInstance();
 		getContentManager().registerLanguage(codec);
 		getContentManager().registerOntology(serviceOntology);
+		
 	}
 
 	@Override
