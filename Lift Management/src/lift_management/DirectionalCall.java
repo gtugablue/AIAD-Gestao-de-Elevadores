@@ -26,6 +26,6 @@ public class DirectionalCall extends Call {
 	
 	@Override
 	public String toString() {
-		return origin + " " + (this.up ? "UP" : "DOWN");
+		return origin + " " + (this.up ? "^" : "v");
 	}
 }

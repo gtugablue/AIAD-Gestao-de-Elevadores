@@ -6,6 +6,7 @@ import lift_management.CallSystem;
 import lift_management.DirectionCallSystem;
 import lift_management.FloorIndicatorCallSystem;
 import lift_management.agents.Building;
+import lift_management.agents.Lift;
 import repast.simphony.visualizationOGL2D.DefaultStyleOGL2D;
 import saf.v3d.scene.TextureLayer;
 import saf.v3d.scene.VComposite;
@@ -30,7 +31,12 @@ public class BuildingStyle extends DefaultStyleOGL2D {
 				try {
 					for (int i = 0; i < building.getNumLifts(); i++) {
 						for (int j = 0; j < building.getNumFloors(); j++) {
-							VImage2D liftImage = shapeFactory.createImage("icons/lift_closed.jpg");
+							VImage2D liftImage;
+							Integer openLiftDoor = building.getOpenLiftDoor("Lift " + i);
+							if (openLiftDoor != null && openLiftDoor == j)
+								liftImage = shapeFactory.createImage("icons/lift_open.jpg");
+							else
+								liftImage = shapeFactory.createImage("icons/lift_closed.jpg");
 							VImage2D liftUpButtonImage, liftDownButtonImage;
 							
 							if (directionCallSystem.toClimb(j))
