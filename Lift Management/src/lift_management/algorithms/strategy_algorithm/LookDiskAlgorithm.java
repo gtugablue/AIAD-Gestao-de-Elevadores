@@ -113,8 +113,22 @@ public class LookDiskAlgorithm {
 		return direction;
 	}
 	
+	protected static Task getDirection(int previousStop, int nextStop){
+		Task direction;
+		
+		if(previousStop > nextStop) {
+			direction = Task.UP;
+		}else if(previousStop < nextStop){
+			direction = Task.DOWN;
+		}else{
+			direction = Task.STOP;
+		}
+		
+		return direction;
+	}
+	
 	/**
-	 * Alters the given tasks param and inserts the new task in the ordered list of tasks
+	 * Altera a lista de tasks passada como parâmetro e insere o novo pedido na lista ordenada de tasks
 	 * 
 	 * @param tasks
 	 * @param requestedFloor
@@ -156,8 +170,49 @@ public class LookDiskAlgorithm {
 		//Percorreu toda a lista de tasks e ainda assim não foi atribuido a uma posição				
 		tasks.add(new Pair<Integer, Task>(requestedFloor, requestedTask));
 		return tasks.size()-1;
-
+	}
+	
+	/**
+	 * Executa o atendimento de uma paragem adicionando a paragem na lista de tarefas. Prioritiza o atendimento da tarefa.
+	 * @param tasks
+	 * @param requestedFloor
+	 * @param maxBuildingFloor
+	 * @param currentPosition
+	 * @return retorna a posição onde foi colocado
+	 */
+	public static int attendRequest(List<Pair<Integer, Task>> tasks, int requestedFloor, int maxBuildingFloor, int currentPosition){
+		Pair<Integer,Task> newTask = new Pair<Integer, Task>(requestedFloor, Task.STOP); 
+		if(tasks.size()==0){
+			tasks.add(newTask);
+			return 0;
+		}
 		
+		int previousStop = currentPosition;
+		Task previousTask = Task.STOP;
+		
+		int nextStop;
+		Task nextTask;
+		Task direction;
+		
+		//Percorrer todo o caminho do elevador e tentar encaixar o maior número de paragens no caminho entre a posição inicial e nova paragem
+		for(Pair<Integer, Task> task : tasks){
+			nextStop = task.getKey().intValue();
+			nextTask = task.getValue();
+			direction = getDirection(previousStop, requestedFloor);
+			
+			if(!floorInBetween(previousStop, requestedFloor, nextStop) || !(direction.equals(nextTask))){
+				int i = tasks.indexOf(task);
+				tasks.add(i, newTask);
+				return i;
+			}
+			
+			previousStop = nextStop;
+			nextTask = previousTask;
+		}
+		
+		//Percorreu toda a lista de tasks e ainda assim não foi atribuido a uma posição				
+		tasks.add(newTask);
+		return tasks.size()-1;
 	}
 }
 
