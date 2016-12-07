@@ -40,6 +40,7 @@ import sajas.core.behaviours.TickerBehaviour;
  * Created by Gustavo on 06/10/2016.
  */
 public class Lift extends Agent {
+	public static final long DOOR_OPEN_TIME = 3000;
 	private Codec codec;
 	private Ontology serviceOntology;
 	private ContinuousSpace<Object> space;

@@ -1,5 +1,7 @@
 package lift_management.agents;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 
 import jade.content.lang.Codec;
@@ -22,6 +24,7 @@ import lift_management.onto.ServiceProposal;
 import lift_management.onto.ServiceProposalRequest;
 import sajas.core.AID;
 import sajas.core.Agent;
+import sajas.core.behaviours.WakerBehaviour;
 import sajas.domain.DFService;
 import sajas.proto.ContractNetInitiator;
 import sajas.proto.SubscriptionInitiator;
@@ -34,10 +37,14 @@ public class Building extends Agent {
 	private ACLMessage myCfp;
 	private Codec codec;
 	private Ontology serviceOntology;
+	private Map<String, Integer> liftCurrentOpenDoors;
+	private Map<String, WakerBehaviour> liftDoorCloserBehaviours; 
 	public Building(int numLifts, int numFloors) {
 		this.numLifts = numLifts;
 		this.numFloors = numFloors;
 		this.callSystem = new DirectionCallSystem(this.numFloors);
+		this.liftCurrentOpenDoors = new HashMap<String, Integer>();
+		this.liftDoorCloserBehaviours = new HashMap<String, WakerBehaviour>();
 	}
 
 	public int getNumLifts() {
@@ -57,7 +64,7 @@ public class Building extends Agent {
 		register();
 		subscribeDf();
 		prepareCfpMessage();
-		
+
 		//addBehaviour(new CNetInit(this, myCfp));
 		addBehaviour(new HumanGenerator(this));
 	}
@@ -86,11 +93,11 @@ public class Building extends Agent {
 		getContentManager().registerLanguage(codec);
 		getContentManager().registerOntology(serviceOntology);
 	}
-	
+
 	public void addCall(Call call) {
 		try {
 			getCallSystem().makeCall(call);
-			
+
 			ACLMessage cfp = new ACLMessage(ACLMessage.CFP);
 			cfp.setLanguage(codec.getName());
 			cfp.setOntology(serviceOntology.getName());
@@ -215,18 +222,43 @@ public class Building extends Agent {
 
 		@Override
 		protected void handleInform(ACLMessage inform) {
-			System.out.println("INFORM");
+			System.out.println("INFORM " + call);
 			try {
 				((Building)getAgent()).getCallSystem().resetCall(call);
-				System.out.println("DONE");
+				((Building)getAgent()).setLiftDoorState(inform.getSender().getLocalName(), Lift.DoorState.OPEN, call.getOrigin());
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
-		
+
 		@Override
 		protected void handleAllResultNotifications(Vector resultNotifications) {
 		}
 
+	}
+
+	public void setLiftDoorState(String liftName, Lift.DoorState doorState, int floor) {
+		Map<String, Integer> liftCurrentOpenDoors = this.liftCurrentOpenDoors;
+		if (doorState.equals(Lift.DoorState.OPEN)) {
+			Map<String, WakerBehaviour> liftDoorCloserBehaviours = this.liftDoorCloserBehaviours;
+			liftCurrentOpenDoors.put(liftName, floor);
+			if (liftDoorCloserBehaviours.containsKey(liftName)) {
+				this.removeBehaviour(this.liftDoorCloserBehaviours.get(liftName));
+				liftDoorCloserBehaviours.remove(liftName);
+			}
+			WakerBehaviour b = new WakerBehaviour(this, Lift.DOOR_OPEN_TIME) {
+				@Override
+				protected void onWake() {
+					liftCurrentOpenDoors.remove(liftName);
+					liftDoorCloserBehaviours.remove(this);
+				}
+			};
+			this.addBehaviour(b);
+			this.liftDoorCloserBehaviours.put(liftName, b);
+		}
+	}
+
+	public Integer getOpenLiftDoor(String liftName) {
+		return this.liftCurrentOpenDoors.get(liftName);
 	}
 }
