@@ -20,11 +20,9 @@ import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import jade.lang.acl.UnreadableException;
 import javafx.util.Pair;
 import lift_management.DirectionalCall;
-import lift_management.HumanGenerator;
-import lift_management.LiftManagementLauncher;
+import lift_management.behaviours.LiftBehaviour;
 import lift_management.algorithms.strategy_algorithm.ClosestAttendsAlgorithm;
 import lift_management.onto.ServiceOntology;
 import lift_management.onto.ServiceProposal;
@@ -41,13 +39,10 @@ import sajas.core.behaviours.TickerBehaviour;
  * Created by Gustavo on 06/10/2016.
  */
 public class Lift extends Agent {
-	public static final long DOOR_OPEN_TIME = 3000;
 	private Codec codec;
 	private Ontology serviceOntology;
 	private ContinuousSpace<Object> space;
 	private float maxWeight;
-	//TODO improve data structures for stops and tasks
-	private List<Integer> stops = new ArrayList<Integer>();
 	private List<Pair<Integer, Direction>> tasks;
 	private List<ACLMessage> accepts;
 	private int numFloors;
@@ -82,10 +77,10 @@ public class Lift extends Agent {
 		} catch (FIPAException e) {
 			e.printStackTrace();
 		}
-		
-		// behaviours
+
+		// Behaviours
 		addBehaviour(new CNetResponderDispatcher(this));
-		addBehaviour(new TickHandler(this, 17));
+		addBehaviour(new LiftBehaviour(this));
 	}
 
 	/**
@@ -190,53 +185,19 @@ public class Lift extends Agent {
 
 	}
 
-	public class TickHandler extends TickerBehaviour {
+	public void handleTaskComplete() {
+		if (tasks.isEmpty())
+			return;
+		
+		tasks.remove(0);
 
-		public TickHandler(Lift lift, long period) {
-			super(lift, period);
-		}
-
-		@Override
-		protected void onTick() {
-			if (tasks.isEmpty() && stops.isEmpty())
-				return;
-			
-			double delta = 0.01;
-			double y = space.getLocation(myAgent).getY();
-			int destinyFloor = (int) Math.round(y);
-
-			if (!stops.isEmpty() && stops.get(0) > y - delta && stops.get(0) < y + delta) {
-				stops.remove(0);
-			}
-			
-			if (!tasks.isEmpty() && tasks.get(0).getKey() > y - delta && tasks.get(0).getKey() < y + delta) {
-				tasks.remove(0);
-				ACLMessage inform = accepts.get(0).createReply();
-				accepts.remove(0);
-				inform.setPerformative(ACLMessage.INFORM);
-				getAgent().send(inform);
-				System.out.println("SENT INFORM");
-			}
-			
-			if (!stops.isEmpty()) {
-				destinyFloor = stops.get(0);
-			} else if (!tasks.isEmpty()) {
-				destinyFloor = tasks.get(0).getKey();
-			}
-			
-			if (destinyFloor > y - delta && destinyFloor < y + delta)
-				return;
-
-			double location = space.getLocation(myAgent).getY();
-			if (destinyFloor - location > 0)
-				space.moveByDisplacement(myAgent, 0, 0.01f);
-			else if (destinyFloor < location)
-				space.moveByDisplacement(myAgent, 0, -0.01f);
-
-		}
-
+		ACLMessage inform = accepts.get(0).createReply();
+		accepts.remove(0);
+		inform.setPerformative(ACLMessage.INFORM);
+		send(inform);
+		System.out.println("SENT INFORM");
 	}
-
+	
 	public DoorState getDoorState() {
 		return doorState;
 	}
@@ -256,5 +217,17 @@ public class Lift extends Agent {
 
 	public void assignTask(int originFloor, int destinyFloor) {
 		// TODO
+	}
+
+	public void ascend() {
+		space.moveByDisplacement(this, 0, 0.01f);
+	}
+	
+	public void descend() {
+		space.moveByDisplacement(this, 0, -0.01f);
+	}
+
+	public List<Pair<Integer, Direction>> getTasks() {
+		return tasks;
 	}
 }
