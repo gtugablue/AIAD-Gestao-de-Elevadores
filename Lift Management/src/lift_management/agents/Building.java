@@ -136,6 +136,7 @@ public class Building extends Agent {
 			ServiceDescription sd = new ServiceDescription();
 			sd.setType("lift");
 			template.addServices(sd);
+			
 			try {
 				getContentManager().fillContent(cfp, new ServiceProposalRequest("attend-request", call));
 

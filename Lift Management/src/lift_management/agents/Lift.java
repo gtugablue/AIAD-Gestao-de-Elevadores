@@ -161,7 +161,7 @@ public class Lift extends Agent {
 				call = (DirectionalCall) ((ServiceProposalRequest) getContentManager().extractContent(cfp)).getCall();
 				addRequest(call);
 				accepts.add(accept);
-				return null;
+				return null; // We'll send the response manually later
 			} catch (CodecException | OntologyException e) {
 				e.printStackTrace();
 				result.setPerformative(ACLMessage.FAILURE);
@@ -172,7 +172,7 @@ public class Lift extends Agent {
 		
 		private void addRequest(DirectionalCall call) {
 			for (int i = 0; i < tasks.size(); i++) {
-				if (tasks.get(i).getKey() == call.getOrigin() && tasks.get(i).getValue().equals(call.getDirection()))
+				if (tasks.get(i).getKey().equals(call.getOrigin()) && tasks.get(i).getValue().equals(call.getDirection()))
 					return;
 			}
 			tasks.add(new Pair<Integer, Direction>(call.getOrigin(), call.getDirection())); // TODO insert in the right place

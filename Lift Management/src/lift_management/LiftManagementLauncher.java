@@ -22,6 +22,7 @@ import repast.simphony.space.continuous.ContinuousSpace;
 import repast.simphony.space.continuous.PointTranslator;
 import repast.simphony.space.continuous.SimpleCartesianAdder;
 import repast.simphony.space.continuous.StrictBorders;
+import repast.simphony.ui.RSApplication;
 import sajas.core.Runtime;
 import sajas.sim.repasts.RepastSLauncher;
 import sajas.wrapper.ContainerController;
