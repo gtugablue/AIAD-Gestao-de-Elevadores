@@ -31,12 +31,7 @@ public class BuildingStyle extends DefaultStyleOGL2D {
 				try {
 					for (int i = 0; i < building.getNumLifts(); i++) {
 						for (int j = 0; j < building.getNumFloors(); j++) {
-							VImage2D liftImage;
-							Integer openLiftDoor = building.getOpenLiftDoor("Lift " + i);
-							if (openLiftDoor != null && openLiftDoor == j)
-								liftImage = shapeFactory.createImage("icons/lift_open.jpg");
-							else
-								liftImage = shapeFactory.createImage("icons/lift_closed.jpg");
+							VImage2D liftImage = shapeFactory.createImage("icons/lift_open.jpg");
 							VImage2D liftUpButtonImage, liftDownButtonImage;
 							
 							if (directionCallSystem.toClimb(j))
