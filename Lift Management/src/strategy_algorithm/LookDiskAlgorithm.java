@@ -3,6 +3,7 @@ package strategy_algorithm;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.util.Pair;
+import lift_management.TravelTimes;
 
 public class LookDiskAlgorithm {
 	public enum Task {UP, DOWN, STOP}
@@ -75,7 +76,7 @@ public class LookDiskAlgorithm {
 			}	
 		}
 		
-		return floorsTraveled; 
+		return floorsTraveled*TravelTimes.FLOOR+TravelTimes.getStopsExtraTime(numStops); 
 	}
 	
 	protected static int getEstimatedDestiny(int previousStop, Task previousTask, int maxBuildingFloor) {
