@@ -12,7 +12,6 @@ import jade.core.ProfileImpl;
 import jade.wrapper.StaleProxyException;
 import lift_management.agents.Building;
 import lift_management.agents.Lift;
-import lift_management.gui.ConfigFrame;
 import repast.simphony.context.Context;
 import repast.simphony.context.space.continuous.ContinuousSpaceFactory;
 import repast.simphony.context.space.continuous.ContinuousSpaceFactoryFinder;
