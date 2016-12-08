@@ -8,17 +8,7 @@ import lift_management.agents.Lift.Direction;
 
 public class LookDiskAlgorithm implements LiftAlgorithm{
 	
-	/**
-	 * Dada a lista de tarafas de um elevador, a sua posição actual, o número de pisos do edifício e um pedido , analisa qual é o custo de atender o pedido.
-	 * 
-	 * @param tasks
-	 * @param requestedFloor
-	 * @param requestedDirection
-	 * @param maxBuildingFloor
-	 * @param currentPosition
-	 * @return Retorna a estimação de tempo que vai demorar até atender o pedido
-	 * @throws Exception 
-	 */
+	@Override
 	public int evaluate(List<Pair<Integer, Direction>> tasks, int requestedFloor, Direction requestedDirection, int maxBuildingFloor, int currentPosition) throws Exception{
 		if(requestedDirection.equals(Direction.STOP)){
 			throw new Exception("requestedTask cannot be STOP. Only UP or DOWN");
@@ -127,17 +117,7 @@ public class LookDiskAlgorithm implements LiftAlgorithm{
 		return direction;
 	}
 	
-	/**
-	 * Altera a lista de tasks passada como parâmetro e insere o novo pedido na lista ordenada de tasks
-	 * 
-	 * @param tasks
-	 * @param requestedFloor
-	 * @param requestedDirection
-	 * @param maxBuildingFloor
-	 * @param currentPosition
-	 * @return position of the new task
-	 * @throws Exception
-	 */
+	@Override
 	public int addNewTask(List<Pair<Integer, Direction>> tasks, int requestedFloor, Direction requestedDirection, int maxBuildingFloor, int currentPosition) throws Exception{
 		if(requestedDirection.equals(Direction.STOP)){
 			throw new Exception("requestedDirection cannot be STOP. Only UP or DOWN");
@@ -172,14 +152,7 @@ public class LookDiskAlgorithm implements LiftAlgorithm{
 		return tasks.size()-1;
 	}
 	
-	/**
-	 * Executa o atendimento de uma paragem adicionando a paragem na lista de tarefas. Prioritiza o atendimento da tarefa.
-	 * @param tasks
-	 * @param requestedFloor
-	 * @param maxBuildingFloor
-	 * @param currentPosition
-	 * @return retorna a posição onde foi colocado
-	 */
+	@Override
 	public int attendRequest(List<Pair<Integer, Direction>> tasks, int requestedFloor, int maxBuildingFloor, int currentPosition){
 		Pair<Integer,Direction> newTask = new Pair<Integer, Direction>(requestedFloor, Direction.STOP); 
 		if(tasks.size()==0){
