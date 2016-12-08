@@ -12,8 +12,11 @@ import jade.content.onto.OntologyException;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.NotUnderstoodException;
+import jade.domain.FIPAAgentManagement.RefuseException;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 import lift_management.Call;
 import lift_management.CallSystem;
 import lift_management.DirectionCallSystem;
@@ -26,7 +29,9 @@ import sajas.core.AID;
 import sajas.core.Agent;
 import sajas.core.behaviours.WakerBehaviour;
 import sajas.domain.DFService;
+import sajas.proto.AchieveREResponder;
 import sajas.proto.ContractNetInitiator;
+import sajas.proto.SimpleAchieveREResponder;
 import sajas.proto.SubscriptionInitiator;
 
 public class Building extends Agent {
@@ -231,5 +236,23 @@ public class Building extends Agent {
 		protected void handleAllResultNotifications(Vector resultNotifications) {
 		}
 
+	}
+	
+	private class ReqIntResp extends AchieveREResponder {
+		private Building building;
+		public ReqIntResp(Building building, MessageTemplate mt) {
+			super(building, mt);
+			this.building = building;
+		}
+		
+		@Override
+		protected ACLMessage handleRequest(ACLMessage request) throws NotUnderstoodException, RefuseException {
+			try {
+				Call call = (Call)(getContentManager().extractContent(request));
+			} catch (CodecException | OntologyException e) {
+				e.printStackTrace();
+			}
+			return super.handleRequest(request);
+		}
 	}
 }
