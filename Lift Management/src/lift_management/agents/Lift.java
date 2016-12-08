@@ -1,6 +1,7 @@
 package lift_management.agents;
 
 import sajas.domain.DFService;
+import sajas.proto.AchieveREInitiator;
 import sajas.proto.ContractNetResponder;
 import sajas.proto.SSContractNetResponder;
 import sajas.proto.SSResponderDispatcher;
@@ -8,6 +9,7 @@ import sajas.proto.SSResponderDispatcher;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Vector;
 
 import jade.content.lang.Codec;
 import jade.content.lang.Codec.CodecException;
@@ -21,9 +23,11 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import javafx.util.Pair;
+import lift_management.Call;
 import lift_management.DirectionalCall;
 import lift_management.behaviours.LiftBehaviour;
 import lift_management.algorithms.strategy_algorithm.ClosestAttendsAlgorithm;
+import lift_management.onto.ServiceExecutionRequest;
 import lift_management.onto.ServiceOntology;
 import lift_management.onto.ServiceProposal;
 import lift_management.onto.ServiceProposalRequest;
@@ -46,6 +50,7 @@ public class Lift extends Agent {
 	private List<Pair<Integer, Direction>> tasks;
 	private List<ACLMessage> accepts;
 	private int numFloors;
+	private AID buildingAID;
 	public enum DoorState {
 		OPEN,
 		CLOSED
@@ -134,11 +139,11 @@ public class Lift extends Agent {
 
 		@Override
 		protected ACLMessage handleCfp(ACLMessage cfp) {
-			//System.out.println(cfp);
+			Lift lift = (Lift)myAgent;
+			lift.buildingAID = (AID)cfp.getSender();
 			ACLMessage reply = cfp.createReply();
 			reply.setPerformative(ACLMessage.PROPOSE);
 			try {
-				Lift lift = (Lift)myAgent;
 				DirectionalCall call = (DirectionalCall)((ServiceProposalRequest)getContentManager().extractContent(cfp)).getCall();
 				int price = new ClosestAttendsAlgorithm().evaluate(lift.tasks, call.getOrigin(), call.isAscending() ? Direction.UP : Direction.DOWN, numFloors, (int) Math.round(lift.getPosition().getY()));
 				getContentManager().fillContent(reply, new ServiceProposal("attend-request", price));
@@ -183,6 +188,36 @@ public class Lift extends Agent {
 			//System.out.println(myAgent.getLocalName() + ": proposal rejected");
 		}
 
+	}
+	
+	private class ReqIntInit extends AchieveREInitiator {
+		private Lift lift;
+		private Call call;
+		
+		public ReqIntInit(Lift lift, ACLMessage msg, Call call) {
+			super(lift, msg);
+			this.lift = lift;
+			this.call = call;
+		}
+		
+		@Override
+		protected Vector prepareRequests(ACLMessage request) {
+			request.addReceiver(lift.buildingAID);
+			try {
+				getContentManager().fillContent(request, new ServiceExecutionRequest("reassign-request", call));
+			} catch (CodecException | OntologyException e) {
+				e.printStackTrace();
+			}
+			return super.prepareRequests(request);
+		}
+		
+		@Override
+		protected void handleInform(ACLMessage inform) {
+		}
+		
+		@Override
+		protected void handleFailure(ACLMessage failure) {
+		}
 	}
 
 	public void handleTaskComplete() {
