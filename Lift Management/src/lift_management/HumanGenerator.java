@@ -136,6 +136,6 @@ public class HumanGenerator extends TickerBehaviour {
 	}
 	
 	private static long generateRandomTime(int numFloors) {
-		return (long) Math.ceil(10000 * Math.random() / numFloors);
+		return (long) Math.ceil(1000 * Math.random() / numFloors);
 	}
 }

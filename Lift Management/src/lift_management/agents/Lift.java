@@ -1,6 +1,7 @@
 package lift_management.agents;
 
 import sajas.domain.DFService;
+import sajas.proto.AchieveREInitiator;
 import sajas.proto.ContractNetResponder;
 import sajas.proto.SSContractNetResponder;
 import sajas.proto.SSResponderDispatcher;
@@ -8,12 +9,14 @@ import sajas.proto.SSResponderDispatcher;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Vector;
 
 import jade.content.lang.Codec;
 import jade.content.lang.Codec.CodecException;
 import jade.content.lang.sl.SLCodec;
 import jade.content.onto.Ontology;
 import jade.content.onto.OntologyException;
+import jade.core.AID;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
@@ -21,16 +24,19 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import javafx.util.Pair;
+import lift_management.Call;
 import lift_management.DirectionalCall;
+import lift_management.Human;
 import lift_management.behaviours.LiftBehaviour;
 import lift_management.algorithms.strategy_algorithm.ClosestAttendsAlgorithm;
+import lift_management.algorithms.strategy_algorithm.LookDiskAlgorithm;
+import lift_management.onto.ServiceExecutionRequest;
 import lift_management.onto.ServiceOntology;
 import lift_management.onto.ServiceProposal;
 import lift_management.onto.ServiceProposalRequest;
 import repast.simphony.engine.schedule.ScheduledMethod;
 import repast.simphony.space.continuous.ContinuousSpace;
 import repast.simphony.space.continuous.NdPoint;
-import sajas.core.AID;
 import sajas.core.Agent;
 import sajas.core.behaviours.Behaviour;
 import sajas.core.behaviours.TickerBehaviour;
@@ -42,10 +48,12 @@ public class Lift extends Agent {
 	private Codec codec;
 	private Ontology serviceOntology;
 	private ContinuousSpace<Object> space;
-	private float maxWeight;
+	private final float maxWeight;
 	private List<Pair<Integer, Direction>> tasks;
 	private List<ACLMessage> accepts;
 	private int numFloors;
+	private AID buildingAID;
+	private List<Human> humans;
 	public enum DoorState {
 		OPEN,
 		CLOSED
@@ -134,13 +142,13 @@ public class Lift extends Agent {
 
 		@Override
 		protected ACLMessage handleCfp(ACLMessage cfp) {
-			//System.out.println(cfp);
+			Lift lift = (Lift)myAgent;
+			lift.buildingAID = cfp.getSender();
 			ACLMessage reply = cfp.createReply();
 			reply.setPerformative(ACLMessage.PROPOSE);
 			try {
-				Lift lift = (Lift)myAgent;
 				DirectionalCall call = (DirectionalCall)((ServiceProposalRequest)getContentManager().extractContent(cfp)).getCall();
-				int price = new ClosestAttendsAlgorithm().evaluate(lift.tasks, call.getOrigin(), call.isAscending() ? Direction.UP : Direction.DOWN, numFloors, (int) Math.round(lift.getPosition().getY()));
+				int price = new LookDiskAlgorithm().evaluate(lift.tasks, call.getOrigin(), call.isAscending() ? Direction.UP : Direction.DOWN, numFloors, (int) Math.round(lift.getPosition().getY()));
 				getContentManager().fillContent(reply, new ServiceProposal("attend-request", price));
 			} catch (Exception e) {
 				// TODO Auto-generated catch block

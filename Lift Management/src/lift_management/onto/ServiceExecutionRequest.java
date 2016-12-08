@@ -1,18 +1,21 @@
 package lift_management.onto;
 
 import jade.content.AgentAction;
+import lift_management.Call;
 
 public class ServiceExecutionRequest implements AgentAction {
 	
 	private static final long serialVersionUID = 1L;
 	
 	private String serviceName;
+	private Call call;
 
 	public ServiceExecutionRequest() {
 	}
 	
-	public ServiceExecutionRequest(String serviceName) {
+	public ServiceExecutionRequest(String serviceName, Call call) {
 		this.serviceName = serviceName;
+		this.call = call;
 	}
 
 	public String getServiceName() {
@@ -23,4 +26,11 @@ public class ServiceExecutionRequest implements AgentAction {
 		this.serviceName = serviceName;
 	}
 
+	public Call getCall() {
+		return call;
+	}
+
+	public void setCall(Call call) {
+		this.call = call;
+	}
 }
