@@ -23,6 +23,7 @@ import jade.lang.acl.MessageTemplate;
 import javafx.util.Pair;
 import lift_management.DirectionalCall;
 import lift_management.behaviours.LiftBehaviour;
+import lift_management.models.Task;
 import lift_management.algorithms.strategy_algorithm.ClosestAttendsAlgorithm;
 import lift_management.onto.ServiceOntology;
 import lift_management.onto.ServiceProposal;
@@ -43,7 +44,7 @@ public class Lift extends Agent {
 	private Ontology serviceOntology;
 	private ContinuousSpace<Object> space;
 	private float maxWeight;
-	private List<Pair<Integer, Direction>> tasks;
+	private List<Task<Direction>> tasks;
 	private List<ACLMessage> accepts;
 	private int numFloors;
 	public enum DoorState {
@@ -57,7 +58,7 @@ public class Lift extends Agent {
 		this.space = space;
 		this.numFloors = numFloors;
 		this.maxWeight = maxWeight;
-		this.tasks = new ArrayList<Pair<Integer, Direction>>();
+		this.tasks = new ArrayList<Task<Direction>>();
 		this.accepts = new ArrayList<ACLMessage>();
 	}
 	
@@ -172,10 +173,10 @@ public class Lift extends Agent {
 		
 		private void addRequest(DirectionalCall call) {
 			for (int i = 0; i < tasks.size(); i++) {
-				if (tasks.get(i).getKey().equals(call.getOrigin()) && tasks.get(i).getValue().equals(call.getDirection()))
+				if (tasks.get(i).getFloor() == call.getOrigin() && tasks.get(i).getDestiny().equals(call.getDirection()))
 					return;
 			}
-			tasks.add(new Pair<Integer, Direction>(call.getOrigin(), call.getDirection())); // TODO insert in the right place
+			tasks.add(new Task<Direction>(call.getOrigin(), call.getDirection())); // TODO insert in the right place
 		}
 
 		@Override
@@ -211,7 +212,7 @@ public class Lift extends Agent {
 	}
 
 	public void assignTask(int originFloor, Direction direction) {
-		this.tasks.add(new Pair<Integer, Direction>(originFloor, direction));
+		this.tasks.add(new Task<Direction>(originFloor, direction));
 		// TODO place in the correct position
 	}
 
@@ -227,7 +228,7 @@ public class Lift extends Agent {
 		space.moveByDisplacement(this, 0, -0.01f);
 	}
 
-	public List<Pair<Integer, Direction>> getTasks() {
+	public List<Task<Direction>> getTasks() {
 		return tasks;
 	}
 }

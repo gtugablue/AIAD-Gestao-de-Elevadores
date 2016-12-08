@@ -5,11 +5,12 @@ import java.util.List;
 import javafx.util.Pair;
 import lift_management.TravelTimes;
 import lift_management.agents.Lift.Direction;
+import lift_management.models.Task;
 
 public class LookDiskAlgorithm implements LiftAlgorithm<Direction>{
 	
 	@Override
-	public int evaluate(List<Pair<Integer, Direction>> tasks, int requestedFloor, Direction requestedDirection, int maxBuildingFloor, int currentPosition) throws Exception{
+	public int evaluate(List<Task<Direction>> tasks, int requestedFloor, Direction requestedDirection, int maxBuildingFloor, int currentPosition) throws Exception{
 		if(requestedDirection.equals(Direction.STOP)){
 			throw new Exception("requestedTask cannot be STOP. Only UP or DOWN");
 		}
@@ -29,9 +30,9 @@ public class LookDiskAlgorithm implements LiftAlgorithm<Direction>{
 		
 		
 		//Percorrer todo o caminho do elevador e tentar encaixar a paragem no caminho
-		for(Pair<Integer, Direction> task : tasks){
-			nextStop = task.getKey().intValue();
-			nextDirection = task.getValue();
+		for(Task<Direction> task : tasks){
+			nextStop = task.getFloor();
+			nextDirection = task.getDestiny();
 			direction = getDirection(tasks,tasks.indexOf(task), previousStop);
 			
 			if( floorInBetween(previousStop, nextStop, requestedFloor) && (direction.equals(requestedDirection))){
@@ -84,20 +85,20 @@ public class LookDiskAlgorithm implements LiftAlgorithm<Direction>{
 		return (previous < n && n <= next) || (previous > n && n >= next);
 	}
 	
-	protected static Direction getDirection(List<Pair<Integer, Direction>> tasks,int i, int previousStop){		
+	protected static Direction getDirection(List<Task<Direction>> tasks,int i, int previousStop){		
 		Direction direction;
 		
-		while(previousStop == tasks.get(i).getKey().intValue() && i < tasks.size()){
+		while(previousStop == tasks.get(i).getFloor()&& i < tasks.size()){
 			i++;
 		}
 		
-		int nextStop = tasks.get(i).getKey().intValue();
+		int nextStop = tasks.get(i).getFloor();
 		if(previousStop > nextStop) {
 			direction = Direction.UP;
 		}else if(previousStop < nextStop){
 			direction = Direction.DOWN;
 		}else{
-			direction = tasks.get(i).getValue();
+			direction = tasks.get(i).getDestiny();
 		}
 		
 		return direction;
@@ -118,7 +119,7 @@ public class LookDiskAlgorithm implements LiftAlgorithm<Direction>{
 	}
 	
 	@Override
-	public int addNewTask(List<Pair<Integer, Direction>> tasks, int requestedFloor, Direction requestedDirection, int maxBuildingFloor, int currentPosition) throws Exception{
+	public int addNewTask(List<Task<Direction>> tasks, int requestedFloor, Direction requestedDirection, int maxBuildingFloor, int currentPosition) throws Exception{
 		if(requestedDirection.equals(Direction.STOP)){
 			throw new Exception("requestedDirection cannot be STOP. Only UP or DOWN");
 		}
@@ -131,14 +132,14 @@ public class LookDiskAlgorithm implements LiftAlgorithm<Direction>{
 		Direction direction;
 		
 		//Percorrer todo o caminho do elevador e tentar encaixar a paragem no caminho
-		for(Pair<Integer, Direction> task : tasks){
-			nextStop = task.getKey().intValue();
-			nextDirection = task.getValue();
+		for(Task<Direction> task : tasks){
+			nextStop = task.getFloor();
+			nextDirection = task.getDestiny();
 			direction = getDirection(tasks,tasks.indexOf(task), previousStop);
 			
 			if( floorInBetween(previousStop, nextStop, requestedFloor) && (direction.equals(requestedDirection))){
 				int i = tasks.indexOf(task);
-				tasks.add(i, new Pair<Integer, Direction>(requestedFloor, requestedDirection));
+				tasks.add(i, new Task<Direction>(requestedFloor, requestedDirection));
 				return i;
 			}
 			
@@ -148,13 +149,13 @@ public class LookDiskAlgorithm implements LiftAlgorithm<Direction>{
 		
 		
 		//Percorreu toda a lista de tasks e ainda assim não foi atribuido a uma posição				
-		tasks.add(new Pair<Integer, Direction>(requestedFloor, requestedDirection));
+		tasks.add(new Task<Direction>(requestedFloor, requestedDirection));
 		return tasks.size()-1;
 	}
 	
 	@Override
-	public int attendRequest(List<Pair<Integer, Direction>> tasks, int requestedFloor, int maxBuildingFloor, int currentPosition){
-		Pair<Integer,Direction> newTask = new Pair<Integer, Direction>(requestedFloor, Direction.STOP); 
+	public int attendRequest(List<Task<Direction>> tasks, int requestedFloor, int maxBuildingFloor, int currentPosition){
+		Task<Direction> newTask = new Task<Direction>(requestedFloor, Direction.STOP); 
 		if(tasks.size()==0){
 			tasks.add(newTask);
 			return 0;
@@ -168,9 +169,9 @@ public class LookDiskAlgorithm implements LiftAlgorithm<Direction>{
 		Direction direction;
 		
 		//Percorrer todo o caminho do elevador e tentar encaixar o maior número de paragens no caminho entre a posição inicial e nova paragem
-		for(Pair<Integer, Direction> task : tasks){
-			nextStop = task.getKey().intValue();
-			nextDirection = task.getValue();
+		for(Task<Direction> task : tasks){
+			nextStop = task.getFloor();
+			nextDirection = task.getDestiny();
 			direction = getDirection(previousStop, requestedFloor);
 			
 			if(!floorInBetween(previousStop, requestedFloor, nextStop) || !(direction.equals(nextDirection))){

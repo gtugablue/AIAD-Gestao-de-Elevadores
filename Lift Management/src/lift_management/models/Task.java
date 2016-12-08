@@ -20,4 +20,7 @@ public class Task<T> {
 		return destiny;
 	}
 	
+	public int getId(){
+		return id;
+	}
 }
