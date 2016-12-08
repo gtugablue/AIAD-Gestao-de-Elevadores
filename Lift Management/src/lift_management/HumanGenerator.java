@@ -55,19 +55,14 @@ public class HumanGenerator extends TickerBehaviour {
 	}
 	
 	protected static int generateOriginFloor(int numFloors){
-		double rate = 1.25;
 		double n = numFloors + 1;
 		
-		RealMatrix coefficients =
-			    new Array2DRowRealMatrix(new double[][] { { (rate)/(n-1) + 1, 0}, { 1/(n-1), 1} },
-			                       false);
-		DecompositionSolver solver = new LUDecomposition(coefficients).getSolver();
-		RealVector constants = new ArrayRealVector(new double[] { rate/(n-1), 1/(n-1)}, false);
-		RealVector solution = solver.solve(constants);
-		
-		double groundFloorRate = solution.getEntry(0);
-		double nFloorRate = solution.getEntry(1);
+		double groundFloorRate = 0.4;
+		double nFloorRate = (1-groundFloorRate)/(n-1);
 		double x = random.nextDouble();		
+		
+		System.out.println("nFloorRate: "+nFloorRate);
+		System.out.println("x: "+x);
 		
 		if(x <= groundFloorRate){
 			return 0;
