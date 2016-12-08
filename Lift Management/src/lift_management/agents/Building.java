@@ -1,7 +1,5 @@
 package lift_management.agents;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Vector;
 
 import jade.content.lang.Codec;
@@ -20,18 +18,16 @@ import jade.lang.acl.MessageTemplate;
 import lift_management.Call;
 import lift_management.CallSystem;
 import lift_management.DirectionCallSystem;
-import lift_management.DirectionalCall;
 import lift_management.HumanGenerator;
 import lift_management.onto.ServiceOntology;
 import lift_management.onto.ServiceProposal;
 import lift_management.onto.ServiceProposalRequest;
 import sajas.core.AID;
 import sajas.core.Agent;
-import sajas.core.behaviours.WakerBehaviour;
 import sajas.domain.DFService;
 import sajas.proto.AchieveREResponder;
 import sajas.proto.ContractNetInitiator;
-import sajas.proto.SimpleAchieveREResponder;
+import sajas.proto.ContractNetResponder;
 import sajas.proto.SubscriptionInitiator;
 
 public class Building extends Agent {
@@ -66,7 +62,6 @@ public class Building extends Agent {
 		subscribeDf();
 		prepareCfpMessage();
 
-		//addBehaviour(new CNetInit(this, myCfp));
 		addBehaviour(new HumanGenerator(this));
 	}
 
@@ -236,23 +231,5 @@ public class Building extends Agent {
 		protected void handleAllResultNotifications(Vector resultNotifications) {
 		}
 
-	}
-	
-	private class ReqIntResp extends AchieveREResponder {
-		private Building building;
-		public ReqIntResp(Building building, MessageTemplate mt) {
-			super(building, mt);
-			this.building = building;
-		}
-		
-		@Override
-		protected ACLMessage handleRequest(ACLMessage request) throws NotUnderstoodException, RefuseException {
-			try {
-				Call call = (Call)(getContentManager().extractContent(request));
-			} catch (CodecException | OntologyException e) {
-				e.printStackTrace();
-			}
-			return super.handleRequest(request);
-		}
 	}
 }

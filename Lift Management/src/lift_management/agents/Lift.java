@@ -16,6 +16,7 @@ import jade.content.lang.Codec.CodecException;
 import jade.content.lang.sl.SLCodec;
 import jade.content.onto.Ontology;
 import jade.content.onto.OntologyException;
+import jade.core.AID;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
@@ -27,6 +28,7 @@ import lift_management.Call;
 import lift_management.DirectionalCall;
 import lift_management.behaviours.LiftBehaviour;
 import lift_management.algorithms.strategy_algorithm.ClosestAttendsAlgorithm;
+import lift_management.algorithms.strategy_algorithm.LookDiskAlgorithm;
 import lift_management.onto.ServiceExecutionRequest;
 import lift_management.onto.ServiceOntology;
 import lift_management.onto.ServiceProposal;
@@ -34,7 +36,6 @@ import lift_management.onto.ServiceProposalRequest;
 import repast.simphony.engine.schedule.ScheduledMethod;
 import repast.simphony.space.continuous.ContinuousSpace;
 import repast.simphony.space.continuous.NdPoint;
-import sajas.core.AID;
 import sajas.core.Agent;
 import sajas.core.behaviours.Behaviour;
 import sajas.core.behaviours.TickerBehaviour;
@@ -140,12 +141,12 @@ public class Lift extends Agent {
 		@Override
 		protected ACLMessage handleCfp(ACLMessage cfp) {
 			Lift lift = (Lift)myAgent;
-			lift.buildingAID = (AID)cfp.getSender();
+			lift.buildingAID = cfp.getSender();
 			ACLMessage reply = cfp.createReply();
 			reply.setPerformative(ACLMessage.PROPOSE);
 			try {
 				DirectionalCall call = (DirectionalCall)((ServiceProposalRequest)getContentManager().extractContent(cfp)).getCall();
-				int price = new ClosestAttendsAlgorithm().evaluate(lift.tasks, call.getOrigin(), call.isAscending() ? Direction.UP : Direction.DOWN, numFloors, (int) Math.round(lift.getPosition().getY()));
+				int price = new LookDiskAlgorithm().evaluate(lift.tasks, call.getOrigin(), call.isAscending() ? Direction.UP : Direction.DOWN, numFloors, (int) Math.round(lift.getPosition().getY()));
 				getContentManager().fillContent(reply, new ServiceProposal("attend-request", price));
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -188,36 +189,6 @@ public class Lift extends Agent {
 			//System.out.println(myAgent.getLocalName() + ": proposal rejected");
 		}
 
-	}
-	
-	private class ReqIntInit extends AchieveREInitiator {
-		private Lift lift;
-		private Call call;
-		
-		public ReqIntInit(Lift lift, ACLMessage msg, Call call) {
-			super(lift, msg);
-			this.lift = lift;
-			this.call = call;
-		}
-		
-		@Override
-		protected Vector prepareRequests(ACLMessage request) {
-			request.addReceiver(lift.buildingAID);
-			try {
-				getContentManager().fillContent(request, new ServiceExecutionRequest("attend-request", call));
-			} catch (CodecException | OntologyException e) {
-				e.printStackTrace();
-			}
-			return super.prepareRequests(request);
-		}
-		
-		@Override
-		protected void handleInform(ACLMessage inform) {
-		}
-		
-		@Override
-		protected void handleFailure(ACLMessage failure) {
-		}
 	}
 
 	public void handleTaskComplete() {
