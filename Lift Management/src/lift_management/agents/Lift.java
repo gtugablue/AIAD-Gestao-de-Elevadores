@@ -204,7 +204,7 @@ public class Lift extends Agent {
 		protected Vector prepareRequests(ACLMessage request) {
 			request.addReceiver(lift.buildingAID);
 			try {
-				getContentManager().fillContent(request, new ServiceExecutionRequest("reassign-request", call));
+				getContentManager().fillContent(request, new ServiceExecutionRequest("attend-request", call));
 			} catch (CodecException | OntologyException e) {
 				e.printStackTrace();
 			}
