@@ -6,7 +6,7 @@ import javafx.util.Pair;
 import lift_management.TravelTimes;
 import lift_management.agents.Lift.Direction;
 
-public class LookDiskAlgorithm implements LiftAlgorithm{
+public class LookDiskAlgorithm implements LiftAlgorithm<Direction>{
 	
 	@Override
 	public int evaluate(List<Pair<Integer, Direction>> tasks, int requestedFloor, Direction requestedDirection, int maxBuildingFloor, int currentPosition) throws Exception{
