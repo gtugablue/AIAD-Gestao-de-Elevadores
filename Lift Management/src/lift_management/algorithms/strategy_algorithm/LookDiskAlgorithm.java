@@ -87,7 +87,7 @@ public class LookDiskAlgorithm implements LiftAlgorithm{
 	protected static Direction getDirection(List<Pair<Integer, Direction>> tasks,int i, int previousStop){		
 		Direction direction;
 		
-		while(i < tasks.size() && previousStop == tasks.get(i).getKey().intValue()){
+		while(i < tasks.size() - 1 && previousStop == tasks.get(i).getKey().intValue()){
 			i++;
 		}
 		

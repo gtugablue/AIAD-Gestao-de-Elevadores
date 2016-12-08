@@ -26,6 +26,7 @@ import jade.lang.acl.MessageTemplate;
 import javafx.util.Pair;
 import lift_management.Call;
 import lift_management.DirectionalCall;
+import lift_management.Human;
 import lift_management.behaviours.LiftBehaviour;
 import lift_management.algorithms.strategy_algorithm.ClosestAttendsAlgorithm;
 import lift_management.algorithms.strategy_algorithm.LookDiskAlgorithm;
@@ -47,11 +48,12 @@ public class Lift extends Agent {
 	private Codec codec;
 	private Ontology serviceOntology;
 	private ContinuousSpace<Object> space;
-	private float maxWeight;
+	private final float maxWeight;
 	private List<Pair<Integer, Direction>> tasks;
 	private List<ACLMessage> accepts;
 	private int numFloors;
 	private AID buildingAID;
+	private List<Human> humans;
 	public enum DoorState {
 		OPEN,
 		CLOSED

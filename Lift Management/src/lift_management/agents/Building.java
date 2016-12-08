@@ -214,7 +214,12 @@ public class Building extends Agent {
 
 		@Override
 		protected void handleFailure(ACLMessage failure) {
-			// TODO
+			// Reassign the task
+			ACLMessage cfp = new ACLMessage(ACLMessage.CFP);
+			cfp.setLanguage(codec.getName());
+			cfp.setOntology(serviceOntology.getName());
+			cfp.setProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET);
+			addBehaviour(new CNetInit(getAgent(), cfp, call));
 		}
 
 		@Override
@@ -230,6 +235,5 @@ public class Building extends Agent {
 		@Override
 		protected void handleAllResultNotifications(Vector resultNotifications) {
 		}
-
 	}
 }
