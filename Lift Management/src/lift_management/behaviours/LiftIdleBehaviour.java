@@ -25,9 +25,15 @@ public class LiftIdleBehaviour extends Behaviour {
 	
 	@Override
 	public int onEnd() {
-		if (lift.getTasks().get(0).getKey() == (int) Math.round(lift.getPosition().getY()))
+		System.out.print(lift.getLocalName() + ": ");
+		for (int i = 0; i < lift.getTasks().size(); i++) {
+			System.out.print(lift.getTasks().get(i).getKey() + " " + lift.getTasks().get(i).getValue() + ", ");
+		}
+		System.out.println();
+		if (lift.getTasks().get(0).getKey() == (int) Math.round(lift.getPosition().getY())) {
+			lift.handleTaskComplete();
 			return LiftBehaviour.Transitions.TASK_SAME_FLOOR.ordinal();
-		else
+		} else
 			return LiftBehaviour.Transitions.TASK_DIFF_FLOOR.ordinal();
 	}
 }
