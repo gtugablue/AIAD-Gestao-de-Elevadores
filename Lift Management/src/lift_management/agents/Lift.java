@@ -140,7 +140,7 @@ public class Lift extends Agent {
 			try {
 				Lift lift = (Lift)myAgent;
 				DirectionalCall call = (DirectionalCall)((ServiceProposalRequest)getContentManager().extractContent(cfp)).getCall();
-				int price = new ClosestAttendsAlgorithm().evaluate(lift.tasks, call.getOrigin(), call.isAscending() ? Direction.UP : Direction.DOWN, numFloors, lift.getPosition().getY());
+				int price = new ClosestAttendsAlgorithm().evaluate(lift.tasks, call.getOrigin(), call.isAscending() ? Direction.UP : Direction.DOWN, numFloors, (int) Math.round(lift.getPosition().getY()));
 				getContentManager().fillContent(reply, new ServiceProposal("attend-request", price));
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
