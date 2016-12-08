@@ -9,7 +9,11 @@ public class ClosestAttendsAlgorithm implements LiftAlgorithm {
 
 	@Override
 	public int evaluate(List<Pair<Integer, Direction>> tasks, int requestedFloor, Direction requestedTask, int maxBuildingFloor, int currentPosition) throws Exception {
-		return Math.abs((int)Math.round(currentPosition) - requestedFloor);
+		if (tasks.isEmpty())
+			return Math.abs((int)Math.round(currentPosition) - requestedFloor);
+		else {
+			return Math.abs(tasks.get(tasks.size() - 1).getKey() - requestedFloor);
+		}
 	}
 
 	@Override
