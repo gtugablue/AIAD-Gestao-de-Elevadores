@@ -1,40 +1,44 @@
 package lift_management.algorithms.strategy_algorithm;
 
+import java.util.ArrayList;
 import java.util.List;
-
 import javafx.util.Pair;
+import lift_management.TravelTimes;
 import lift_management.agents.Lift.Direction;
 
-public class LookDiskAlgorithm implements LiftAlgorithm {
-
+public class LookDiskAlgorithm implements LiftAlgorithm{
+	
 	@Override
-	public int evaluate(List<Pair<Integer, Direction>> tasks, int requestedFloor, Direction requestedTask, int maxBuildingFloor, double currentPosition) throws Exception {
-		if(requestedTask.equals(Direction.STOP)){
+	public int evaluate(List<Pair<Integer, Direction>> tasks, int requestedFloor, Direction requestedDirection, int maxBuildingFloor, int currentPosition) throws Exception{
+		if(requestedDirection.equals(Direction.STOP)){
 			throw new Exception("requestedTask cannot be STOP. Only UP or DOWN");
 		}
 		if(tasks.isEmpty()){
-			return Math.abs((int)Math.round(currentPosition)-requestedFloor);
+			return Math.abs(currentPosition-requestedFloor);
 		}
 		
-		int previousStop = (int)Math.round(currentPosition);
-		Direction previousTask = Direction.STOP;
+		int previousStop = currentPosition;
+		Direction previousDirection = Direction.STOP;
 		int floorsTraveled=0;
+		int numStops = 0;
 		boolean assigned = false;
 		
 		int nextStop;
-		Direction nextTask;
+		Direction nextDirection;
 		Direction direction;
+		
 		
 		//Percorrer todo o caminho do elevador e tentar encaixar a paragem no caminho
 		for(Pair<Integer, Direction> task : tasks){
 			nextStop = task.getKey().intValue();
-			nextTask = task.getValue();
+			nextDirection = task.getValue();
 			direction = getDirection(tasks,tasks.indexOf(task), previousStop);
 			
-			if( floorInBetween(previousStop, nextStop, requestedFloor) && direction.equals(requestedTask) ){
+			if( floorInBetween(previousStop, nextStop, requestedFloor) && (direction.equals(requestedDirection))){
 				
-				if(!previousTask.equals(direction)){	//Se a direção do elevador é diferente da direção de próxima tarefa, quer dizer que o elevador vai fazer uma paragem entre esta tarefa e a próxima tarefa que involve andar no sentido oposto.													
-					int estimatedDestiny = getEstimatedDestiny(previousStop, previousTask, maxBuildingFloor);
+				if(!(previousDirection.equals(direction) || previousDirection.equals(Direction.STOP))){	//Se a direção do elevador é não for igual à direção de próxima tarefa e não for STOP, quer dizer que o elevador vai fazer uma paragem entre esta tarefa e a próxima tarefa que involve andar no sentido oposto.													
+					int estimatedDestiny = getEstimatedDestiny(previousStop, previousDirection, maxBuildingFloor);
+					numStops++;
 					floorsTraveled += Math.abs( estimatedDestiny - previousStop) + Math.abs(estimatedDestiny + requestedFloor); //O custo será então igual a fazer uma viagem que satisfaça o pedido anterior mais o de ir dessa paragem para o requestedFloor
 				}
 				else{
@@ -44,31 +48,34 @@ public class LookDiskAlgorithm implements LiftAlgorithm {
 				break;
 			}
 			
+			numStops++;
 			floorsTraveled += Math.abs(nextStop-previousStop);
 			previousStop = nextStop;
-			nextTask = previousTask;
+			nextDirection = previousDirection;
 		}
-		
-		
+				
 		//Percorreu toda a lista de tasks e ainda assim não foi atribuido a uma posição
 		if(assigned == false){		
-			int estimatedDestiny = getEstimatedDestiny(previousStop, previousTask, maxBuildingFloor);
-			if(previousTask.equals(requestedTask) && floorInBetween(previousStop, estimatedDestiny, requestedFloor)){	//Se a direção do elevador é igual ao requestedTask e o requestedFloor está entre a última paragem e o destino quer dizer que o elevador pode parar no caminho para apanhar.	
+			int estimatedDestiny = getEstimatedDestiny(previousStop, previousDirection, maxBuildingFloor);
+			if((previousDirection.equals(requestedDirection) && floorInBetween(previousStop, estimatedDestiny, requestedFloor)) || previousDirection.equals(Direction.STOP)){	//Se a direção do elevador é igual ao requestedTask e o requestedFloor está entre a última paragem e o destino quer dizer que o elevador pode parar no caminho para apanhar.	
 				floorsTraveled += Math.abs(previousStop - requestedFloor);
 			}else{
-				estimatedDestiny = getEstimatedDestiny(previousStop, previousTask, maxBuildingFloor);
+				estimatedDestiny = getEstimatedDestiny(previousStop, previousDirection, maxBuildingFloor);
+				numStops++;
 				floorsTraveled += Math.abs( estimatedDestiny - previousStop) + Math.abs(estimatedDestiny + requestedFloor); //O custo será então igual a fazer uma viagem que satisfaça o pedido anterior mais o de ir dessa paragem para o requestedFloor
 			}	
 		}
 		
-		return floorsTraveled; 
+		return floorsTraveled*TravelTimes.FLOOR+TravelTimes.getStopsExtraTime(numStops); 
 	}
 	
 	protected static int getEstimatedDestiny(int previousStop, Direction previousTask, int maxBuildingFloor) {
 		if(previousTask.equals(Direction.DOWN)){
 			return 0;
-		}else{
+		}else if(previousTask.equals(Direction.UP)){
 			return (int) Math.ceil((maxBuildingFloor+1 - previousStop)/2);
+		}else{
+			return previousStop;
 		}
 		
 	}
@@ -79,9 +86,11 @@ public class LookDiskAlgorithm implements LiftAlgorithm {
 	
 	protected static Direction getDirection(List<Pair<Integer, Direction>> tasks,int i, int previousStop){		
 		Direction direction;
+		
 		while(previousStop == tasks.get(i).getKey().intValue() && i < tasks.size()){
 			i++;
 		}
+		
 		int nextStop = tasks.get(i).getKey().intValue();
 		if(previousStop > nextStop) {
 			direction = Direction.UP;
@@ -92,6 +101,91 @@ public class LookDiskAlgorithm implements LiftAlgorithm {
 		}
 		
 		return direction;
+	}
+	
+	protected static Direction getDirection(int previousStop, int nextStop){
+		Direction direction;
+		
+		if(previousStop > nextStop) {
+			direction = Direction.UP;
+		}else if(previousStop < nextStop){
+			direction = Direction.DOWN;
+		}else{
+			direction = Direction.STOP;
+		}
+		
+		return direction;
+	}
+	
+	@Override
+	public int addNewTask(List<Pair<Integer, Direction>> tasks, int requestedFloor, Direction requestedDirection, int maxBuildingFloor, int currentPosition) throws Exception{
+		if(requestedDirection.equals(Direction.STOP)){
+			throw new Exception("requestedDirection cannot be STOP. Only UP or DOWN");
+		}
+		
+		int previousStop = currentPosition;
+		Direction previousDirection = Direction.STOP;
+		
+		int nextStop;
+		Direction nextDirection;
+		Direction direction;
+		
+		//Percorrer todo o caminho do elevador e tentar encaixar a paragem no caminho
+		for(Pair<Integer, Direction> task : tasks){
+			nextStop = task.getKey().intValue();
+			nextDirection = task.getValue();
+			direction = getDirection(tasks,tasks.indexOf(task), previousStop);
+			
+			if( floorInBetween(previousStop, nextStop, requestedFloor) && (direction.equals(requestedDirection))){
+				int i = tasks.indexOf(task);
+				tasks.add(i, new Pair<Integer, Direction>(requestedFloor, requestedDirection));
+				return i;
+			}
+			
+			previousStop = nextStop;
+			nextDirection = previousDirection;
+		}
+		
+		
+		//Percorreu toda a lista de tasks e ainda assim não foi atribuido a uma posição				
+		tasks.add(new Pair<Integer, Direction>(requestedFloor, requestedDirection));
+		return tasks.size()-1;
+	}
+	
+	@Override
+	public int attendRequest(List<Pair<Integer, Direction>> tasks, int requestedFloor, int maxBuildingFloor, int currentPosition){
+		Pair<Integer,Direction> newTask = new Pair<Integer, Direction>(requestedFloor, Direction.STOP); 
+		if(tasks.size()==0){
+			tasks.add(newTask);
+			return 0;
+		}
+		
+		int previousStop = currentPosition;
+		Direction previousDirection = Direction.STOP;
+		
+		int nextStop;
+		Direction nextDirection;
+		Direction direction;
+		
+		//Percorrer todo o caminho do elevador e tentar encaixar o maior número de paragens no caminho entre a posição inicial e nova paragem
+		for(Pair<Integer, Direction> task : tasks){
+			nextStop = task.getKey().intValue();
+			nextDirection = task.getValue();
+			direction = getDirection(previousStop, requestedFloor);
+			
+			if(!floorInBetween(previousStop, requestedFloor, nextStop) || !(direction.equals(nextDirection))){
+				int i = tasks.indexOf(task);
+				tasks.add(i, newTask);
+				return i;
+			}
+			
+			previousStop = nextStop;
+			nextDirection = previousDirection;
+		}
+		
+		//Percorreu toda a lista de tasks e ainda assim não foi atribuido a uma posição				
+		tasks.add(newTask);
+		return tasks.size()-1;
 	}
 }
 
