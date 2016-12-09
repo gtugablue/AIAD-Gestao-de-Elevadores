@@ -1,7 +1,5 @@
 package lift_management.agents;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Vector;
 
 import jade.content.lang.Codec;
@@ -12,21 +10,24 @@ import jade.content.onto.OntologyException;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.NotUnderstoodException;
+import jade.domain.FIPAAgentManagement.RefuseException;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 import lift_management.Call;
 import lift_management.CallSystem;
 import lift_management.DirectionCallSystem;
-import lift_management.DirectionalCall;
 import lift_management.HumanGenerator;
 import lift_management.onto.ServiceOntology;
 import lift_management.onto.ServiceProposal;
 import lift_management.onto.ServiceProposalRequest;
 import sajas.core.AID;
 import sajas.core.Agent;
-import sajas.core.behaviours.WakerBehaviour;
 import sajas.domain.DFService;
+import sajas.proto.AchieveREResponder;
 import sajas.proto.ContractNetInitiator;
+import sajas.proto.ContractNetResponder;
 import sajas.proto.SubscriptionInitiator;
 
 public class Building extends Agent {
@@ -61,7 +62,6 @@ public class Building extends Agent {
 		subscribeDf();
 		prepareCfpMessage();
 
-		//addBehaviour(new CNetInit(this, myCfp));
 		addBehaviour(new HumanGenerator(this));
 	}
 
@@ -214,7 +214,12 @@ public class Building extends Agent {
 
 		@Override
 		protected void handleFailure(ACLMessage failure) {
-			// TODO
+			// Reassign the task
+			ACLMessage cfp = new ACLMessage(ACLMessage.CFP);
+			cfp.setLanguage(codec.getName());
+			cfp.setOntology(serviceOntology.getName());
+			cfp.setProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET);
+			addBehaviour(new CNetInit(getAgent(), cfp, call));
 		}
 
 		@Override
@@ -230,6 +235,5 @@ public class Building extends Agent {
 		@Override
 		protected void handleAllResultNotifications(Vector resultNotifications) {
 		}
-
 	}
 }
