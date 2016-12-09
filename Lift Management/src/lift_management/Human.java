@@ -6,7 +6,7 @@ public class Human {
 	protected int destinyFloor=0;
 	protected int originFloor=0;
 	protected final int id = ++currentId;
-	
+	protected Integer liftID; /** The ID of the lift the human is in, or null if still waiting for one. **/
 	
 	public Human(double weight, int originFloor, int destinyFloor){
 		this.weight = weight;
@@ -37,5 +37,13 @@ public class Human {
 
 	public int getId(){
 		return id;
+	}
+
+	public Integer getLiftID() {
+		return liftID;
+	}
+
+	public void setLiftID(Integer liftID) {
+		this.liftID = liftID;
 	}
 }

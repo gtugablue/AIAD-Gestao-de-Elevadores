@@ -1,5 +1,6 @@
 package lift_management.agents;
 
+import java.util.List;
 import java.util.Vector;
 
 import jade.content.lang.Codec;
@@ -18,12 +19,15 @@ import jade.lang.acl.MessageTemplate;
 import lift_management.Call;
 import lift_management.CallSystem;
 import lift_management.DirectionCallSystem;
-import lift_management.HumanGenerator;
+import lift_management.DirectionalCall;
+import lift_management.God;
+import lift_management.Human;
 import lift_management.onto.ServiceOntology;
 import lift_management.onto.ServiceProposal;
 import lift_management.onto.ServiceProposalRequest;
 import sajas.core.AID;
 import sajas.core.Agent;
+import sajas.core.behaviours.TickerBehaviour;
 import sajas.domain.DFService;
 import sajas.proto.AchieveREResponder;
 import sajas.proto.ContractNetInitiator;
@@ -38,10 +42,17 @@ public class Building extends Agent {
 	private ACLMessage myCfp;
 	private Codec codec;
 	private Ontology serviceOntology;
-	public Building(int numLifts, int numFloors) {
+	private God god;
+	
+	public Building(God god, int numLifts, int numFloors) {
+		this.god = god;
 		this.numLifts = numLifts;
 		this.numFloors = numFloors;
 		this.callSystem = new DirectionCallSystem(this.numFloors);
+	}
+
+	public God getGod() {
+		return god;
 	}
 
 	public int getNumLifts() {
@@ -62,7 +73,17 @@ public class Building extends Agent {
 		subscribeDf();
 		prepareCfpMessage();
 
-		addBehaviour(new HumanGenerator(this));
+		addBehaviour(new TickerBehaviour(this, 1) {
+
+			@Override
+			protected void onTick() {
+				Call call = god.generateNewCall();
+				addCall(call);
+			
+				reset(God.generateRandomTime(numFloors));
+			}
+			
+		});
 	}
 
 	private void prepareCfpMessage() {
