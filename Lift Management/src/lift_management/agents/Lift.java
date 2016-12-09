@@ -81,7 +81,7 @@ public class Lift extends Agent {
 		this.accepts = new HashMap<Integer, ACLMessage>();
 		this.algorithm = new LookDiskAlgorithm();
 	}
-	
+
 	@Override
 	protected void setup() {
 		register();
@@ -112,7 +112,7 @@ public class Lift extends Agent {
 		serviceOntology = ServiceOntology.getInstance();
 		getContentManager().registerLanguage(codec);
 		getContentManager().registerOntology(serviceOntology);
-		
+
 	}
 
 	@Override
@@ -189,7 +189,7 @@ public class Lift extends Agent {
 
 			return result;
 		}
-		
+
 		private void addRequest(DirectionalCall call, ACLMessage accept) {
 			for (int i = 0; i < tasks.size(); i++) {
 				if (tasks.get(i).getFloor() == call.getOrigin() && tasks.get(i).getDestiny().equals(call.getDirection()))
@@ -209,20 +209,20 @@ public class Lift extends Agent {
 		passengersInOut();
 		if (tasks.isEmpty())
 			return;
-		
-		for (int i = 0; i < tasks.size(); i++)
-			System.out.println("TASK2 " + this.tasks.get(i).getId());
+
 		Task task = tasks.get(0);
 		tasks.remove(0);
 
-		System.out.println("ACESSING " + task.getId());
-		ACLMessage inform = accepts.get(task.getId()).createReply();
-		accepts.remove(task.getId());
-		inform.setPerformative(ACLMessage.INFORM);
-		send(inform);
-		System.out.println("SENT INFORM");
+		ACLMessage accept = accepts.get(task.getId());
+		if (accept != null) {
+			ACLMessage inform = accept.createReply();
+			accepts.remove(task.getId());
+			inform.setPerformative(ACLMessage.INFORM);
+			send(inform);
+			System.out.println("SENT INFORM");
+		}
 	}
-	
+
 	public DoorState getDoorState() {
 		return doorState;
 	}
@@ -244,19 +244,13 @@ public class Lift extends Agent {
 	public void assignTask(int floor, Direction direction, ACLMessage accept) {
 		try {
 			int pos = this.algorithm.addNewTask(this.tasks, floor, direction, this.numFloors, (int)this.getPosition().getY());
-			for (int i = 0; i < this.tasks.size(); i++)
-				System.out.println("TASK " + this.tasks.get(i).getId());
-			if (accept != null) {
+			if (accept != null)
 				accepts.put(tasks.get(pos).getId(), accept);
-				System.out.println("SAVING " + tasks.get(pos).getId() + " pos: " + pos);
-			} else {
-				System.out.println("NOT SAVING " + tasks.get(pos).getId() + " pos: " + pos);
-			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void assignTask(int originFloor, int destinyFloor, ACLMessage accept) {
 		// TODO
 	}
@@ -264,7 +258,7 @@ public class Lift extends Agent {
 	public void ascend() {
 		space.moveByDisplacement(this, 0, 0.01f);
 	}
-	
+
 	public void descend() {
 		space.moveByDisplacement(this, 0, -0.01f);
 	}
@@ -272,24 +266,32 @@ public class Lift extends Agent {
 	public List<Task<Direction>> getTasks() {
 		return tasks;
 	}
-	
+
 	public int getCurrentFloor() {
 		return (int)Math.round(getPosition().getY());
 	}
-	
+
 	/**
 	 * This method should be called when the lift opens its doors, for people to leave and enter.
 	 */
 	public void passengersInOut() {
 		this.currentWeight -= god.dropoffHumans(humans, getCurrentFloor());
-		
+
 		List<Human> humans = god.attendWaitingHumans(getCurrentFloor(), this.maxWeight - this.currentWeight, getId());
 		this.currentWeight += calculateHumansWeight(humans);
 		for (Human human : humans) {
-			this.algorithm.attendRequest(tasks, human.getDestinyFloor(), this.numFloors, getCurrentFloor());
+			boolean found = false;
+			for (Task task : tasks) {
+				if (task.getDestiny().equals(human.getDestinyFloor()) && task.getFloor() == getCurrentFloor()) {
+					found = true;
+					break;
+				}
+			}
+			if (!found)
+				this.algorithm.attendRequest(tasks, human.getDestinyFloor(), this.numFloors, getCurrentFloor());
 		}
 	}
-	
+
 	private static int calculateHumansWeight(Collection<Human> humans) {
 		int weight = 0;
 		for (Human human : humans) {

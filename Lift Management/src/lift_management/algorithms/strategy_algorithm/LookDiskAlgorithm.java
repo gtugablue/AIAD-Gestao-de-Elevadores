@@ -156,6 +156,8 @@ public class LookDiskAlgorithm implements LiftAlgorithm<Direction>{
 	@Override
 	public int attendRequest(List<Task<Direction>> tasks, int requestedFloor, int maxBuildingFloor, int currentPosition){
 		Task<Direction> newTask = new Task<Direction>(requestedFloor, Direction.STOP); 
+		if (tasks.contains(newTask))
+			return tasks.indexOf(newTask);
 		if(tasks.size()==0){
 			tasks.add(newTask);
 			return 0;
