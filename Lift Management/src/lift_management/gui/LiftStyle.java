@@ -7,6 +7,7 @@ import lift_management.agents.Building;
 import lift_management.agents.Lift;
 import lift_management.agents.Lift.DoorState;
 import repast.simphony.space.continuous.NdPoint;
+import repast.simphony.visualization.editedStyle.DefaultEditedStyleData2D;
 import repast.simphony.visualizationOGL2D.DefaultStyleOGL2D;
 import saf.v3d.scene.TextureLayer;
 import saf.v3d.scene.VComposite;
@@ -14,10 +15,15 @@ import saf.v3d.scene.VImage2D;
 import saf.v3d.scene.VSpatial;
 
 
-public class LiftStyle extends DefaultStyleOGL2D {
+public class LiftStyle extends DefaultEditedStyleData2D {
 	public static final float scale = 15;
 	public static final int liftDoorImageWidth = 200;
 	public static final int liftDoorImageHeight = 342;
+	
+	public LiftStyle() {
+		super();
+		this.iconFile2D = "icons/lift_closed.jpg";
+	}
 
 	/*@Override
 	public VSpatial getVSpatial(Object agent, VSpatial spatial) {
@@ -41,7 +47,7 @@ public class LiftStyle extends DefaultStyleOGL2D {
 			spatial = composite;
 		}
 		return spatial;
-	}*/
+	}
 
 	@Override
 	public Color getColor(Object agent) {
@@ -51,5 +57,5 @@ public class LiftStyle extends DefaultStyleOGL2D {
 	@Override
 	public String getLabel(Object agent) {
 		return "AAA";
-	}
+	}*/
 }

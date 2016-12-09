@@ -80,6 +80,7 @@ public class Lift extends Agent {
 		this.tasks = new ArrayList<Task<Direction>>();
 		this.accepts = new HashMap<Integer, ACLMessage>();
 		this.algorithm = new LookDiskAlgorithm();
+		this.humans = new ArrayList<Human>();
 	}
 
 	@Override
@@ -173,7 +174,6 @@ public class Lift extends Agent {
 
 		@Override
 		protected ACLMessage handleAcceptProposal(ACLMessage cfp, ACLMessage propose, ACLMessage accept) {
-			//System.out.println(myAgent.getLocalName() + ": proposal accepted");
 			ACLMessage result = accept.createReply();
 
 			DirectionalCall call;
@@ -200,7 +200,6 @@ public class Lift extends Agent {
 
 		@Override
 		protected void handleRejectProposal(ACLMessage cfp, ACLMessage propose, ACLMessage accept) {
-			//System.out.println(myAgent.getLocalName() + ": proposal rejected");
 		}
 
 	}
@@ -275,10 +274,10 @@ public class Lift extends Agent {
 	 * This method should be called when the lift opens its doors, for people to leave and enter.
 	 */
 	public void passengersInOut() {
-		this.currentWeight -= god.dropoffHumans(humans, getCurrentFloor());
-
-		List<Human> humans = god.attendWaitingHumans(getCurrentFloor(), this.maxWeight - this.currentWeight, getId());
-		this.currentWeight += calculateHumansWeight(humans);
+		this.humans.removeAll(god.dropoffHumans(getCurrentFloor()));
+		List<Human> newHumans = god.attendWaitingHumans(getCurrentFloor(), this.maxWeight - this.currentWeight, getId());
+		this.humans.addAll(newHumans);
+		this.currentWeight = calculateHumansWeight(this.humans);
 		for (Human human : humans) {
 			Task task = new Task(getCurrentFloor(), human.getDestinyFloor());
 			if (!tasks.contains(task)) {
@@ -307,5 +306,10 @@ public class Lift extends Agent {
 
 	public int getId() {
 		return id;
+	}
+	
+	public int getNumHumansInside() {
+		return this.humans.size();
+		//return god.getNumHumansInLift(getId());
 	}
 }
