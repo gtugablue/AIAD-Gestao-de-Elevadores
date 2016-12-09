@@ -1,6 +1,10 @@
 package lift_management.gui;
 
+import java.awt.Font;
+import java.awt.GraphicsEnvironment;
 import java.io.IOException;
+
+import com.jogamp.opengl.util.awt.TextRenderer;
 
 import lift_management.CallSystem;
 import lift_management.DirectionCallSystem;
@@ -8,9 +12,11 @@ import lift_management.FloorIndicatorCallSystem;
 import lift_management.agents.Building;
 import lift_management.agents.Lift;
 import repast.simphony.visualizationOGL2D.DefaultStyleOGL2D;
+import saf.v3d.scene.Label;
 import saf.v3d.scene.TextureLayer;
 import saf.v3d.scene.VComposite;
 import saf.v3d.scene.VImage2D;
+import saf.v3d.scene.VLabelLayer;
 import saf.v3d.scene.VSpatial;
 
 public class BuildingStyle extends DefaultStyleOGL2D {
@@ -27,7 +33,7 @@ public class BuildingStyle extends DefaultStyleOGL2D {
 			VComposite composite = new TextureLayer();
 			CallSystem callSystem = building.getCallSystem();
 			if (callSystem instanceof DirectionCallSystem) {
-				DirectionCallSystem directionCallSystem = (DirectionCallSystem) callSystem;
+				DirectionCallSystem directionCallSystem = (DirectionCallSystem) callSystem;				
 				try {
 					for (int i = 0; i < building.getNumLifts(); i++) {
 						for (int j = 0; j < building.getNumFloors(); j++) {

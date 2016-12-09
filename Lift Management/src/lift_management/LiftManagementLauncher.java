@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.swing.JFrame;
 
+import lift_management.gui.StatisticsPanel;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.wrapper.StaleProxyException;
@@ -56,6 +57,8 @@ public class LiftManagementLauncher extends RepastSLauncher {
 		} catch (StaleProxyException e) {
 			e.printStackTrace();
 		}
+        
+        StatisticsPanel.run();
     }
     
     private void launchAgents() throws StaleProxyException {
@@ -87,7 +90,7 @@ public class LiftManagementLauncher extends RepastSLauncher {
     private List<Lift> createLifts(God god, int numLifts, ContinuousSpace<Object> space, Context<Object> context) {
     	ArrayList<Lift> lifts = new ArrayList<Lift>();
     	for (int i = 0; i < numLifts; i++) {
-    		Lift lift = new Lift(i, god, space, config.maxWeights[i], config.numFloors);
+    		Lift lift = new Lift(i, god, space, config.numFloors, config.maxWeights[i]);
     		lifts.add(lift);
     		context.add(lift);
     		space.moveTo(lift, i + 1, 0);

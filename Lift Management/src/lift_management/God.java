@@ -35,10 +35,10 @@ public class God {
 	 * @return weight in lbs
 	 */
 	protected static double getKgToLbs(double weight){
-		return weight / conversionRate;
+		return weight * conversionRate;
 	}
 
-	protected static double generateWeigth(){
+	protected static double generateWeight(){
 		double weight = random.nextGaussian()*standardVariance+mean;
 
 		return getKgToLbs(weight);
@@ -49,10 +49,7 @@ public class God {
 
 		double groundFloorRate = 0.4;
 		double nFloorRate = (1-groundFloorRate)/(n-1);
-		double x = random.nextDouble();		
-
-		System.out.println("nFloorRate: "+nFloorRate);
-		System.out.println("x: "+x);
+		double x = random.nextDouble();
 
 		if(x <= groundFloorRate){
 			return 0;
@@ -99,7 +96,7 @@ public class God {
 		ArrayList<Human> humans = new ArrayList<Human>();
 		Human human;
 		for (int i = 0; i < numHumans; i++) {
-			double weight = generateWeigth();
+			double weight = generateWeight();
 			human = new Human(weight, originFloor, destinyFloor);
 			humans.add(human);
 		}
@@ -137,6 +134,7 @@ public class God {
 		List<Human> humans = new ArrayList<Human>();
 		int currWeight = 0;
 		synchronized (this.humans) {
+			System.out.println(this.humans.size());
 			for (Human human : this.humans) {
 				if (human.getLiftID() != null)
 					continue; // Human already in a lift
@@ -154,23 +152,34 @@ public class God {
 
 	/**
 	 * 
-	 * @param humans
 	 * @param currFloor
-	 * @return The weight of the humans that left the lift.
+	 * @return The humans that left the lift.
 	 */
-	public int dropoffHumans(List<Human> humans, int currFloor) {
-		int weight = 0;
+	public List<Human> dropoffHumans(int currFloor) {
+		List<Human> removed = new ArrayList<Human>();
 		synchronized (this.humans) {
 			Iterator<Human> iter = this.humans.iterator();
 			while(iter.hasNext()){
 				Human human = iter.next();
 				if (currFloor == human.getDestinyFloor()) {
 					human.setLiftID(null);
-					weight += human.getWeight();
 					iter.remove();
+					removed.add(human);
 				}
 			}
 		}
-		return weight;
+		return removed;
+	}
+	
+	public int getNumHumansInLift(int liftId) {
+		int n = 0;
+		synchronized (this.humans) {
+			for (Human human : this.humans) {
+				Integer humanLiftId = human.getLiftID();
+				if (humanLiftId != null && humanLiftId.equals(liftId))
+					n++;
+			}
+		}
+		return n;
 	}
 }
