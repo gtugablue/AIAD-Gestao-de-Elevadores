@@ -31,7 +31,7 @@ public abstract class LiftAlgorithm<T>{
 	 * @param requestedDestiny
 	 * @param maxBuildingFloor
 	 * @param currentPosition
-	 * @return posição onde foi
+	 * @return posição onde foi inserida a nova task
 	 * @throws Exception
 	 */
 	public abstract int addNewTask(List<Task<T>> tasks, int requestedFloor, T requestedDestiny, int maxBuildingFloor, int currentPosition) throws Exception;

@@ -9,7 +9,9 @@ import sajas.proto.SSResponderDispatcher;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import jade.content.lang.Codec;
@@ -55,7 +57,7 @@ public class Lift extends Agent {
 	private List<Task<Direction>> tasks;
 	private final int maxWeight;
 	private int currentWeight;
-	private List<ACLMessage> accepts;
+	private Map<Integer, ACLMessage> accepts;
 	private int numFloors;
 	private AID buildingAID;
 	private List<Human> humans;
@@ -76,10 +78,10 @@ public class Lift extends Agent {
 		this.numFloors = numFloors;
 		this.maxWeight = maxWeight;
 		this.tasks = new ArrayList<Task<Direction>>();
-		this.accepts = new ArrayList<ACLMessage>();
+		this.accepts = new HashMap<Integer, ACLMessage>();
 		this.algorithm = new LookDiskAlgorithm();
 	}
-	
+
 	@Override
 	protected void setup() {
 		register();
@@ -110,7 +112,7 @@ public class Lift extends Agent {
 		serviceOntology = ServiceOntology.getInstance();
 		getContentManager().registerLanguage(codec);
 		getContentManager().registerOntology(serviceOntology);
-		
+
 	}
 
 	@Override
@@ -159,7 +161,7 @@ public class Lift extends Agent {
 			reply.setPerformative(ACLMessage.PROPOSE);
 			try {
 				DirectionalCall call = (DirectionalCall)((ServiceProposalRequest)getContentManager().extractContent(cfp)).getCall();
-				int price = new LookDiskAlgorithm().evaluate(lift.tasks, call.getOrigin(), call.isAscending() ? Direction.UP : Direction.DOWN, numFloors, (int) Math.round(lift.getPosition().getY()));
+				int price = lift.algorithm.evaluate(lift.tasks, call.getOrigin(), call.isAscending() ? Direction.UP : Direction.DOWN, numFloors, (int) Math.round(lift.getPosition().getY()));
 				getContentManager().fillContent(reply, new ServiceProposal("attend-request", price));
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -178,8 +180,7 @@ public class Lift extends Agent {
 			try {
 				//TODO generalize to different calls
 				call = (DirectionalCall) ((ServiceProposalRequest) getContentManager().extractContent(cfp)).getCall();
-				addRequest(call);
-				accepts.add(accept);
+				addRequest(call, accept);
 				return null; // We'll send the response manually later
 			} catch (CodecException | OntologyException e) {
 				e.printStackTrace();
@@ -188,13 +189,13 @@ public class Lift extends Agent {
 
 			return result;
 		}
-		
-		private void addRequest(DirectionalCall call) {
+
+		private void addRequest(DirectionalCall call, ACLMessage accept) {
 			for (int i = 0; i < tasks.size(); i++) {
 				if (tasks.get(i).getFloor() == call.getOrigin() && tasks.get(i).getDestiny().equals(call.getDirection()))
 					return;
 			}
-			tasks.add(new Task<Direction>(call.getOrigin(), call.getDirection())); // TODO insert in the right place
+			assignTask(call.getOrigin(), call.getDirection(), accept);
 		}
 
 		@Override
@@ -208,16 +209,20 @@ public class Lift extends Agent {
 		passengersInOut();
 		if (tasks.isEmpty())
 			return;
-		
+
+		Task task = tasks.get(0);
 		tasks.remove(0);
 
-		ACLMessage inform = accepts.get(0).createReply();
-		accepts.remove(0);
-		inform.setPerformative(ACLMessage.INFORM);
-		send(inform);
-		System.out.println("SENT INFORM");
+		ACLMessage accept = accepts.get(task.getId());
+		if (accept != null) {
+			ACLMessage inform = accept.createReply();
+			accepts.remove(task.getId());
+			inform.setPerformative(ACLMessage.INFORM);
+			send(inform);
+			System.out.println("SENT INFORM");
+		}
 	}
-	
+
 	public DoorState getDoorState() {
 		return doorState;
 	}
@@ -230,19 +235,30 @@ public class Lift extends Agent {
 		return this.maxWeight;
 	}
 
-	public void assignTask(int originFloor, Direction direction) {
-		this.tasks.add(new Task<Direction>(originFloor, direction));
-		// TODO place in the correct position
+	/**
+	 * Adds a new task by placing it in the correct spot in the task list.
+	 * @param floor
+	 * @param direction
+	 * @param accept The Accept Proposal message that originated this task.
+	 */
+	public void assignTask(int floor, Direction direction, ACLMessage accept) {
+		try {
+			int pos = this.algorithm.addNewTask(this.tasks, floor, direction, this.numFloors, (int)this.getPosition().getY());
+			if (accept != null)
+				accepts.put(tasks.get(pos).getId(), accept);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
-	public void assignTask(int originFloor, int destinyFloor) {
+	public void assignTask(int originFloor, int destinyFloor, ACLMessage accept) {
 		// TODO
 	}
 
 	public void ascend() {
 		space.moveByDisplacement(this, 0, 0.01f);
 	}
-	
+
 	public void descend() {
 		space.moveByDisplacement(this, 0, -0.01f);
 	}
@@ -250,24 +266,32 @@ public class Lift extends Agent {
 	public List<Task<Direction>> getTasks() {
 		return tasks;
 	}
-	
+
 	public int getCurrentFloor() {
 		return (int)Math.round(getPosition().getY());
 	}
-	
+
 	/**
 	 * This method should be called when the lift opens its doors, for people to leave and enter.
 	 */
 	public void passengersInOut() {
 		this.currentWeight -= god.dropoffHumans(humans, getCurrentFloor());
-		
+
 		List<Human> humans = god.attendWaitingHumans(getCurrentFloor(), this.maxWeight - this.currentWeight, getId());
 		this.currentWeight += calculateHumansWeight(humans);
 		for (Human human : humans) {
-			this.algorithm.attendRequest(tasks, human.getDestinyFloor(), this.numFloors, getCurrentFloor());
+			boolean found = false;
+			for (Task task : tasks) {
+				if (task.getDestiny().equals(human.getDestinyFloor()) && task.getFloor() == getCurrentFloor()) {
+					found = true;
+					break;
+				}
+			}
+			if (!found)
+				this.algorithm.attendRequest(tasks, human.getDestinyFloor(), this.numFloors, getCurrentFloor());
 		}
 	}
-	
+
 	private static int calculateHumansWeight(Collection<Human> humans) {
 		int weight = 0;
 		for (Human human : humans) {
