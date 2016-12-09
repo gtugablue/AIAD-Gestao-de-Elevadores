@@ -280,14 +280,8 @@ public class Lift extends Agent {
 		List<Human> humans = god.attendWaitingHumans(getCurrentFloor(), this.maxWeight - this.currentWeight, getId());
 		this.currentWeight += calculateHumansWeight(humans);
 		for (Human human : humans) {
-			boolean found = false;
-			for (Task task : tasks) {
-				if (task.getDestiny().equals(human.getDestinyFloor()) && task.getFloor() == getCurrentFloor()) {
-					found = true;
-					break;
-				}
-			}
-			if (!found)
+			Task task = new Task(getCurrentFloor(), human.getDestinyFloor());
+			if (!tasks.contains(task))
 				this.algorithm.attendRequest(tasks, human.getDestinyFloor(), this.numFloors, getCurrentFloor());
 		}
 	}
