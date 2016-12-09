@@ -31,7 +31,7 @@ public interface LiftAlgorithm<T>{
 	 * @param requestedDirection
 	 * @param maxBuildingFloor
 	 * @param currentPosition
-	 * @return posição onde foi
+	 * @return posição onde foi inserida a nova task
 	 * @throws Exception
 	 */
 	public int addNewTask(List<Task<T>> tasks, int requestedFloor, Direction requestedDirection, int maxBuildingFloor, int currentPosition) throws Exception;

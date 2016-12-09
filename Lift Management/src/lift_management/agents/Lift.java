@@ -9,7 +9,9 @@ import sajas.proto.SSResponderDispatcher;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import jade.content.lang.Codec;
@@ -55,7 +57,7 @@ public class Lift extends Agent {
 	private List<Task<Direction>> tasks;
 	private final int maxWeight;
 	private int currentWeight;
-	private List<ACLMessage> accepts;
+	private Map<Integer, ACLMessage> accepts;
 	private int numFloors;
 	private AID buildingAID;
 	private List<Human> humans;
@@ -76,7 +78,7 @@ public class Lift extends Agent {
 		this.numFloors = numFloors;
 		this.maxWeight = maxWeight;
 		this.tasks = new ArrayList<Task<Direction>>();
-		this.accepts = new ArrayList<ACLMessage>();
+		this.accepts = new HashMap<Integer, ACLMessage>();
 		this.algorithm = new LookDiskAlgorithm();
 	}
 	
@@ -159,7 +161,7 @@ public class Lift extends Agent {
 			reply.setPerformative(ACLMessage.PROPOSE);
 			try {
 				DirectionalCall call = (DirectionalCall)((ServiceProposalRequest)getContentManager().extractContent(cfp)).getCall();
-				int price = new LookDiskAlgorithm().evaluate(lift.tasks, call.getOrigin(), call.isAscending() ? Direction.UP : Direction.DOWN, numFloors, (int) Math.round(lift.getPosition().getY()));
+				int price = lift.algorithm.evaluate(lift.tasks, call.getOrigin(), call.isAscending() ? Direction.UP : Direction.DOWN, numFloors, (int) Math.round(lift.getPosition().getY()));
 				getContentManager().fillContent(reply, new ServiceProposal("attend-request", price));
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -178,8 +180,7 @@ public class Lift extends Agent {
 			try {
 				//TODO generalize to different calls
 				call = (DirectionalCall) ((ServiceProposalRequest) getContentManager().extractContent(cfp)).getCall();
-				addRequest(call);
-				accepts.add(accept);
+				addRequest(call, accept);
 				return null; // We'll send the response manually later
 			} catch (CodecException | OntologyException e) {
 				e.printStackTrace();
@@ -189,12 +190,12 @@ public class Lift extends Agent {
 			return result;
 		}
 		
-		private void addRequest(DirectionalCall call) {
+		private void addRequest(DirectionalCall call, ACLMessage accept) {
 			for (int i = 0; i < tasks.size(); i++) {
 				if (tasks.get(i).getFloor() == call.getOrigin() && tasks.get(i).getDestiny().equals(call.getDirection()))
 					return;
 			}
-			tasks.add(new Task<Direction>(call.getOrigin(), call.getDirection())); // TODO insert in the right place
+			assignTask(call.getOrigin(), call.getDirection(), accept);
 		}
 
 		@Override
@@ -209,10 +210,14 @@ public class Lift extends Agent {
 		if (tasks.isEmpty())
 			return;
 		
+		for (int i = 0; i < tasks.size(); i++)
+			System.out.println("TASK2 " + this.tasks.get(i).getId());
+		Task task = tasks.get(0);
 		tasks.remove(0);
 
-		ACLMessage inform = accepts.get(0).createReply();
-		accepts.remove(0);
+		System.out.println("ACESSING " + task.getId());
+		ACLMessage inform = accepts.get(task.getId()).createReply();
+		accepts.remove(task.getId());
 		inform.setPerformative(ACLMessage.INFORM);
 		send(inform);
 		System.out.println("SENT INFORM");
@@ -230,12 +235,29 @@ public class Lift extends Agent {
 		return this.maxWeight;
 	}
 
-	public void assignTask(int originFloor, Direction direction) {
-		this.tasks.add(new Task<Direction>(originFloor, direction));
-		// TODO place in the correct position
+	/**
+	 * Adds a new task by placing it in the correct spot in the task list.
+	 * @param floor
+	 * @param direction
+	 * @param accept The Accept Proposal message that originated this task.
+	 */
+	public void assignTask(int floor, Direction direction, ACLMessage accept) {
+		try {
+			int pos = this.algorithm.addNewTask(this.tasks, floor, direction, this.numFloors, (int)this.getPosition().getY());
+			for (int i = 0; i < this.tasks.size(); i++)
+				System.out.println("TASK " + this.tasks.get(i).getId());
+			if (accept != null) {
+				accepts.put(tasks.get(pos).getId(), accept);
+				System.out.println("SAVING " + tasks.get(pos).getId() + " pos: " + pos);
+			} else {
+				System.out.println("NOT SAVING " + tasks.get(pos).getId() + " pos: " + pos);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
-
-	public void assignTask(int originFloor, int destinyFloor) {
+	
+	public void assignTask(int originFloor, int destinyFloor, ACLMessage accept) {
 		// TODO
 	}
 
