@@ -281,8 +281,19 @@ public class Lift extends Agent {
 		this.currentWeight += calculateHumansWeight(humans);
 		for (Human human : humans) {
 			Task task = new Task(getCurrentFloor(), human.getDestinyFloor());
-			if (!tasks.contains(task))
-				this.algorithm.attendRequest(tasks, human.getDestinyFloor(), this.numFloors, getCurrentFloor());
+			if (!tasks.contains(task)) {
+				int pos = this.algorithm.attendRequest(tasks, human.getDestinyFloor(), this.numFloors, getCurrentFloor());
+				for (int i = pos + 1; i < tasks.size(); i++) {
+					int taskID = tasks.get(i).getId();
+					tasks.remove(i);
+					if (accepts.containsKey(taskID)) {
+						ACLMessage accept = accepts.remove(taskID);
+						accept.setPerformative(ACLMessage.FAILURE);
+						send(accept);
+					}
+					i--;
+				}
+			}
 		}
 	}
 

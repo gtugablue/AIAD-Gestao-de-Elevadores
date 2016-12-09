@@ -19,7 +19,7 @@ public class LiftStyle extends DefaultStyleOGL2D {
 	public static final int liftDoorImageWidth = 200;
 	public static final int liftDoorImageHeight = 342;
 
-	@Override
+	/*@Override
 	public VSpatial getVSpatial(Object agent, VSpatial spatial) {
 		if (agent instanceof Lift) {
 			Lift lift = (Lift)agent;
@@ -41,10 +41,15 @@ public class LiftStyle extends DefaultStyleOGL2D {
 			spatial = composite;
 		}
 		return spatial;
-	}
+	}*/
 
 	@Override
 	public Color getColor(Object agent) {
 		return Color.GRAY;
+	}
+	
+	@Override
+	public String getLabel(Object agent) {
+		return "AAA";
 	}
 }

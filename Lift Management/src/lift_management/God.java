@@ -49,10 +49,7 @@ public class God {
 
 		double groundFloorRate = 0.4;
 		double nFloorRate = (1-groundFloorRate)/(n-1);
-		double x = random.nextDouble();		
-
-		System.out.println("nFloorRate: "+nFloorRate);
-		System.out.println("x: "+x);
+		double x = random.nextDouble();
 
 		if(x <= groundFloorRate){
 			return 0;
