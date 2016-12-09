@@ -6,7 +6,7 @@ import javafx.util.Pair;
 import lift_management.agents.Lift.Direction;
 import lift_management.models.Task;
 
-public class ClosestAttendsAlgorithm implements LiftAlgorithm<Direction> {
+public class ClosestAttendsAlgorithm extends LiftAlgorithm<Direction> {
 
 	@Override
 	public int evaluate(List<Task<Direction>> tasks, int requestedFloor, Direction requestedTask, int maxBuildingFloor, int currentPosition) throws Exception {
