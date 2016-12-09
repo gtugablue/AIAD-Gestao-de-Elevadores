@@ -4,8 +4,10 @@ import java.util.List;
 
 import javafx.util.Pair;
 import lift_management.agents.Lift.Direction;
+import lift_management.models.Task;
 
-public interface LiftAlgorithm {
+public interface LiftAlgorithm<T>{
+	
 	
 	/**
 	 * Dada a lista de tarafas de um elevador, a sua posição actual, o número de pisos do edifício e um pedido , analisa qual é o custo de atender o pedido.
@@ -18,7 +20,7 @@ public interface LiftAlgorithm {
 	 * @return Retorna a quantidade de pisos percorridos até parar o requestedFloor e atender o pedido do Human
 	 * @throws Exception 
 	 */
-	public int evaluate(List<Pair<Integer, Direction>> tasks, int requestedFloor, Direction requestedTask, int maxBuildingFloor, int currentPosition) throws Exception;
+	public int evaluate(List<Task<T>> tasks, int requestedFloor, Direction requestedTask, int maxBuildingFloor, int currentPosition) throws Exception;
 	
 	
 	/**
@@ -32,7 +34,7 @@ public interface LiftAlgorithm {
 	 * @return posição onde foi
 	 * @throws Exception
 	 */
-	public int addNewTask(List<Pair<Integer, Direction>> tasks, int requestedFloor, Direction requestedDirection, int maxBuildingFloor, int currentPosition) throws Exception;
+	public int addNewTask(List<Task<T>> tasks, int requestedFloor, Direction requestedDirection, int maxBuildingFloor, int currentPosition) throws Exception;
 
 	
 	/**
@@ -43,6 +45,6 @@ public interface LiftAlgorithm {
 	 * @param currentPosition
 	 * @return retorna a posição onde foi colocado
 	 */
-	public int attendRequest(List<Pair<Integer, Direction>> tasks, int requestedFloor, int maxBuildingFloor, int currentPosition);
+	public int attendRequest(List<Task<T>> tasks, int requestedFloor, int maxBuildingFloor, int currentPosition);
 
 }

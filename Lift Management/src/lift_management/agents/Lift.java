@@ -7,6 +7,7 @@ import sajas.proto.SSContractNetResponder;
 import sajas.proto.SSResponderDispatcher;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
@@ -26,9 +27,12 @@ import jade.lang.acl.MessageTemplate;
 import javafx.util.Pair;
 import lift_management.Call;
 import lift_management.DirectionalCall;
+import lift_management.God;
 import lift_management.Human;
 import lift_management.behaviours.LiftBehaviour;
+import lift_management.models.Task;
 import lift_management.algorithms.strategy_algorithm.ClosestAttendsAlgorithm;
+import lift_management.algorithms.strategy_algorithm.LiftAlgorithm;
 import lift_management.algorithms.strategy_algorithm.LookDiskAlgorithm;
 import lift_management.onto.ServiceExecutionRequest;
 import lift_management.onto.ServiceOntology;
@@ -48,12 +52,16 @@ public class Lift extends Agent {
 	private Codec codec;
 	private Ontology serviceOntology;
 	private ContinuousSpace<Object> space;
-	private final float maxWeight;
-	private List<Pair<Integer, Direction>> tasks;
+	private List<Task<Direction>> tasks;
+	private final int maxWeight;
+	private int currentWeight;
 	private List<ACLMessage> accepts;
 	private int numFloors;
 	private AID buildingAID;
 	private List<Human> humans;
+	private God god;
+	private int id;
+	private LiftAlgorithm algorithm;
 	public enum DoorState {
 		OPEN,
 		CLOSED
@@ -61,12 +69,15 @@ public class Lift extends Agent {
 	public enum Direction {UP, DOWN, STOP};
 	private DoorState doorState = DoorState.CLOSED;
 
-	public Lift(ContinuousSpace<Object> space, int numFloors, float maxWeight) {
+	public Lift(int id, God god, ContinuousSpace<Object> space, int numFloors, int maxWeight) {
+		this.id = id;
+		this.god = god;
 		this.space = space;
 		this.numFloors = numFloors;
 		this.maxWeight = maxWeight;
-		this.tasks = new ArrayList<Pair<Integer, Direction>>();
+		this.tasks = new ArrayList<Task<Direction>>();
 		this.accepts = new ArrayList<ACLMessage>();
+		this.algorithm = new LookDiskAlgorithm();
 	}
 	
 	@Override
@@ -180,10 +191,10 @@ public class Lift extends Agent {
 		
 		private void addRequest(DirectionalCall call) {
 			for (int i = 0; i < tasks.size(); i++) {
-				if (tasks.get(i).getKey().equals(call.getOrigin()) && tasks.get(i).getValue().equals(call.getDirection()))
+				if (tasks.get(i).getFloor() == call.getOrigin() && tasks.get(i).getDestiny().equals(call.getDirection()))
 					return;
 			}
-			tasks.add(new Pair<Integer, Direction>(call.getOrigin(), call.getDirection())); // TODO insert in the right place
+			tasks.add(new Task<Direction>(call.getOrigin(), call.getDirection())); // TODO insert in the right place
 		}
 
 		@Override
@@ -194,6 +205,7 @@ public class Lift extends Agent {
 	}
 
 	public void handleTaskComplete() {
+		passengersInOut();
 		if (tasks.isEmpty())
 			return;
 		
@@ -219,7 +231,7 @@ public class Lift extends Agent {
 	}
 
 	public void assignTask(int originFloor, Direction direction) {
-		this.tasks.add(new Pair<Integer, Direction>(originFloor, direction));
+		this.tasks.add(new Task<Direction>(originFloor, direction));
 		// TODO place in the correct position
 	}
 
@@ -235,7 +247,36 @@ public class Lift extends Agent {
 		space.moveByDisplacement(this, 0, -0.01f);
 	}
 
-	public List<Pair<Integer, Direction>> getTasks() {
+	public List<Task<Direction>> getTasks() {
 		return tasks;
+	}
+	
+	public int getCurrentFloor() {
+		return (int)Math.round(getPosition().getY());
+	}
+	
+	/**
+	 * This method should be called when the lift opens its doors, for people to leave and enter.
+	 */
+	public void passengersInOut() {
+		this.currentWeight -= god.dropoffHumans(humans, getCurrentFloor());
+		
+		List<Human> humans = god.attendWaitingHumans(getCurrentFloor(), this.maxWeight - this.currentWeight, getId());
+		this.currentWeight += calculateHumansWeight(humans);
+		for (Human human : humans) {
+			this.algorithm.attendRequest(tasks, human.getDestinyFloor(), this.numFloors, getCurrentFloor());
+		}
+	}
+	
+	private static int calculateHumansWeight(Collection<Human> humans) {
+		int weight = 0;
+		for (Human human : humans) {
+			weight += human.getWeight();
+		}
+		return weight;
+	}
+
+	public int getId() {
+		return id;
 	}
 }
