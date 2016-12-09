@@ -7,7 +7,7 @@ import lift_management.TravelTimes;
 import lift_management.agents.Lift.Direction;
 import lift_management.models.Task;
 
-public class LookDiskAlgorithm implements LiftAlgorithm<Direction>{
+public class LookDiskAlgorithm extends LiftAlgorithm<Direction>{
 	
 	@Override
 	public int evaluate(List<Task<Direction>> tasks, int requestedFloor, Direction requestedDirection, int maxBuildingFloor, int currentPosition) throws Exception{
@@ -40,7 +40,7 @@ public class LookDiskAlgorithm implements LiftAlgorithm<Direction>{
 				if(!(previousDirection.equals(direction) || previousDirection.equals(Direction.STOP))){	//Se a direção do elevador é não for igual à direção de próxima tarefa e não for STOP, quer dizer que o elevador vai fazer uma paragem entre esta tarefa e a próxima tarefa que involve andar no sentido oposto.													
 					int estimatedDestiny = getEstimatedDestiny(previousStop, previousDirection, maxBuildingFloor);
 					numStops++;
-					floorsTraveled += Math.abs( estimatedDestiny - previousStop) + Math.abs(estimatedDestiny + requestedFloor); //O custo será então igual a fazer uma viagem que satisfaça o pedido anterior mais o de ir dessa paragem para o requestedFloor
+					floorsTraveled += Math.abs( estimatedDestiny - previousStop) + Math.abs(estimatedDestiny - requestedFloor); //O custo será então igual a fazer uma viagem que satisfaça o pedido anterior mais o de ir dessa paragem para o requestedFloor
 				}
 				else{
 					floorsTraveled += Math.abs(previousStop - requestedFloor);
@@ -52,7 +52,7 @@ public class LookDiskAlgorithm implements LiftAlgorithm<Direction>{
 			numStops++;
 			floorsTraveled += Math.abs(nextStop-previousStop);
 			previousStop = nextStop;
-			nextDirection = previousDirection;
+			previousDirection = nextDirection;
 		}
 				
 		//Percorreu toda a lista de tasks e ainda assim não foi atribuido a uma posição
@@ -63,7 +63,7 @@ public class LookDiskAlgorithm implements LiftAlgorithm<Direction>{
 			}else{
 				estimatedDestiny = getEstimatedDestiny(previousStop, previousDirection, maxBuildingFloor);
 				numStops++;
-				floorsTraveled += Math.abs( estimatedDestiny - previousStop) + Math.abs(estimatedDestiny + requestedFloor); //O custo será então igual a fazer uma viagem que satisfaça o pedido anterior mais o de ir dessa paragem para o requestedFloor
+				floorsTraveled += Math.abs( estimatedDestiny - previousStop) + Math.abs(estimatedDestiny - requestedFloor); //O custo será então igual a fazer uma viagem que satisfaça o pedido anterior mais o de ir dessa paragem para o requestedFloor
 			}	
 		}
 		
@@ -81,9 +81,7 @@ public class LookDiskAlgorithm implements LiftAlgorithm<Direction>{
 		
 	}
 
-	protected static boolean floorInBetween(int previous, int next, int n){
-		return (previous < n && n <= next) || (previous > n && n >= next);
-	}
+	
 	
 	protected static Direction getDirection(List<Task<Direction>> tasks,int i, int previousStop){		
 		Direction direction;
@@ -144,7 +142,7 @@ public class LookDiskAlgorithm implements LiftAlgorithm<Direction>{
 			}
 			
 			previousStop = nextStop;
-			nextDirection = previousDirection;
+			previousDirection = nextDirection;
 		}
 		
 		
@@ -181,7 +179,7 @@ public class LookDiskAlgorithm implements LiftAlgorithm<Direction>{
 			}
 			
 			previousStop = nextStop;
-			nextDirection = previousDirection;
+			previousDirection = nextDirection;
 		}
 		
 		//Percorreu toda a lista de tasks e ainda assim não foi atribuido a uma posição				

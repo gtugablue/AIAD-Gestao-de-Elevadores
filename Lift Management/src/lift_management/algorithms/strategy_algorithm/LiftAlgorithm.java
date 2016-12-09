@@ -6,7 +6,7 @@ import javafx.util.Pair;
 import lift_management.agents.Lift.Direction;
 import lift_management.models.Task;
 
-public interface LiftAlgorithm<T>{
+public abstract class LiftAlgorithm<T>{
 	
 	
 	/**
@@ -14,13 +14,13 @@ public interface LiftAlgorithm<T>{
 	 * 
 	 * @param tasks
 	 * @param requestedFloor
-	 * @param requestedTask
+	 * @param requestedDestiny
 	 * @param maxBuildingFloor
 	 * @param currentPosition
 	 * @return Retorna a quantidade de pisos percorridos até parar o requestedFloor e atender o pedido do Human
 	 * @throws Exception 
 	 */
-	public int evaluate(List<Task<T>> tasks, int requestedFloor, Direction requestedTask, int maxBuildingFloor, int currentPosition) throws Exception;
+	public abstract int evaluate(List<Task<T>> tasks, int requestedFloor, T requestedDestiny, int maxBuildingFloor, int currentPosition) throws Exception;
 	
 	
 	/**
@@ -28,13 +28,13 @@ public interface LiftAlgorithm<T>{
 	 * 
 	 * @param tasks
 	 * @param requestedFloor
-	 * @param requestedDirection
+	 * @param requestedDestiny
 	 * @param maxBuildingFloor
 	 * @param currentPosition
 	 * @return posição onde foi
 	 * @throws Exception
 	 */
-	public int addNewTask(List<Task<T>> tasks, int requestedFloor, Direction requestedDirection, int maxBuildingFloor, int currentPosition) throws Exception;
+	public abstract int addNewTask(List<Task<T>> tasks, int requestedFloor, T requestedDestiny, int maxBuildingFloor, int currentPosition) throws Exception;
 
 	
 	/**
@@ -45,6 +45,24 @@ public interface LiftAlgorithm<T>{
 	 * @param currentPosition
 	 * @return retorna a posição onde foi colocado
 	 */
-	public int attendRequest(List<Task<T>> tasks, int requestedFloor, int maxBuildingFloor, int currentPosition);
+	public abstract int attendRequest(List<Task<T>> tasks, int requestedFloor, int maxBuildingFloor, int currentPosition);
+	
+	protected static boolean floorInBetween(int previous, int next, int n){
+		return (previous < n && n <= next) || (previous > n && n >= next);
+	}
+	
+	protected static Direction getDirection(int previousStop, int nextStop){
+		Direction direction;
+		
+		if(previousStop > nextStop) {
+			direction = Direction.UP;
+		}else if(previousStop < nextStop){
+			direction = Direction.DOWN;
+		}else{
+			direction = Direction.STOP;
+		}
+		
+		return direction;
+	}
 
 }
