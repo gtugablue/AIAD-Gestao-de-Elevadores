@@ -72,10 +72,11 @@ public class LiftManagementLauncher extends RepastSLauncher {
         	PointTranslator translator = new StrictBorders();
         	ContinuousSpaceFactory factory = ContinuousSpaceFactoryFinder.createContinuousSpaceFactory(null);
         	ContinuousSpace<Object> space = factory.createContinuousSpace("space", context, adder, translator, config.numLifts + 1, Building.floorHeight * config.numFloors);
-        	building = new Building(config.numLifts, config.numFloors);
+        	God god = new God(config.numFloors);
+        	building = new Building(god, config.numLifts, config.numFloors);
         	context.add(building);
         	space.moveTo(building, 0, 0);
-        	lifts = createLifts(config.numLifts, space, context);
+        	lifts = createLifts(god, config.numLifts, space, context);
         	return super.build(context);
     	} catch (IllegalParameterException e) {
     		e.printStackTrace();
@@ -83,10 +84,10 @@ public class LiftManagementLauncher extends RepastSLauncher {
     	}
     }
     
-    private List<Lift> createLifts(int numLifts, ContinuousSpace<Object> space, Context<Object> context) {
+    private List<Lift> createLifts(God god, int numLifts, ContinuousSpace<Object> space, Context<Object> context) {
     	ArrayList<Lift> lifts = new ArrayList<Lift>();
     	for (int i = 0; i < numLifts; i++) {
-    		Lift lift = new Lift(space, config.maxWeights[i], config.numFloors);
+    		Lift lift = new Lift(i, god, space, config.maxWeights[i], config.numFloors);
     		lifts.add(lift);
     		context.add(lift);
     		space.moveTo(lift, i + 1, 0);
