@@ -51,4 +51,10 @@ public class Task<T> {
 			return false;
 		return true;
 	}
+
+	@Override
+	public String toString() {
+		return "Task [id=" + id + ", floor=" + floor + ", destiny=" + destiny + "]";
+	}
+		
 }
