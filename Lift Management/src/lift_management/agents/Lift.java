@@ -274,7 +274,7 @@ public class Lift extends Agent {
 	 */
 	public void passengersInOut() {
 		this.humans.removeAll(god.dropoffHumans(getId(), getCurrentFloor()));
-		List<Human> newHumans = god.attendWaitingHumans(getCurrentFloor(), this.maxWeight - this.currentWeight, getId());
+		List<Human> newHumans = god.attendWaitingHumans(getCurrentFloor(), this.maxWeight - this.currentWeight, getId(), possibleDestinies(getCurrentFloor(), this.numFloors));
 		this.humans.addAll(newHumans);
 		this.currentWeight = calculateHumansWeight(this.humans);
 		for (Human human : humans) {
@@ -295,6 +295,29 @@ public class Lift extends Agent {
 		}
 	}
 
+	public boolean[] possibleDestinies(int currFloor, int numFloors) {
+		boolean[] possibleDestinies = new boolean[numFloors];
+		if (tasks.isEmpty()) {
+			for (int i = 0; i < numFloors; i++) {
+				possibleDestinies[i] = true;
+			}
+		} else {
+			int dest = tasks.get(0).getFloor();
+			Direction liftDirection = LiftAlgorithm.getDirection(currFloor, dest);
+			for (int i = 0; i < numFloors; i++) {
+				if (liftDirection.equals(Direction.STOP))
+					possibleDestinies[i] = true;
+				else
+					possibleDestinies[i] = liftDirection.equals(LiftAlgorithm.getDirection(currFloor, i));
+			}
+		}
+		/*for (int i = 0; i < numFloors; i++) {
+			System.out.print(possibleDestinies[i]);
+		}
+		System.out.println();*/
+		return possibleDestinies;
+	}
+
 	private static int calculateHumansWeight(Collection<Human> humans) {
 		int weight = 0;
 		for (Human human : humans) {
@@ -306,7 +329,7 @@ public class Lift extends Agent {
 	public int getId() {
 		return id;
 	}
-	
+
 	public int getNumHumansInside() {
 		return this.humans.size();
 		//return god.getNumHumansInLift(getId());

@@ -5,6 +5,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
+import lift_management.agents.Lift.Direction;
+
 
 public class God {
 	private static final long serialVersionUID = 6602617123027622789L;
@@ -129,23 +131,28 @@ public class God {
 		}
 	}
 
-	public List<Human> attendWaitingHumans(int floor, int maxWeight, int liftID) {
+	public List<Human> attendWaitingHumans(int floor, int maxWeight, int liftID, boolean[] possibleDestinies) {
 		List<Human> humans = new ArrayList<Human>();
 		int currWeight = 0;
 		synchronized (this.humans) {
-			System.out.println(this.humans.size());
 			for (Human human : this.humans) {
+				/*if (!possibleDestinies[human.getDestinyFloor()]) {
+					// TODO recall
+					continue; // The lift destination is different from the human destination
+				}*/
 				if (human.getLiftID() != null)
 					continue; // Human already in a lift
 
 				currWeight += human.getWeight();
-				if (currWeight > maxWeight)
-					break; // Lift is full
+				if (currWeight > maxWeight) { // Lift is full
+					break;
+				}
 
 				human.setLiftID(liftID);
 				humans.add(human);
 			}
 		}
+		System.out.println("Lift " + liftID + ": Picked up " + humans.size() + " humans on floor " + floor + ", leaving " + getNumHumansInFloor(floor) + " waiting");
 		return humans;
 	}
 
@@ -168,6 +175,7 @@ public class God {
 				}
 			}
 		}
+		System.out.println("Lift " + liftId + ": Dropped off " + removed.size() + " humans on floor " + currFloor + ".");
 		return removed;
 	}
 	
@@ -177,6 +185,17 @@ public class God {
 			for (Human human : this.humans) {
 				Integer humanLiftId = human.getLiftID();
 				if (humanLiftId != null && humanLiftId.equals(liftId))
+					n++;
+			}
+		}
+		return n;
+	}
+	
+	public int getNumHumansInFloor(int floor) {
+		int n = 0;
+		synchronized (this.humans) {
+			for (Human human : this.humans) {
+				if (human.getLiftID() == null && human.getOriginFloor() == floor)
 					n++;
 			}
 		}

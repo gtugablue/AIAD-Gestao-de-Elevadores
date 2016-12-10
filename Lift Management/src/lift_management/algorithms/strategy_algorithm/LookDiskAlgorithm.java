@@ -102,7 +102,7 @@ public class LookDiskAlgorithm extends LiftAlgorithm<Direction>{
 		return direction;
 	}
 	
-	protected static Direction getDirection(int previousStop, int nextStop){
+	public static Direction getDirection(int previousStop, int nextStop){
 		Direction direction;
 		
 		if(previousStop > nextStop) {

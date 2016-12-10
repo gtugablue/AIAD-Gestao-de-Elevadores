@@ -4,13 +4,13 @@
 		type="int" defaultValue="__NULL__" isReadOnly="false"
 		converter="repast.simphony.parameter.StringConverterFactory$IntConverter" />
 	<parameter name="numFloors" displayName="Number of floors"
-		type="int" defaultValue="15" isReadOnly="false"
+		type="int" defaultValue="5" isReadOnly="false"
 		converter="repast.simphony.parameter.StringConverterFactory$IntConverter" />
 	<parameter name="numLifts" displayName="Number of lifts"
-		type="int" defaultValue="4" isReadOnly="false"
+		type="int" defaultValue="2" isReadOnly="false"
 		converter="repast.simphony.parameter.StringConverterFactory$IntConverter" />
 	<parameter name="maxWeights" displayName="Max weight per lift"
-		type="java.lang.String" defaultValue="500 450 400 350" isReadOnly="false"
+		type="java.lang.String" defaultValue="500 450" isReadOnly="false"
 		converter="repast.simphony.parameter.StringConverterFactory$StringStringConverter" />
 		
 </parameters>
