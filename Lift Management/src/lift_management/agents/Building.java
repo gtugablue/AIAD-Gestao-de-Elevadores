@@ -46,8 +46,6 @@ public class Building extends Agent {
 	private Ontology serviceOntology;
 	private God god;
 	
-	private long ticks = 0;
-	
 	public Building(God god, int numLifts, int numFloors) {
 		this.god = god;
 		this.numLifts = numLifts;
@@ -83,13 +81,6 @@ public class Building extends Agent {
 			protected void onTick() {
 				Call call = god.generateNewCall();
 				addCall(call);
-				ticks += getTickCount();
-
-				if (StatisticsPanel.ready) {
-					StatisticsPanel.series.add(ticks, LiftManagementLauncher.lifts.get(0).getTasks().size());
-					System.err.println(getTickCount());
-				}
-				
 				reset(God.generateRandomTime(numFloors));
 			}
 			
