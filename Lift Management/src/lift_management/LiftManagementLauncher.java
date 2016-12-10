@@ -24,6 +24,8 @@ import repast.simphony.space.continuous.PointTranslator;
 import repast.simphony.space.continuous.SimpleCartesianAdder;
 import repast.simphony.space.continuous.StrictBorders;
 import repast.simphony.ui.RSApplication;
+import repast.simphony.visualization.visualization2D.Display2D;
+import repast.simphony.visualization.visualization3D.Display3D;
 import sajas.core.Runtime;
 import sajas.sim.repasts.RepastSLauncher;
 import sajas.wrapper.ContainerController;
@@ -57,6 +59,8 @@ public class LiftManagementLauncher extends RepastSLauncher {
 		} catch (StaleProxyException e) {
 			e.printStackTrace();
 		}
+        
+        StatisticsPanel.getInstance().run();
     }
     
     private void launchAgents() throws StaleProxyException {
