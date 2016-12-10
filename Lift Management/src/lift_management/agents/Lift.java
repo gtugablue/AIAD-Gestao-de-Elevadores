@@ -59,6 +59,7 @@ public class Lift extends Agent {
 	private List<Task<Direction>> tasks;
 	private final int maxWeight;
 	private int currentWeight;
+	private double avgLoad;
 	private Map<Integer, ACLMessage> accepts;
 	private int numFloors;
 	private AID buildingAID;
@@ -297,6 +298,7 @@ public class Lift extends Agent {
 		List<Human> newHumans = god.attendWaitingHumans(getCurrentFloor(), this.maxWeight - this.currentWeight, getId(), possibleDestinies(getCurrentFloor(), this.numFloors));
 		this.humans.addAll(newHumans);
 		this.currentWeight = calculateHumansWeight(this.humans);
+		avgLoad = (avgLoad + this.currentWeight) / 2;
 		for (Human human : humans) {
 			Task task = new Task(getCurrentFloor(), human.getDestinyFloor());
 			if (!tasks.contains(task)) {
@@ -365,5 +367,13 @@ public class Lift extends Agent {
 	
 	public void closeDoor() {
 		this.doorState = DoorState.CLOSED;
+	}
+	
+	public int getCurrentWeight() {
+		return currentWeight;
+	}
+
+	public double getAvgLoad() {
+		return avgLoad;
 	}
 }
