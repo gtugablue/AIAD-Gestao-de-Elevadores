@@ -31,4 +31,10 @@ public class ClosestAttendsAlgorithm extends LiftAlgorithm<Direction> {
 		return 0;
 	}
 
+	@Override
+	protected Direction getDirection(List<Task<Direction>> tasks, int i, int previousStop) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
