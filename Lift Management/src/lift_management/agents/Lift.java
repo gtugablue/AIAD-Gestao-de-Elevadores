@@ -9,7 +9,9 @@ import sajas.proto.SSResponderDispatcher;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import jade.content.lang.Codec;
@@ -49,13 +51,15 @@ import sajas.core.behaviours.TickerBehaviour;
  * Created by Gustavo on 06/10/2016.
  */
 public class Lift extends Agent {
+	public static final float VELOCITY = 0.05f;
+	public static final float DELTA = 0.001f;
 	private Codec codec;
 	private Ontology serviceOntology;
 	private ContinuousSpace<Object> space;
 	private List<Task<Direction>> tasks;
 	private final int maxWeight;
 	private int currentWeight;
-	private List<ACLMessage> accepts;
+	private Map<Integer, ACLMessage> accepts;
 	private int numFloors;
 	private AID buildingAID;
 	private List<Human> humans;
@@ -76,10 +80,11 @@ public class Lift extends Agent {
 		this.numFloors = numFloors;
 		this.maxWeight = maxWeight;
 		this.tasks = new ArrayList<Task<Direction>>();
-		this.accepts = new ArrayList<ACLMessage>();
+		this.accepts = new HashMap<Integer, ACLMessage>();
 		this.algorithm = new LookDiskAlgorithm();
+		this.humans = new ArrayList<Human>();
 	}
-	
+
 	@Override
 	protected void setup() {
 		register();
@@ -110,7 +115,7 @@ public class Lift extends Agent {
 		serviceOntology = ServiceOntology.getInstance();
 		getContentManager().registerLanguage(codec);
 		getContentManager().registerOntology(serviceOntology);
-		
+
 	}
 
 	@Override
@@ -153,13 +158,14 @@ public class Lift extends Agent {
 
 		@Override
 		protected ACLMessage handleCfp(ACLMessage cfp) {
+			System.out.println(getLocalName() + ": Got cfp.");
 			Lift lift = (Lift)myAgent;
 			lift.buildingAID = cfp.getSender();
 			ACLMessage reply = cfp.createReply();
 			reply.setPerformative(ACLMessage.PROPOSE);
 			try {
 				DirectionalCall call = (DirectionalCall)((ServiceProposalRequest)getContentManager().extractContent(cfp)).getCall();
-				int price = new LookDiskAlgorithm().evaluate(lift.tasks, call.getOrigin(), call.isAscending() ? Direction.UP : Direction.DOWN, numFloors, (int) Math.round(lift.getPosition().getY()));
+				int price = lift.algorithm.evaluate(lift.tasks, call.getOrigin(), call.isAscending() ? Direction.UP : Direction.DOWN, numFloors, (int) Math.round(lift.getPosition().getY()));
 				getContentManager().fillContent(reply, new ServiceProposal("attend-request", price));
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -171,15 +177,14 @@ public class Lift extends Agent {
 
 		@Override
 		protected ACLMessage handleAcceptProposal(ACLMessage cfp, ACLMessage propose, ACLMessage accept) {
-			//System.out.println(myAgent.getLocalName() + ": proposal accepted");
+			System.out.println(getLocalName() + ": Got accept proposal.");
 			ACLMessage result = accept.createReply();
 
 			DirectionalCall call;
 			try {
 				//TODO generalize to different calls
 				call = (DirectionalCall) ((ServiceProposalRequest) getContentManager().extractContent(cfp)).getCall();
-				addRequest(call);
-				accepts.add(accept);
+				addRequest(call, accept);
 				return null; // We'll send the response manually later
 			} catch (CodecException | OntologyException e) {
 				e.printStackTrace();
@@ -188,36 +193,41 @@ public class Lift extends Agent {
 
 			return result;
 		}
-		
-		private void addRequest(DirectionalCall call) {
+
+		private void addRequest(DirectionalCall call, ACLMessage accept) {
 			for (int i = 0; i < tasks.size(); i++) {
 				if (tasks.get(i).getFloor() == call.getOrigin() && tasks.get(i).getDestiny().equals(call.getDirection()))
 					return;
 			}
-			tasks.add(new Task<Direction>(call.getOrigin(), call.getDirection())); // TODO insert in the right place
+			assignTask(call.getOrigin(), call.getDirection(), accept);
 		}
 
 		@Override
 		protected void handleRejectProposal(ACLMessage cfp, ACLMessage propose, ACLMessage accept) {
-			//System.out.println(myAgent.getLocalName() + ": proposal rejected");
+			System.out.println(getLocalName() + ": Got reject proposal.");
 		}
 
 	}
 
 	public void handleTaskComplete() {
-		passengersInOut();
 		if (tasks.isEmpty())
 			return;
-		
+
+		Task task = tasks.get(0);
 		tasks.remove(0);
 
-		//ACLMessage inform = accepts.get(0).createReply();
-		//accepts.remove(0);
-		//inform.setPerformative(ACLMessage.INFORM);
-		//send(inform);
-		//System.out.println("SENT INFORM");
+		ACLMessage accept = accepts.get(task.getId());
+		if (accept != null) {
+			ACLMessage inform = accept.createReply();
+			accepts.remove(task.getId());
+			inform.setPerformative(ACLMessage.INFORM);
+			send(inform);
+			System.out.println(getLocalName() + ": INFORM " + task.getFloor());
+		}
+		
+		passengersInOut();
 	}
-	
+
 	public DoorState getDoorState() {
 		return doorState;
 	}
@@ -230,44 +240,108 @@ public class Lift extends Agent {
 		return this.maxWeight;
 	}
 
-	public void assignTask(int originFloor, Direction direction) {
-		this.tasks.add(new Task<Direction>(originFloor, direction));
-		// TODO place in the correct position
+	/**
+	 * Adds a new task by placing it in the correct spot in the task list.
+	 * @param floor
+	 * @param direction
+	 * @param accept The Accept Proposal message that originated this task.
+	 */
+	public void assignTask(int floor, Direction direction, ACLMessage accept) {
+		try {
+			int pos = this.algorithm.addNewTask(this.tasks, floor, direction, this.numFloors, (int)this.getPosition().getY());
+			if (accept != null)
+				accepts.put(tasks.get(pos).getId(), accept);
+			System.out.println(getLocalName() + ": new task " + tasks.get(pos).getId() + ".");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
-	public void assignTask(int originFloor, int destinyFloor) {
+	public void assignTask(int originFloor, int destinyFloor, ACLMessage accept) {
 		// TODO
 	}
 
-	public void ascend() {
-		space.moveByDisplacement(this, 0, 0.01f);
+	private void ascend() {
+		space.moveByDisplacement(this, 0, VELOCITY);
+	}
+
+	private void descend() {
+		space.moveByDisplacement(this, 0, -VELOCITY);
 	}
 	
-	public void descend() {
-		space.moveByDisplacement(this, 0, -0.01f);
+	public void headTo(int floor) {
+		double y = getPosition().getY();
+		
+		if (Math.abs(floor - y) <= DELTA)
+			return;
+
+		if (floor > y)
+			ascend();
+		else
+			descend();
 	}
 
 	public List<Task<Direction>> getTasks() {
 		return tasks;
 	}
-	
+
 	public int getCurrentFloor() {
 		return (int)Math.round(getPosition().getY());
 	}
-	
+
 	/**
 	 * This method should be called when the lift opens its doors, for people to leave and enter.
 	 */
 	public void passengersInOut() {
-		this.currentWeight -= god.dropoffHumans(humans, getCurrentFloor());
-		
-		List<Human> humans = god.attendWaitingHumans(getCurrentFloor(), this.maxWeight - this.currentWeight, getId());
-		this.currentWeight += calculateHumansWeight(humans);
+		this.humans.removeAll(god.dropoffHumans(getId(), getCurrentFloor()));
+		List<Human> newHumans = god.attendWaitingHumans(getCurrentFloor(), this.maxWeight - this.currentWeight, getId(), possibleDestinies(getCurrentFloor(), this.numFloors));
+		this.humans.addAll(newHumans);
+		this.currentWeight = calculateHumansWeight(this.humans);
 		for (Human human : humans) {
-			this.algorithm.attendRequest(tasks, human.getDestinyFloor(), this.numFloors, getCurrentFloor());
+			Task task = new Task(getCurrentFloor(), human.getDestinyFloor());
+			if (!tasks.contains(task)) {
+				int pos = this.algorithm.attendRequest(tasks, human.getDestinyFloor(), this.numFloors, getCurrentFloor());
+				for (int i = pos + 1; i < tasks.size(); i++) {
+					int taskID = tasks.get(i).getId();
+					tasks.remove(i);
+					if (accepts.containsKey(taskID)) {
+						ACLMessage accept = accepts.remove(taskID);
+						accept.setPerformative(ACLMessage.FAILURE);
+						send(accept);
+					}
+					i--;
+				}
+			}
 		}
+		if (tasks.isEmpty()) 
+			System.out.println(getLocalName() + ": Closing doors. Idling");
+		else
+			System.out.println(getLocalName() + ": Closing doors. Heading to floor " + tasks.get(0).getFloor());
 	}
-	
+
+	public boolean[] possibleDestinies(int currFloor, int numFloors) {
+		boolean[] possibleDestinies = new boolean[numFloors];
+		if (tasks.isEmpty()) {
+			for (int i = 0; i < numFloors; i++) {
+				possibleDestinies[i] = true;
+			}
+		} else {
+			int dest = tasks.get(0).getFloor();
+			Direction liftDirection = LiftAlgorithm.getDirection(currFloor, dest);
+			for (int i = 0; i < numFloors; i++) {
+				if (liftDirection.equals(Direction.STOP))
+					possibleDestinies[i] = true;
+				else
+					possibleDestinies[i] = liftDirection.equals(LiftAlgorithm.getDirection(currFloor, i));
+			}
+		}
+		/*for (int i = 0; i < numFloors; i++) {
+			System.out.print(possibleDestinies[i]);
+		}
+		System.out.println();*/
+		return possibleDestinies;
+	}
+
 	private static int calculateHumansWeight(Collection<Human> humans) {
 		int weight = 0;
 		for (Human human : humans) {
@@ -278,5 +352,18 @@ public class Lift extends Agent {
 
 	public int getId() {
 		return id;
+	}
+
+	public int getNumHumansInside() {
+		return this.humans.size();
+		//return god.getNumHumansInLift(getId());
+	}
+	
+	public void openDoor() {
+		this.doorState = DoorState.OPEN;
+	}
+	
+	public void closeDoor() {
+		this.doorState = DoorState.CLOSED;
 	}
 }

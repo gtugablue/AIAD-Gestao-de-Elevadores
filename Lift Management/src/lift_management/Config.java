@@ -9,6 +9,7 @@ public class Config {
 	public final int numFloors;
 	public final int numLifts;
 	public final int[] maxWeights;
+	public final int callFrequency;
 	
 	public Config(Parameters p) throws IllegalParameterException {
 		this.numFloors = (int) p.getValue("numFloors");
@@ -24,5 +25,6 @@ public class Config {
 		if (s.hasNextInt())
 			throw new IllegalParameterException("Excepted " + this.numLifts + " maximum weight values but found more.");
 		s.close();
+		this.callFrequency = (int) p.getValue("callFrequency");
 	}
 }

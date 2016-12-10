@@ -13,9 +13,11 @@ public class LiftIdleBehaviour extends Behaviour {
 
 	@Override
 	public void action() {
+		/*System.out.println(lift.getLocalName() + ": ACTION START " + lift.getTasks());
 		if (lift.getTasks().isEmpty()) {
 			block();
 		}
+		System.out.println(lift.getLocalName() + ": ACTION END " + lift.getTasks());*/
 	}
 
 	@Override
@@ -25,13 +27,9 @@ public class LiftIdleBehaviour extends Behaviour {
 	
 	@Override
 	public int onEnd() {
-		System.out.print(lift.getLocalName() + ": ");
-		for (int i = 0; i < lift.getTasks().size(); i++) {
-			System.out.print(lift.getTasks().get(i).getFloor() + " " + lift.getTasks().get(i).getDestiny() + ", ");
-		}
-		System.out.println();
 		if (lift.getTasks().get(0).getFloor() == (int) Math.round(lift.getPosition().getY())) {
 			lift.handleTaskComplete();
+			lift.openDoor();
 			return LiftBehaviour.Transitions.TASK_SAME_FLOOR.ordinal();
 		} else
 			return LiftBehaviour.Transitions.TASK_DIFF_FLOOR.ordinal();

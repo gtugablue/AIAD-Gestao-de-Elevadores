@@ -7,10 +7,12 @@
 		type="int" defaultValue="15" isReadOnly="false"
 		converter="repast.simphony.parameter.StringConverterFactory$IntConverter" />
 	<parameter name="numLifts" displayName="Number of lifts"
-		type="int" defaultValue="4" isReadOnly="false"
+		type="int" defaultValue="5" isReadOnly="false"
 		converter="repast.simphony.parameter.StringConverterFactory$IntConverter" />
 	<parameter name="maxWeights" displayName="Max weight per lift"
-		type="java.lang.String" defaultValue="500 450 400 350" isReadOnly="false"
+		type="java.lang.String" defaultValue="500 450 500 500 500" isReadOnly="false"
 		converter="repast.simphony.parameter.StringConverterFactory$StringStringConverter" />
-		
+	<parameter name="callFrequency" displayName="Call frequency"
+		type="int" defaultValue="100" isReadOnly="false"
+		converter="repast.simphony.parameter.StringConverterFactory$IntConverter" />
 </parameters>

@@ -11,6 +11,7 @@
       <string>lift_management.gui.LiftStyle</string>
     </entry>
   </styles>
+  <editedStyles/>
   <netStyles/>
   <editedNetStyles/>
   <frequency>ON_MOVE</frequency>

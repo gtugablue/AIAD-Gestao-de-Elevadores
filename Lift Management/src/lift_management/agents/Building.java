@@ -18,6 +18,7 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import lift_management.Call;
 import lift_management.CallSystem;
+import lift_management.Config;
 import lift_management.DirectionCallSystem;
 import lift_management.DirectionalCall;
 import lift_management.God;
@@ -27,8 +28,11 @@ import lift_management.gui.StatisticsPanel;
 import lift_management.onto.ServiceOntology;
 import lift_management.onto.ServiceProposal;
 import lift_management.onto.ServiceProposalRequest;
+import repast.simphony.engine.schedule.Schedule;
 import sajas.core.AID;
 import sajas.core.Agent;
+import sajas.core.behaviours.CyclicBehaviour;
+import sajas.core.behaviours.SimpleBehaviour;
 import sajas.core.behaviours.TickerBehaviour;
 import sajas.domain.DFService;
 import sajas.proto.AchieveREResponder;
@@ -45,12 +49,14 @@ public class Building extends Agent {
 	private Codec codec;
 	private Ontology serviceOntology;
 	private God god;
+	private Config config;
 	
-	public Building(God god, int numLifts, int numFloors) {
+	public Building(God god, Config config) {
 		this.god = god;
-		this.numLifts = numLifts;
-		this.numFloors = numFloors;
+		this.numLifts = config.numLifts;
+		this.numFloors = config.numFloors;
 		this.callSystem = new DirectionCallSystem(this.numFloors);
+		this.config = config;
 	}
 
 	public God getGod() {
@@ -75,15 +81,22 @@ public class Building extends Agent {
 		subscribeDf();
 		prepareCfpMessage();
 
-		addBehaviour(new TickerBehaviour(this, 1) {
+		addBehaviour(new CyclicBehaviour(this) {
+			private long ticksToNextRun;
 
 			@Override
-			protected void onTick() {
+			public void action() {
+				if (ticksToNextRun > 0)
+				{
+					ticksToNextRun--;
+					return;
+				}
+				
 				Call call = god.generateNewCall();
 				addCall(call);
-				reset(God.generateRandomTime(numFloors));
+				
+				ticksToNextRun = God.generateRandomTime(numFloors, config.callFrequency);
 			}
-			
 		});
 	}
 
@@ -246,7 +259,6 @@ public class Building extends Agent {
 
 		@Override
 		protected void handleInform(ACLMessage inform) {
-			System.out.println("INFORM " + call);
 			try {
 				((Building)getAgent()).getCallSystem().resetCall(call);
 			} catch (Exception e) {

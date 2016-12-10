@@ -5,15 +5,19 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
+import lift_management.agents.Lift.Direction;
+
 
 public class God {
 	private static final long serialVersionUID = 6602617123027622789L;
 	private List<Human> humans;
 	private int numFloors;
+	private int callFrequency;
 
-	public God(int numFloors) {
+	public God(int numFloors, int callFrequency) {
 		this.humans = Collections.synchronizedList(new ArrayList<Human>());
 		this.numFloors = numFloors;
+		this.callFrequency = callFrequency;
 	}
 
 	/**
@@ -35,10 +39,10 @@ public class God {
 	 * @return weight in lbs
 	 */
 	protected static double getKgToLbs(double weight){
-		return weight / conversionRate;
+		return weight * conversionRate;
 	}
 
-	protected static double generateWeigth(){
+	protected static double generateWeight(){
 		double weight = random.nextGaussian()*standardVariance+mean;
 
 		return getKgToLbs(weight);
@@ -49,10 +53,7 @@ public class God {
 
 		double groundFloorRate = 0.4;
 		double nFloorRate = (1-groundFloorRate)/(n-1);
-		double x = random.nextDouble();		
-
-		System.out.println("nFloorRate: "+nFloorRate);
-		System.out.println("x: "+x);
+		double x = random.nextDouble();
 
 		if(x <= groundFloorRate){
 			return 0;
@@ -95,19 +96,19 @@ public class God {
 	public static List<Human> generateRandomHumans(int maxBuildingFloor, int numHumans) {
 		int originFloor = generateOriginFloor(maxBuildingFloor);
 		int destinyFloor = generateDestinyFloor(originFloor, maxBuildingFloor);
-		System.out.println(originFloor + " -> " + destinyFloor);
 		ArrayList<Human> humans = new ArrayList<Human>();
 		Human human;
 		for (int i = 0; i < numHumans; i++) {
-			double weight = generateWeigth();
+			double weight = generateWeight();
 			human = new Human(weight, originFloor, destinyFloor);
 			humans.add(human);
 		}
+		System.out.println("God: generated " + numHumans + " humans (" + originFloor + "->" + destinyFloor + ").");
 		return humans;
 	}
 
 	public static void main(String[] args){
-		System.out.println("Floor: "+generateOriginFloor(5));
+		System.out.println("Floor: " + generateOriginFloor(5));
 	}
 
 	public Call generateNewCall() {
@@ -123,8 +124,8 @@ public class God {
 		return (int) Math.ceil(Math.pow(2 * Math.random(), 2));
 	}
 
-	public static long generateRandomTime(int numFloors) {
-		return (long) Math.ceil(1000 * Math.random() / numFloors);
+	public static long generateRandomTime(int numFloors, int callFrequency) {
+		return (long) Math.ceil((1000000 * Math.random()) / (numFloors * callFrequency));
 	}
 
 	public void addHumans(List<Human> humans) {
@@ -133,44 +134,77 @@ public class God {
 		}
 	}
 
-	public List<Human> attendWaitingHumans(int floor, int maxWeight, int liftID) {
+	public List<Human> attendWaitingHumans(int floor, int maxWeight, int liftID, boolean[] possibleDestinies) {
 		List<Human> humans = new ArrayList<Human>();
 		int currWeight = 0;
 		synchronized (this.humans) {
 			for (Human human : this.humans) {
+				/*if (!possibleDestinies[human.getDestinyFloor()]) {
+					// TODO recall
+					continue; // The lift destination is different from the human destination
+				}*/
 				if (human.getLiftID() != null)
 					continue; // Human already in a lift
+				
+				if (human.getOriginFloor() != floor)
+					continue; // Human not in the same floor as the lift
 
 				currWeight += human.getWeight();
-				if (currWeight > maxWeight)
-					break; // Lift is full
+				if (currWeight > maxWeight) { // Lift is full
+					break;
+				}
 
 				human.setLiftID(liftID);
 				humans.add(human);
 			}
 		}
+		System.out.println("Lift " + liftID + ": Picked up " + humans.size() + " humans on floor " + floor + ", leaving " + getNumHumansInFloor(floor) + " waiting");
 		return humans;
 	}
 
 	/**
 	 * 
-	 * @param humans
 	 * @param currFloor
-	 * @return The weight of the humans that left the lift.
+	 * @return The humans that left the lift.
 	 */
-	public int dropoffHumans(List<Human> humans, int currFloor) {
-		int weight = 0;
+	public List<Human> dropoffHumans(int liftId, int currFloor) {
+		List<Human> removed = new ArrayList<Human>();
 		synchronized (this.humans) {
 			Iterator<Human> iter = this.humans.iterator();
 			while(iter.hasNext()){
 				Human human = iter.next();
-				if (currFloor == human.getDestinyFloor()) {
+				Integer humanLiftId = human.getLiftID();
+				if (humanLiftId != null && humanLiftId.equals(liftId) && currFloor == human.getDestinyFloor()) {
 					human.setLiftID(null);
-					weight += human.getWeight();
 					iter.remove();
+					removed.add(human);
 				}
 			}
 		}
-		return weight;
+		System.out.println("Lift " + liftId + ": Dropped off " + removed.size() + " humans on floor " + currFloor + ".");
+		return removed;
+	}
+	
+	public int getNumHumansInLift(int liftId) {
+		int n = 0;
+		synchronized (this.humans) {
+			for (Human human : this.humans) {
+				Integer humanLiftId = human.getLiftID();
+				if (humanLiftId != null && humanLiftId.equals(liftId))
+					n++;
+			}
+		}
+		return n;
+	}
+	
+	public int getNumHumansInFloor(int floor) {
+		int n = 0;
+		synchronized (this.humans) {
+			for (Human human : this.humans) {
+				if (human.getLiftID() == null && human.getOriginFloor() == floor)
+					n++;
+			}
+		}
+		return n;
 	}
 }
