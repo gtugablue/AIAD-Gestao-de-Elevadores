@@ -103,6 +103,7 @@ public class God {
 			human = new Human(weight, originFloor, destinyFloor);
 			humans.add(human);
 		}
+		System.out.println("God: generated " + numHumans + " humans (" + originFloor + "->" + destinyFloor + ").");
 		return humans;
 	}
 
@@ -124,7 +125,7 @@ public class God {
 	}
 
 	public static long generateRandomTime(int numFloors, int callFrequency) {
-		return (long) Math.ceil((100000 * Math.random()) / (numFloors * callFrequency));
+		return (long) Math.ceil((1000000 * Math.random()) / (numFloors * callFrequency));
 	}
 
 	public void addHumans(List<Human> humans) {

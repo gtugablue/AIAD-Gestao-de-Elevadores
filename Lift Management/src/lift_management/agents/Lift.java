@@ -218,6 +218,7 @@ public class Lift extends Agent {
 			accepts.remove(task.getId());
 			inform.setPerformative(ACLMessage.INFORM);
 			send(inform);
+			System.out.println(getLocalName() + ": INFORM " + task.getFloor());
 		}
 	}
 

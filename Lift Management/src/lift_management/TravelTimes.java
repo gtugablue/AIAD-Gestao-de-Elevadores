@@ -1,7 +1,7 @@
 package lift_management;
 
 public class TravelTimes {
-	public static int FLOOR = 20;
+	public static int FLOOR = 100;
 	
 	public static int DOORS = 5;
 	
