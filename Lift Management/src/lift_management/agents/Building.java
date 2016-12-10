@@ -252,11 +252,13 @@ public class Building extends Agent {
 			cfp.setLanguage(codec.getName());
 			cfp.setOntology(serviceOntology.getName());
 			cfp.setProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET);
+			System.out.println("Building: Reassigning call " + call + ".");
 			addBehaviour(new CNetInit(getAgent(), cfp, call));
 		}
 
 		@Override
 		protected void handleInform(ACLMessage inform) {
+			System.out.println("Building: Shutting down light for call " + call + ".");
 			try {
 				((Building)getAgent()).getCallSystem().resetCall(call);
 			} catch (Exception e) {
