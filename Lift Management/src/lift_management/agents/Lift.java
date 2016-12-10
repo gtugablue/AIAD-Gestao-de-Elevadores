@@ -358,4 +358,12 @@ public class Lift extends Agent {
 		return this.humans.size();
 		//return god.getNumHumansInLift(getId());
 	}
+	
+	public void openDoor() {
+		this.doorState = DoorState.OPEN;
+	}
+	
+	public void closeDoor() {
+		this.doorState = DoorState.CLOSED;
+	}
 }

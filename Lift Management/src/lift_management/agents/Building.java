@@ -94,7 +94,6 @@ public class Building extends Agent {
 				addCall(call);
 			
 				ticksToNextRun = God.generateRandomTime(numFloors, config.callFrequency);
-				System.out.println(ticksToNextRun);
 			}
 		});
 	}

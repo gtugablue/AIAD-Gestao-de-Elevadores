@@ -8,19 +8,10 @@
     </entry>
     <entry>
       <string>lift_management.agents.Lift</string>
-      <string>repast.simphony.visualization.editedStyle.EditedStyle2D</string>
+      <string>lift_management.gui.LiftStyle</string>
     </entry>
   </styles>
-  <editedStyles>
-    <entry>
-      <string>lift_management.agents.Building</string>
-      <null/>
-    </entry>
-    <entry>
-      <string>lift_management.agents.Lift</string>
-      <string>lift_management.agents.Lift.style_0.xml</string>
-    </entry>
-  </editedStyles>
+  <editedStyles/>
   <netStyles/>
   <editedNetStyles/>
   <frequency>ON_MOVE</frequency>

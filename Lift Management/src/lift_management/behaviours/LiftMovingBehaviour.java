@@ -23,6 +23,7 @@ public class LiftMovingBehaviour extends Behaviour {
 	@Override
 	public int onEnd() {
 		lift.handleTaskComplete();
+		lift.openDoor();
 		return LiftBehaviour.Transitions.ARRIVED.ordinal();
 	}
 
