@@ -50,22 +50,23 @@ import sajas.core.behaviours.TickerBehaviour;
 /**
  * Created by Gustavo on 06/10/2016.
  */
-public class Lift extends Agent {
+public class Lift<T> extends Agent {
 	public static final float VELOCITY = 0.05f;
 	public static final float DELTA = 0.001f;
 	private Codec codec;
 	private Ontology serviceOntology;
 	private ContinuousSpace<Object> space;
-	private List<Task<Direction>> tasks;
 	private final int maxWeight;
 	private int currentWeight;
-	private Map<Integer, ACLMessage> accepts;
 	private int numFloors;
 	private AID buildingAID;
-	private List<Human> humans;
 	private God god;
 	private int id;
 	private LiftAlgorithm algorithm;
+	private List<Task<T>> tasks = new ArrayList<Task<T>>();
+	private Map<Integer, ACLMessage> accepts = new HashMap<Integer, ACLMessage>();
+	private List<Human> humans = new ArrayList<Human>();
+
 	public enum DoorState {
 		OPEN,
 		CLOSED
@@ -73,16 +74,13 @@ public class Lift extends Agent {
 	public enum Direction {UP, DOWN, STOP};
 	private DoorState doorState = DoorState.CLOSED;
 
-	public Lift(int id, God god, ContinuousSpace<Object> space, int numFloors, int maxWeight) {
+	public Lift(int id, God god, ContinuousSpace<Object> space, int numFloors, int maxWeight, LiftAlgorithm algorithm) {
 		this.id = id;
 		this.god = god;
 		this.space = space;
 		this.numFloors = numFloors;
 		this.maxWeight = maxWeight;
-		this.tasks = new ArrayList<Task<Direction>>();
-		this.accepts = new HashMap<Integer, ACLMessage>();
-		this.algorithm = new LookDiskAlgorithm();
-		this.humans = new ArrayList<Human>();
+		this.algorithm = algorithm;
 	}
 
 	@Override
@@ -196,10 +194,10 @@ public class Lift extends Agent {
 
 		private void addRequest(DirectionalCall call, ACLMessage accept) {
 			for (int i = 0; i < tasks.size(); i++) {
-				if (tasks.get(i).getFloor() == call.getOrigin() && tasks.get(i).getDestiny().equals(call.getDirection()))
+				if (tasks.get(i).getFloor() == call.getOrigin() && tasks.get(i).getDestiny().equals(call.getDestiny()))
 					return;
 			}
-			assignTask(call.getOrigin(), call.getDirection(), accept);
+			assignTask(call.getOrigin(), call.getDestiny(), accept);
 		}
 
 		@Override
@@ -281,7 +279,7 @@ public class Lift extends Agent {
 			descend();
 	}
 
-	public List<Task<Direction>> getTasks() {
+	public List<Task<T>> getTasks() {
 		return tasks;
 	}
 

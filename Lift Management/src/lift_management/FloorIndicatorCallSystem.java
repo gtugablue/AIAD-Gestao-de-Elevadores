@@ -8,7 +8,7 @@ public class FloorIndicatorCallSystem extends CallSystem {
 
 	@Override
 	public void makeCall(Call call) throws Exception {
-		if (!(call != null && call instanceof FloorIndicatorCall)) {
+		if (!(call != null && call instanceof DestinyDispatchCall)) {
 			throw new Exception("Expected DirectionalCall object instead got " + call.getClass());
 		}
 		//TODO add call to the system
@@ -16,7 +16,7 @@ public class FloorIndicatorCallSystem extends CallSystem {
 
 	@Override
 	public void resetCall(Call call) throws Exception {
-		if (!(call != null && call instanceof FloorIndicatorCall)) {
+		if (!(call != null && call instanceof DestinyDispatchCall)) {
 			throw new Exception("Expected DirectionalCall object instead got " + call.getClass());
 		}
 		//TODO remove call from the system

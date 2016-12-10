@@ -4,7 +4,7 @@ import jade.content.onto.BeanOntology;
 import jade.content.onto.BeanOntologyException;
 import jade.content.onto.Ontology;
 import lift_management.DirectionalCall;
-import lift_management.FloorIndicatorCall;
+import lift_management.DestinyDispatchCall;
 
 public class ServiceOntology extends BeanOntology {
 	
@@ -32,7 +32,7 @@ public class ServiceOntology extends BeanOntology {
 			add(ContractOutcome.class);
 			add(Results.class);
 			add(DirectionalCall.class);
-			add(FloorIndicatorCall.class);
+			add(DestinyDispatchCall.class);
 			
 		} catch(BeanOntologyException boe) {
 			boe.printStackTrace();

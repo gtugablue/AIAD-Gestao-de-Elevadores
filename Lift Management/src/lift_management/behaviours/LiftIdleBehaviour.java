@@ -3,10 +3,10 @@ package lift_management.behaviours;
 import lift_management.agents.Lift;
 import sajas.core.behaviours.Behaviour;
 
-public class LiftIdleBehaviour extends Behaviour {
-	private Lift lift;
+public class LiftIdleBehaviour<T> extends Behaviour {
+	private Lift<T> lift;
 
-	public LiftIdleBehaviour(Lift lift) {
+	public LiftIdleBehaviour(Lift<T> lift) {
 		super(lift);
 		this.lift = lift;
 	}

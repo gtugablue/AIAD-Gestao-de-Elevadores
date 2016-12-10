@@ -13,6 +13,9 @@ import jade.core.ProfileImpl;
 import jade.wrapper.StaleProxyException;
 import lift_management.agents.Building;
 import lift_management.agents.Lift;
+import lift_management.agents.Lift.Direction;
+import lift_management.algorithms.strategy_algorithm.DestinationDispatchAlgorithm;
+import lift_management.algorithms.strategy_algorithm.LookDiskAlgorithm;
 import repast.simphony.context.Context;
 import repast.simphony.context.space.continuous.ContinuousSpaceFactory;
 import repast.simphony.context.space.continuous.ContinuousSpaceFactoryFinder;
@@ -90,7 +93,7 @@ public class LiftManagementLauncher extends RepastSLauncher {
     private List<Lift> createLifts(God god, int numLifts, ContinuousSpace<Object> space, Context<Object> context) {
     	ArrayList<Lift> lifts = new ArrayList<Lift>();
     	for (int i = 0; i < numLifts; i++) {
-    		Lift lift = new Lift(i, god, space, config.numFloors, config.maxWeights[i]);
+    		Lift<Integer> lift = new Lift<Integer>(i, god, space, config.numFloors, config.maxWeights[i], new DestinationDispatchAlgorithm());
     		lifts.add(lift);
     		context.add(lift);
     		space.moveTo(lift, i + 1, 0);
