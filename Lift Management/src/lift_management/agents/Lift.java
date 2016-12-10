@@ -51,7 +51,7 @@ import sajas.core.behaviours.TickerBehaviour;
  * Created by Gustavo on 06/10/2016.
  */
 public class Lift extends Agent {
-	public static final float VELOCITY = 0.05f;
+	public static final float VELOCITY = 0.005f;
 	public static final float DELTA = 0.001f;
 	private Codec codec;
 	private Ontology serviceOntology;
@@ -158,7 +158,7 @@ public class Lift extends Agent {
 
 		@Override
 		protected ACLMessage handleCfp(ACLMessage cfp) {
-			System.out.println(getLocalName() + ": Got cfp.");
+			//System.out.println(getLocalName() + ": Got cfp.");
 			Lift lift = (Lift)myAgent;
 			lift.buildingAID = cfp.getSender();
 			ACLMessage reply = cfp.createReply();
@@ -177,13 +177,13 @@ public class Lift extends Agent {
 
 		@Override
 		protected ACLMessage handleAcceptProposal(ACLMessage cfp, ACLMessage propose, ACLMessage accept) {
-			System.out.println(getLocalName() + ": Got accept proposal.");
 			ACLMessage result = accept.createReply();
 
 			DirectionalCall call;
 			try {
 				//TODO generalize to different calls
 				call = (DirectionalCall) ((ServiceProposalRequest) getContentManager().extractContent(cfp)).getCall();
+				System.out.println(getLocalName() + ": Got accept proposal (" + call + ").");
 				addRequest(call, accept);
 				return null; // We'll send the response manually later
 			} catch (CodecException | OntologyException e) {
@@ -204,7 +204,7 @@ public class Lift extends Agent {
 
 		@Override
 		protected void handleRejectProposal(ACLMessage cfp, ACLMessage propose, ACLMessage accept) {
-			System.out.println(getLocalName() + ": Got reject proposal.");
+			//System.out.println(getLocalName() + ": Got reject proposal.");
 		}
 
 	}
@@ -222,7 +222,7 @@ public class Lift extends Agent {
 			accepts.remove(task.getId());
 			inform.setPerformative(ACLMessage.INFORM);
 			send(inform);
-			System.out.println(getLocalName() + ": INFORM " + task.getFloor());
+			System.out.println(getLocalName() + ": Informing the building that a task has been complete on floor " + task.getFloor() + "->" + task.getDestiny() + ".");
 		}
 		
 		passengersInOut();
@@ -249,6 +249,7 @@ public class Lift extends Agent {
 	public void assignTask(int floor, Direction direction, ACLMessage accept) {
 		try {
 			int pos = this.algorithm.addNewTask(this.tasks, floor, direction, this.numFloors, (int)this.getPosition().getY());
+			System.out.println(getLocalName() + ": tasks: " + this.tasks);
 			if (accept != null)
 				accepts.put(tasks.get(pos).getId(), accept);
 			System.out.println(getLocalName() + ": new task " + tasks.get(pos).getId() + ".");
@@ -305,14 +306,16 @@ public class Lift extends Agent {
 					int taskID = tasks.get(i).getId();
 					tasks.remove(i);
 					if (accepts.containsKey(taskID)) {
-						ACLMessage accept = accepts.remove(taskID);
-						accept.setPerformative(ACLMessage.FAILURE);
-						send(accept);
+						ACLMessage response = accepts.remove(taskID).createReply();
+						response.setPerformative(ACLMessage.FAILURE);
+						send(response);
+						System.err.println("DERP");;
 					}
 					i--;
 				}
 			}
 		}
+		System.out.println(getLocalName() + ": tasks: " + this.tasks);
 		if (tasks.isEmpty()) 
 			System.out.println(getLocalName() + ": Closing doors. Idling");
 		else

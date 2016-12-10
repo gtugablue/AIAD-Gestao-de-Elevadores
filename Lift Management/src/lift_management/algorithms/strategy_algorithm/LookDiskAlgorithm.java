@@ -91,9 +91,9 @@ public class LookDiskAlgorithm extends LiftAlgorithm<Direction>{
 		}
 		
 		int nextStop = tasks.get(i).getFloor();
-		if(previousStop > nextStop) {
+		if(previousStop < nextStop) {
 			direction = Direction.UP;
-		}else if(previousStop < nextStop){
+		}else if(previousStop > nextStop){
 			direction = Direction.DOWN;
 		}else{
 			direction = tasks.get(i).getDestiny();
@@ -105,9 +105,9 @@ public class LookDiskAlgorithm extends LiftAlgorithm<Direction>{
 	public static Direction getDirection(int previousStop, int nextStop){
 		Direction direction;
 		
-		if(previousStop > nextStop) {
+		if(previousStop < nextStop) {
 			direction = Direction.UP;
-		}else if(previousStop < nextStop){
+		}else if(previousStop > nextStop){
 			direction = Direction.DOWN;
 		}else{
 			direction = Direction.STOP;
@@ -122,7 +122,7 @@ public class LookDiskAlgorithm extends LiftAlgorithm<Direction>{
 			throw new Exception("requestedDirection cannot be STOP. Only UP or DOWN");
 		}
 		
-		System.out.println("ADD TASK Init, requestFloor: "+requestedFloor+" requestedDirection: "+requestedDirection+" \n" + tasks.toString());
+		//System.out.println("ADD TASK Init, requestFloor: "+requestedFloor+" requestedDirection: "+requestedDirection+" \n" + tasks.toString());
 
 		
 		int previousStop = currentPosition;
@@ -151,13 +151,13 @@ public class LookDiskAlgorithm extends LiftAlgorithm<Direction>{
 
 		//Percorreu toda a lista de tasks e ainda assim não foi atribuido a uma posição				
 		tasks.add(new Task<Direction>(requestedFloor, requestedDirection));
-		System.out.println("ADD TASK END, requestFloor: "+requestedFloor+" requestedDirection: "+requestedDirection+" \n" + tasks.toString());
+		//System.out.println("ADD TASK END, requestFloor: "+requestedFloor+" requestedDirection: "+requestedDirection+" \n" + tasks.toString());
 		return tasks.size()-1;
 	}
 	
 	@Override
 	public int attendRequest(List<Task<Direction>> tasks, int requestedFloor, int maxBuildingFloor, int currentPosition){
-		System.out.println("Attend request Init, requestFloor: "+requestedFloor+" \n" + tasks.toString());
+		//System.out.println("Attend request Init, requestFloor: "+requestedFloor+" \n" + tasks.toString());
 		Task<Direction> newTask = new Task<Direction>(requestedFloor, Direction.STOP); 
 		if (tasks.contains(newTask))
 			return tasks.indexOf(newTask);
@@ -191,7 +191,7 @@ public class LookDiskAlgorithm extends LiftAlgorithm<Direction>{
 		
 		//Percorreu toda a lista de tasks e ainda assim não foi atribuido a uma posição				
 		tasks.add(newTask);
-		System.out.println("Attend request END, requestFloor: "+requestedFloor+" \n" + tasks.toString());
+		//System.out.println("Attend request END, requestFloor: "+requestedFloor+" \n" + tasks.toString());
 
 		return tasks.size()-1;
 	}

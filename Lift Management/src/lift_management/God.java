@@ -159,6 +159,7 @@ public class God {
 			}
 		}
 		System.out.println("Lift " + liftID + ": Picked up " + humans.size() + " humans on floor " + floor + ", leaving " + getNumHumansInFloor(floor) + " waiting");
+		System.out.println("Humans in system: " + this.humans);
 		return humans;
 	}
 
