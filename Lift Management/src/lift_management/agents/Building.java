@@ -18,6 +18,7 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import lift_management.Call;
 import lift_management.CallSystem;
+import lift_management.Config;
 import lift_management.DirectionCallSystem;
 import lift_management.DirectionalCall;
 import lift_management.God;
@@ -43,12 +44,14 @@ public class Building extends Agent {
 	private Codec codec;
 	private Ontology serviceOntology;
 	private God god;
+	private Config config;
 	
-	public Building(God god, int numLifts, int numFloors) {
+	public Building(God god, Config config) {
 		this.god = god;
-		this.numLifts = numLifts;
-		this.numFloors = numFloors;
+		this.numLifts = config.numLifts;
+		this.numFloors = config.numFloors;
 		this.callSystem = new DirectionCallSystem(this.numFloors);
+		this.config = config;
 	}
 
 	public God getGod() {
@@ -80,7 +83,7 @@ public class Building extends Agent {
 				Call call = god.generateNewCall();
 				addCall(call);
 			
-				reset(God.generateRandomTime(numFloors));
+				reset(God.generateRandomTime(numFloors, config.callFrequency));
 			}
 			
 		});

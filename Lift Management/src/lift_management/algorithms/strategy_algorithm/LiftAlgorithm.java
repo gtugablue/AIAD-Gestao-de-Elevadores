@@ -51,7 +51,7 @@ public abstract class LiftAlgorithm<T>{
 		return (previous < n && n <= next) || (previous > n && n >= next);
 	}
 	
-	protected static Direction getDirection(int previousStop, int nextStop){
+	public static Direction getDirection(int previousStop, int nextStop){
 		Direction direction;
 		
 		if(previousStop > nextStop) {

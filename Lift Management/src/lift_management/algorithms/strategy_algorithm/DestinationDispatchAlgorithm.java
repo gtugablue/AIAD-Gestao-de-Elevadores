@@ -88,7 +88,7 @@ public class DestinationDispatchAlgorithm extends LiftAlgorithm<Integer>{
 		return direction;
 	}
 
-	protected static Direction getDirection(int previousStop, int nextStop){
+	public static Direction getDirection(int previousStop, int nextStop){
 		Direction direction;
 		
 		if(previousStop > nextStop) {
