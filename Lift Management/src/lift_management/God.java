@@ -108,7 +108,7 @@ public class God {
 	}
 
 	public static void main(String[] args){
-		System.out.println("Floor: "+generateOriginFloor(5));
+		System.out.println("Floor: " + generateOriginFloor(5));
 	}
 
 	public Call generateNewCall() {

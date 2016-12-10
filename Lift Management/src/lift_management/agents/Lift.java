@@ -156,6 +156,7 @@ public class Lift extends Agent {
 
 		@Override
 		protected ACLMessage handleCfp(ACLMessage cfp) {
+			System.out.println(getLocalName() + ": Got cfp.");
 			Lift lift = (Lift)myAgent;
 			lift.buildingAID = cfp.getSender();
 			ACLMessage reply = cfp.createReply();
@@ -174,6 +175,7 @@ public class Lift extends Agent {
 
 		@Override
 		protected ACLMessage handleAcceptProposal(ACLMessage cfp, ACLMessage propose, ACLMessage accept) {
+			System.out.println(getLocalName() + ": Got accept proposal.");
 			ACLMessage result = accept.createReply();
 
 			DirectionalCall call;
@@ -200,6 +202,7 @@ public class Lift extends Agent {
 
 		@Override
 		protected void handleRejectProposal(ACLMessage cfp, ACLMessage propose, ACLMessage accept) {
+			System.out.println(getLocalName() + ": Got reject proposal.");
 		}
 
 	}
@@ -245,6 +248,7 @@ public class Lift extends Agent {
 			int pos = this.algorithm.addNewTask(this.tasks, floor, direction, this.numFloors, (int)this.getPosition().getY());
 			if (accept != null)
 				accepts.put(tasks.get(pos).getId(), accept);
+			System.out.println(getLocalName() + ": new task " + tasks.get(pos).getId() + ".");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -295,9 +299,9 @@ public class Lift extends Agent {
 			}
 		}
 		if (tasks.isEmpty()) 
-			System.out.println(getLocalName() + ": Closed doors. Idling");
+			System.out.println(getLocalName() + ": Closing doors. Idling");
 		else
-			System.out.println(getLocalName() + ": Closed doors. Heading to floor " + tasks.get(0).getFloor());
+			System.out.println(getLocalName() + ": Closing doors. Heading to floor " + tasks.get(0).getFloor());
 	}
 
 	public boolean[] possibleDestinies(int currFloor, int numFloors) {
