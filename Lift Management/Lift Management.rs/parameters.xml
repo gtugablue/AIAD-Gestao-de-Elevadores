@@ -15,4 +15,7 @@
 	<parameter name="callFrequency" displayName="Call frequency"
 		type="int" defaultValue="100" isReadOnly="false"
 		converter="repast.simphony.parameter.StringConverterFactory$IntConverter" />
+	<parameter name="algorithm" displayName="Algorithm"
+		type="java.lang.String" defaultValue="DestinationDispatch" isReadOnly="false"
+		converter="repast.simphony.parameter.StringConverterFactory$StringStringConverter" />
 </parameters>

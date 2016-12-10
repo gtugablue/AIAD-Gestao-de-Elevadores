@@ -6,11 +6,11 @@ import java.io.IOException;
 
 import com.jogamp.opengl.util.awt.TextRenderer;
 
-import lift_management.CallSystem;
-import lift_management.DirectionCallSystem;
-import lift_management.FloorIndicatorCallSystem;
 import lift_management.agents.Building;
 import lift_management.agents.Lift;
+import lift_management.calls.CallSystem;
+import lift_management.calls.DestinationDispatchCallSystem;
+import lift_management.calls.DirectionalCallSystem;
 import repast.simphony.visualizationOGL2D.DefaultStyleOGL2D;
 import saf.v3d.scene.Label;
 import saf.v3d.scene.TextureLayer;
@@ -32,8 +32,8 @@ public class BuildingStyle extends DefaultStyleOGL2D {
 			Building building = (Building)agent;
 			VComposite composite = new TextureLayer();
 			CallSystem callSystem = building.getCallSystem();
-			if (callSystem instanceof DirectionCallSystem) {
-				DirectionCallSystem directionCallSystem = (DirectionCallSystem) callSystem;				
+			if (callSystem instanceof DirectionalCallSystem) {
+				DirectionalCallSystem directionCallSystem = (DirectionalCallSystem) callSystem;				
 				try {
 					for (int i = 0; i < building.getNumLifts(); i++) {
 						for (int j = 0; j < building.getNumFloors(); j++) {
@@ -60,8 +60,8 @@ public class BuildingStyle extends DefaultStyleOGL2D {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-			} else if (callSystem instanceof FloorIndicatorCallSystem){
-				FloorIndicatorCallSystem floorIndicatorCallSystem = (FloorIndicatorCallSystem) callSystem;
+			} else if (callSystem instanceof DestinationDispatchCallSystem){
+				DestinationDispatchCallSystem floorIndicatorCallSystem = (DestinationDispatchCallSystem) callSystem;
 				// TODO
 			}
 			spatial = composite;

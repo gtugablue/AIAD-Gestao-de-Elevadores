@@ -1,9 +1,13 @@
-package lift_management;
+package lift_management.calls;
 
 import lift_management.agents.Lift.Direction;
 
 public class DirectionalCall extends Call<Direction> {
 	protected boolean ascending;
+	
+	public DirectionalCall(){
+		
+	}
 	
 	public DirectionalCall(int origin, boolean up) {
 		super(origin, up ? Direction.UP : Direction.DOWN);

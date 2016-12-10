@@ -1,12 +1,10 @@
-package lift_management;
+package lift_management.calls;
 
-import javafx.util.Pair;
-
-public class DirectionCallSystem extends CallSystem {
+public class DirectionalCallSystem extends CallSystem {
 	
 	boolean calls[][];
 
-	public DirectionCallSystem(int numFloors) {
+	public DirectionalCallSystem(int numFloors) {
 		super(numFloors);
 		calls = new boolean[numFloors][2];
 	}
@@ -36,5 +34,10 @@ public class DirectionCallSystem extends CallSystem {
 		DirectionalCall directionCall = (DirectionalCall) call;
 		calls[directionCall.getOrigin()][directionCall.isAscending() ? 0 : 1] = false;
 		System.out.println("Reseting: " + call);
+	}
+
+	@Override
+	public Call newCall(int originFloor, int destinyFloor) {
+		return new DirectionalCall(originFloor, originFloor < destinyFloor);
 	}
 }

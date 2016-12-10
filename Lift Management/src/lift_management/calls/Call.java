@@ -1,4 +1,4 @@
-package lift_management;
+package lift_management.calls;
 
 public abstract class Call<T> {
 	protected int origin;

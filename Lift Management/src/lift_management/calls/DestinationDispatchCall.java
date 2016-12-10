@@ -1,16 +1,16 @@
-package lift_management;
+package lift_management.calls;
 
-public class DestinyDispatchCall extends Call<Integer> {
+public class DestinationDispatchCall extends Call<Integer> {
 	
-	public DestinyDispatchCall() {
+	public DestinationDispatchCall() {
 		
 	}
 	
-	public DestinyDispatchCall(int origin, Integer destiny) {
+	public DestinationDispatchCall(int origin, Integer destiny) {
 		super(origin, destiny);
 	}
 
-	public DestinyDispatchCall(int origin, int destiny) {
+	public DestinationDispatchCall(int origin, int destiny) {
 		super(origin, Integer.valueOf(destiny));
 	}
 	

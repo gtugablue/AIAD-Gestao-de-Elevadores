@@ -6,18 +6,22 @@ import java.util.List;
 import java.util.Random;
 
 import lift_management.agents.Lift.Direction;
+import lift_management.calls.Call;
+import lift_management.calls.CallSystem;
+import lift_management.calls.DirectionalCall;
 
 
 public class God {
 	private static final long serialVersionUID = 6602617123027622789L;
-	private List<Human> humans;
+	private List<Human> humans = Collections.synchronizedList(new ArrayList<Human>());
 	private int numFloors;
 	private int callFrequency;
+	private CallSystem callSystem;
 
-	public God(int numFloors, int callFrequency) {
-		this.humans = Collections.synchronizedList(new ArrayList<Human>());
+	public God(int numFloors, int callFrequency, CallSystem callSystem) {
 		this.numFloors = numFloors;
 		this.callFrequency = callFrequency;
+		this.callSystem = callSystem;
 	}
 
 	/**
@@ -116,8 +120,7 @@ public class God {
 		addHumans(humans);		
 		Human human = humans.get(0);
 
-		//TODO the type of call depends the algorithm
-		return new DirectionalCall(human.getOriginFloor(), human.getOriginFloor() < human.getDestinyFloor());
+		return callSystem.newCall(human.getOriginFloor(), human.getDestinyFloor());
 	}
 
 	private static int generateGroupSize() {
