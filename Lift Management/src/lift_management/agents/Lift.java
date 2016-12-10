@@ -294,6 +294,10 @@ public class Lift extends Agent {
 				}
 			}
 		}
+		if (tasks.isEmpty()) 
+			System.out.println(getLocalName() + ": Closed doors. Idling");
+		else
+			System.out.println(getLocalName() + ": Closed doors. Heading to floor " + tasks.get(0).getFloor());
 	}
 
 	public boolean[] possibleDestinies(int currFloor, int numFloors) {

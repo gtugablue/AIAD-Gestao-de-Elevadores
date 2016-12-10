@@ -145,6 +145,9 @@ public class God {
 				}*/
 				if (human.getLiftID() != null)
 					continue; // Human already in a lift
+				
+				if (human.getOriginFloor() != floor)
+					continue; // Human not in the same floor as the lift
 
 				currWeight += human.getWeight();
 				if (currWeight > maxWeight) { // Lift is full
