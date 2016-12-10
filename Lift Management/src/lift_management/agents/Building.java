@@ -26,8 +26,11 @@ import lift_management.Human;
 import lift_management.onto.ServiceOntology;
 import lift_management.onto.ServiceProposal;
 import lift_management.onto.ServiceProposalRequest;
+import repast.simphony.engine.schedule.Schedule;
 import sajas.core.AID;
 import sajas.core.Agent;
+import sajas.core.behaviours.CyclicBehaviour;
+import sajas.core.behaviours.SimpleBehaviour;
 import sajas.core.behaviours.TickerBehaviour;
 import sajas.domain.DFService;
 import sajas.proto.AchieveREResponder;
@@ -76,16 +79,23 @@ public class Building extends Agent {
 		subscribeDf();
 		prepareCfpMessage();
 
-		addBehaviour(new TickerBehaviour(this, 1) {
+		addBehaviour(new CyclicBehaviour(this) {
+			private long ticksToNextRun;
 
 			@Override
-			protected void onTick() {
+			public void action() {
+				if (ticksToNextRun > 0)
+				{
+					ticksToNextRun--;
+					return;
+				}
+				
 				Call call = god.generateNewCall();
 				addCall(call);
 			
-				reset(God.generateRandomTime(numFloors, config.callFrequency));
+				ticksToNextRun = God.generateRandomTime(numFloors, config.callFrequency);
+				System.out.println(ticksToNextRun);
 			}
-			
 		});
 	}
 
