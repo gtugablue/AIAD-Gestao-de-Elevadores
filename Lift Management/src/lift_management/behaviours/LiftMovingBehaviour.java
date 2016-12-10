@@ -17,10 +17,7 @@ public class LiftMovingBehaviour extends Behaviour {
 		double y = lift.getPosition().getY();
 		int targetedFloor = lift.getTasks().get(0).getFloor();
 
-		if (targetedFloor > y)
-			lift.ascend();
-		else
-			lift.descend();
+		lift.headTo(targetedFloor);
 	}
 		
 	@Override
@@ -31,9 +28,8 @@ public class LiftMovingBehaviour extends Behaviour {
 
 	@Override
 	public boolean done() {
-		double delta = 0.01;
 		double y = lift.getPosition().getY();
 		int targetedFloor = lift.getTasks().get(0).getFloor();
-		return targetedFloor > y - delta && targetedFloor < y + delta;
+		return targetedFloor > y - Lift.DELTA && targetedFloor < y + Lift.DELTA;
 	}
 }

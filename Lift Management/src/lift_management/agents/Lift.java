@@ -51,7 +51,8 @@ import sajas.core.behaviours.TickerBehaviour;
  * Created by Gustavo on 06/10/2016.
  */
 public class Lift extends Agent {
-	public static final float VELOCITY = 0.01f;
+	public static final float VELOCITY = 0.05f;
+	public static final float DELTA = 0.001f;
 	private Codec codec;
 	private Ontology serviceOntology;
 	private ContinuousSpace<Object> space;
@@ -260,12 +261,24 @@ public class Lift extends Agent {
 		// TODO
 	}
 
-	public void ascend() {
+	private void ascend() {
 		space.moveByDisplacement(this, 0, VELOCITY);
 	}
 
-	public void descend() {
+	private void descend() {
 		space.moveByDisplacement(this, 0, -VELOCITY);
+	}
+	
+	public void headTo(int floor) {
+		double y = getPosition().getY();
+		
+		if (Math.abs(floor - y) <= DELTA)
+			return;
+
+		if (floor > y)
+			ascend();
+		else
+			descend();
 	}
 
 	public List<Task<Direction>> getTasks() {
