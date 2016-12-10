@@ -2,6 +2,7 @@ package lift_management.gui;
 
 import java.awt.EventQueue;
 import java.text.DecimalFormat;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
@@ -25,6 +26,8 @@ import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
+import lift_management.agents.Lift;
+
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -35,6 +38,7 @@ import javax.swing.JButton;
 public class StatisticsPanel {
 	XYSeriesCollection datasetRequestsByLift = new XYSeriesCollection();
 	private static StatisticsPanel window = null;
+	List<Lift> lifts;
 	long ticks = 0;
 	//TODO it should be used something else
 	Color colors[] = {Color.BLACK, Color.BLUE, Color.CYAN, Color.GRAY, Color.GREEN, Color.MAGENTA, Color.ORANGE, Color.ORANGE, Color.RED};
@@ -52,8 +56,10 @@ public class StatisticsPanel {
 
 	/**
 	 * Launch the application.
+	 * @param lifts 
 	 */
-	public void run(/*info required by arg*/) {
+	public void run(List<Lift> lifts) {
+		this.lifts = lifts;
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -106,32 +112,46 @@ public class StatisticsPanel {
 	}
 
 	private Component requestsByLiftPane() {
-		datasetRequestsByLift.addSeries(new XYSeries("Random Data"));
+		//each lift has a series
+		for (int i = 0; i < lifts.size(); i++) {
+			datasetRequestsByLift.addSeries(new XYSeries("Lift " + i));
+		}
+		
+		//create the chart
 		final JFreeChart chart = ChartFactory.createXYLineChart(
 				"Lift Performance",
 				"Ticks",
-				"# requests",
+				"Number of Tasks",
 				datasetRequestsByLift,             
-				PlotOrientation.VERTICAL, false, false, false);
+				PlotOrientation.VERTICAL, true, false, false);
 
 		final XYPlot plot = chart.getXYPlot();
 		XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
-		int liftIndex = 0;
-		renderer.setSeriesPaint(0, colors[liftIndex % colors.length]);
-		renderer.setSeriesStroke(0, new BasicStroke(4.0f));
+		
+		//different colors for different lifts
+		for (int i = 0; i < lifts.size(); i++) {
+			renderer.setSeriesPaint(i, colors[i % colors.length]);
+		}
 		plot.setRenderer(renderer);
 
+		//chart pane size
 		final ChartPanel chartPanel = new ChartPanel(chart);
 		chartPanel.setPreferredSize(new java.awt.Dimension(560, 370));
 		chartPanel.setMouseZoomable(true, false);
 
 		return chartPanel;
 	}
+	
+	private void updateRequestsByLiftDataset() {
+		for (int i = 0; i < lifts.size(); i++) {
+			datasetRequestsByLift.getSeries(i).add(ticks, lifts.get(i).getTasks().size());
+		}
+	}
 
-	public void incOneTick() {
-		ticks++;
+	public void incTick(long ticksToNextRun) {
+		ticks += ticksToNextRun;
 		//TODO update info of the dataset
-		datasetRequestsByLift.getSeries(0).add(ticks, ticks + 1000 * Math.random());
+		updateRequestsByLiftDataset();
 	}
 
 }

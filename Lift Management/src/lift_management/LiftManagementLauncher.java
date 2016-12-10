@@ -60,7 +60,7 @@ public class LiftManagementLauncher extends RepastSLauncher {
 			e.printStackTrace();
 		}
         
-        StatisticsPanel.getInstance().run();
+        StatisticsPanel.getInstance().run(lifts);
     }
     
     private void launchAgents() throws StaleProxyException {
