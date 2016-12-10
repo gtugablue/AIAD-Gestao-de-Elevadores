@@ -92,7 +92,6 @@ public class God {
 	public static List<Human> generateRandomHumans(int maxBuildingFloor, int numHumans) {
 		int originFloor = generateOriginFloor(maxBuildingFloor);
 		int destinyFloor = generateDestinyFloor(originFloor, maxBuildingFloor);
-		System.out.println(originFloor + " -> " + destinyFloor);
 		ArrayList<Human> humans = new ArrayList<Human>();
 		Human human;
 		for (int i = 0; i < numHumans; i++) {
@@ -155,13 +154,14 @@ public class God {
 	 * @param currFloor
 	 * @return The humans that left the lift.
 	 */
-	public List<Human> dropoffHumans(int currFloor) {
+	public List<Human> dropoffHumans(int liftId, int currFloor) {
 		List<Human> removed = new ArrayList<Human>();
 		synchronized (this.humans) {
 			Iterator<Human> iter = this.humans.iterator();
 			while(iter.hasNext()){
 				Human human = iter.next();
-				if (currFloor == human.getDestinyFloor()) {
+				Integer humanLiftId = human.getLiftID();
+				if (humanLiftId != null && humanLiftId.equals(liftId) && currFloor == human.getDestinyFloor()) {
 					human.setLiftID(null);
 					iter.remove();
 					removed.add(human);
