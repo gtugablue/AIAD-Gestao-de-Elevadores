@@ -15,7 +15,7 @@ public class LiftOpenBehaviour extends WakerBehaviour {
 	@Override
 	public int onEnd() {
 		lift.closeDoor();
-		//this.reset();
+		this.reset();
 		return LiftBehaviour.Transitions.PASSANGERS_ENTER_LEAVING.ordinal();
 	}
 }

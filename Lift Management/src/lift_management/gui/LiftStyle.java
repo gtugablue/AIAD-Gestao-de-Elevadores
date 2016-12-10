@@ -30,14 +30,14 @@ public class LiftStyle extends DefaultStyleOGL2D {
 			Lift lift = (Lift)agent;
 			VComposite composite = new TextureLayer();
 			try {
-				VImage2D liftImage;
+				VSpatial liftImage;
 				if (lift.getDoorState().equals(DoorState.OPEN)) {
-					liftImage = shapeFactory.createImage("icons/lift_open.jpg");
+					liftImage = shapeFactory.createImage("icons/lift_inside.jpg");
 				} else {
 					liftImage = shapeFactory.createImage("icons/lift_closed.jpg");
 				}
 				NdPoint position = lift.getPosition();
-				liftImage.translate(scale * (float)position.getX(), scale * ((float)position.getY() + 0.8f * Building.floorHeight / 2), 0);
+				liftImage.translate(15 * (float)position.getX(), 15 * ((float)position.getY() + 0.8f * Building.floorHeight / 2), 0);
 				liftImage.scale(scale * 0.8f * Building.floorHeight / liftDoorImageHeight);
 				composite.addChild(liftImage);
 			} catch (IOException e) {
