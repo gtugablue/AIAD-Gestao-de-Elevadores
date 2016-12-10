@@ -122,6 +122,9 @@ public class LookDiskAlgorithm extends LiftAlgorithm<Direction>{
 			throw new Exception("requestedDirection cannot be STOP. Only UP or DOWN");
 		}
 		
+		System.out.println("ADD TASK Init, requestFloor: "+requestedFloor+" requestedDirection: "+requestedDirection+" \n" + tasks.toString());
+
+		
 		int previousStop = currentPosition;
 		Direction previousDirection = Direction.STOP;
 		
@@ -145,14 +148,16 @@ public class LookDiskAlgorithm extends LiftAlgorithm<Direction>{
 			previousDirection = nextDirection;
 		}
 		
-		
+
 		//Percorreu toda a lista de tasks e ainda assim não foi atribuido a uma posição				
 		tasks.add(new Task<Direction>(requestedFloor, requestedDirection));
+		System.out.println("ADD TASK END, requestFloor: "+requestedFloor+" requestedDirection: "+requestedDirection+" \n" + tasks.toString());
 		return tasks.size()-1;
 	}
 	
 	@Override
 	public int attendRequest(List<Task<Direction>> tasks, int requestedFloor, int maxBuildingFloor, int currentPosition){
+		System.out.println("Attend request Init, requestFloor: "+requestedFloor+" \n" + tasks.toString());
 		Task<Direction> newTask = new Task<Direction>(requestedFloor, Direction.STOP); 
 		if (tasks.contains(newTask))
 			return tasks.indexOf(newTask);
@@ -186,6 +191,8 @@ public class LookDiskAlgorithm extends LiftAlgorithm<Direction>{
 		
 		//Percorreu toda a lista de tasks e ainda assim não foi atribuido a uma posição				
 		tasks.add(newTask);
+		System.out.println("Attend request END, requestFloor: "+requestedFloor+" \n" + tasks.toString());
+
 		return tasks.size()-1;
 	}
 }
