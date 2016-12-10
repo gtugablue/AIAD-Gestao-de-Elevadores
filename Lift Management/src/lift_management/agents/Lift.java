@@ -218,7 +218,6 @@ public class Lift extends Agent {
 			accepts.remove(task.getId());
 			inform.setPerformative(ACLMessage.INFORM);
 			send(inform);
-			System.out.println("SENT INFORM");
 		}
 	}
 
@@ -274,7 +273,7 @@ public class Lift extends Agent {
 	 * This method should be called when the lift opens its doors, for people to leave and enter.
 	 */
 	public void passengersInOut() {
-		this.humans.removeAll(god.dropoffHumans(getCurrentFloor()));
+		this.humans.removeAll(god.dropoffHumans(getId(), getCurrentFloor()));
 		List<Human> newHumans = god.attendWaitingHumans(getCurrentFloor(), this.maxWeight - this.currentWeight, getId());
 		this.humans.addAll(newHumans);
 		this.currentWeight = calculateHumansWeight(this.humans);

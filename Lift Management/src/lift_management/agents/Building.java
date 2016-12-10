@@ -245,7 +245,6 @@ public class Building extends Agent {
 
 		@Override
 		protected void handleInform(ACLMessage inform) {
-			System.out.println("INFORM " + call);
 			try {
 				((Building)getAgent()).getCallSystem().resetCall(call);
 			} catch (Exception e) {
