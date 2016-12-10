@@ -4,7 +4,7 @@
 		type="int" defaultValue="__NULL__" isReadOnly="false"
 		converter="repast.simphony.parameter.StringConverterFactory$IntConverter" />
 	<parameter name="numFloors" displayName="Number of floors"
-		type="int" defaultValue="5" isReadOnly="false"
+		type="int" defaultValue="15" isReadOnly="false"
 		converter="repast.simphony.parameter.StringConverterFactory$IntConverter" />
 	<parameter name="numLifts" displayName="Number of lifts"
 		type="int" defaultValue="2" isReadOnly="false"
