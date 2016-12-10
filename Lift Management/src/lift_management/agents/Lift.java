@@ -1,19 +1,15 @@
 package lift_management.agents;
 
 import sajas.domain.DFService;
-import sajas.proto.AchieveREInitiator;
 import sajas.proto.ContractNetResponder;
 import sajas.proto.SSContractNetResponder;
 import sajas.proto.SSResponderDispatcher;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
-
 import jade.content.lang.Codec;
 import jade.content.lang.Codec.CodecException;
 import jade.content.lang.sl.SLCodec;
@@ -26,26 +22,19 @@ import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import javafx.util.Pair;
 import lift_management.Call;
-import lift_management.DirectionalCall;
 import lift_management.God;
 import lift_management.Human;
 import lift_management.behaviours.LiftBehaviour;
 import lift_management.models.Task;
-import lift_management.algorithms.strategy_algorithm.ClosestAttendsAlgorithm;
 import lift_management.algorithms.strategy_algorithm.LiftAlgorithm;
-import lift_management.algorithms.strategy_algorithm.LookDiskAlgorithm;
-import lift_management.onto.ServiceExecutionRequest;
 import lift_management.onto.ServiceOntology;
 import lift_management.onto.ServiceProposal;
 import lift_management.onto.ServiceProposalRequest;
-import repast.simphony.engine.schedule.ScheduledMethod;
 import repast.simphony.space.continuous.ContinuousSpace;
 import repast.simphony.space.continuous.NdPoint;
 import sajas.core.Agent;
 import sajas.core.behaviours.Behaviour;
-import sajas.core.behaviours.TickerBehaviour;
 
 /**
  * Created by Gustavo on 06/10/2016.
@@ -157,13 +146,13 @@ public class Lift<T> extends Agent {
 		@Override
 		protected ACLMessage handleCfp(ACLMessage cfp) {
 			System.out.println(getLocalName() + ": Got cfp.");
-			Lift lift = (Lift)myAgent;
+			Lift<T> lift = (Lift)myAgent;
 			lift.buildingAID = cfp.getSender();
 			ACLMessage reply = cfp.createReply();
 			reply.setPerformative(ACLMessage.PROPOSE);
 			try {
-				DirectionalCall call = (DirectionalCall)((ServiceProposalRequest)getContentManager().extractContent(cfp)).getCall();
-				int price = lift.algorithm.evaluate(lift.tasks, call.getOrigin(), call.isAscending() ? Direction.UP : Direction.DOWN, numFloors, (int) Math.round(lift.getPosition().getY()));
+				Call call = (Call<T>)((ServiceProposalRequest)getContentManager().extractContent(cfp)).getCall();
+				int price = lift.algorithm.evaluate(lift.tasks, call.getOrigin(), call.getDestiny(), numFloors, (int) Math.round(lift.getPosition().getY()));
 				getContentManager().fillContent(reply, new ServiceProposal("attend-request", price));
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -178,10 +167,9 @@ public class Lift<T> extends Agent {
 			System.out.println(getLocalName() + ": Got accept proposal.");
 			ACLMessage result = accept.createReply();
 
-			DirectionalCall call;
+			Call<T> call;
 			try {
-				//TODO generalize to different calls
-				call = (DirectionalCall) ((ServiceProposalRequest) getContentManager().extractContent(cfp)).getCall();
+				call = (Call<T>) ((ServiceProposalRequest) getContentManager().extractContent(cfp)).getCall();
 				addRequest(call, accept);
 				return null; // We'll send the response manually later
 			} catch (CodecException | OntologyException e) {
@@ -192,7 +180,7 @@ public class Lift<T> extends Agent {
 			return result;
 		}
 
-		private void addRequest(DirectionalCall call, ACLMessage accept) {
+		private void addRequest(Call<T> call, ACLMessage accept) {
 			for (int i = 0; i < tasks.size(); i++) {
 				if (tasks.get(i).getFloor() == call.getOrigin() && tasks.get(i).getDestiny().equals(call.getDestiny()))
 					return;
@@ -241,12 +229,12 @@ public class Lift<T> extends Agent {
 	/**
 	 * Adds a new task by placing it in the correct spot in the task list.
 	 * @param floor
-	 * @param direction
+	 * @param destiny
 	 * @param accept The Accept Proposal message that originated this task.
 	 */
-	public void assignTask(int floor, Direction direction, ACLMessage accept) {
+	public void assignTask(int floor, T destiny, ACLMessage accept) {
 		try {
-			int pos = this.algorithm.addNewTask(this.tasks, floor, direction, this.numFloors, (int)this.getPosition().getY());
+			int pos = this.algorithm.addNewTask(this.tasks, floor, destiny, this.numFloors, (int)Math.round(this.getPosition().getY()));
 			if (accept != null)
 				accepts.put(tasks.get(pos).getId(), accept);
 			System.out.println(getLocalName() + ": new task " + tasks.get(pos).getId() + ".");
