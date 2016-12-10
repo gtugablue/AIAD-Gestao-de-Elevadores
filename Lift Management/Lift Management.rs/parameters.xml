@@ -12,5 +12,7 @@
 	<parameter name="maxWeights" displayName="Max weight per lift"
 		type="java.lang.String" defaultValue="500 450" isReadOnly="false"
 		converter="repast.simphony.parameter.StringConverterFactory$StringStringConverter" />
-		
+	<parameter name="callFrequency" displayName="Call frequency"
+		type="int" defaultValue="100" isReadOnly="false"
+		converter="repast.simphony.parameter.StringConverterFactory$IntConverter" />
 </parameters>

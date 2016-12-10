@@ -12,10 +12,12 @@ public class God {
 	private static final long serialVersionUID = 6602617123027622789L;
 	private List<Human> humans;
 	private int numFloors;
+	private int callFrequency;
 
-	public God(int numFloors) {
+	public God(int numFloors, int callFrequency) {
 		this.humans = Collections.synchronizedList(new ArrayList<Human>());
 		this.numFloors = numFloors;
+		this.callFrequency = callFrequency;
 	}
 
 	/**
@@ -121,8 +123,8 @@ public class God {
 		return (int) Math.ceil(Math.pow(2 * Math.random(), 2));
 	}
 
-	public static long generateRandomTime(int numFloors) {
-		return (long) Math.ceil(1000 * Math.random() / numFloors);
+	public static long generateRandomTime(int numFloors, int callFrequency) {
+		return (long) Math.ceil((100000 * Math.random()) / (numFloors * callFrequency));
 	}
 
 	public void addHumans(List<Human> humans) {

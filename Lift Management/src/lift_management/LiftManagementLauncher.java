@@ -75,8 +75,8 @@ public class LiftManagementLauncher extends RepastSLauncher {
         	PointTranslator translator = new StrictBorders();
         	ContinuousSpaceFactory factory = ContinuousSpaceFactoryFinder.createContinuousSpaceFactory(null);
         	ContinuousSpace<Object> space = factory.createContinuousSpace("space", context, adder, translator, config.numLifts + 1, Building.floorHeight * config.numFloors);
-        	God god = new God(config.numFloors);
-        	building = new Building(god, config.numLifts, config.numFloors);
+        	God god = new God(config.numFloors, config.callFrequency);
+        	building = new Building(god, config);
         	context.add(building);
         	space.moveTo(building, 0, 0);
         	lifts = createLifts(god, config.numLifts, space, context);
