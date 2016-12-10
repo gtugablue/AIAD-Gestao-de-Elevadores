@@ -8,6 +8,10 @@ public class Human {
 	protected final int id = ++currentId;
 	protected Integer liftID; /** The ID of the lift the human is in, or null if still waiting for one. **/
 	
+	public Human() {
+		
+	}
+	
 	public Human(double weight, int originFloor, int destinyFloor){
 		this.weight = weight;
 		this.originFloor = originFloor;

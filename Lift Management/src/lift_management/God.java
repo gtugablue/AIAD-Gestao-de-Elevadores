@@ -111,13 +111,10 @@ public class God {
 		System.out.println("Floor: " + generateOriginFloor(5));
 	}
 
-	public Call generateNewCall() {
+	public List<Human> generateNewCall() {
 		List<Human> humans = generateRandomHumans(numFloors - 1, generateGroupSize());
 		addHumans(humans);		
-		Human human = humans.get(0);
-
-		//TODO the type of call depends the algorithm
-		return new DirectionalCall(human.getOriginFloor(), human.getOriginFloor() < human.getDestinyFloor());
+		return humans;
 	}
 
 	private static int generateGroupSize() {

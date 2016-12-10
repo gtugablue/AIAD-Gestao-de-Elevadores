@@ -51,7 +51,7 @@ import sajas.core.behaviours.TickerBehaviour;
  * Created by Gustavo on 06/10/2016.
  */
 public class Lift extends Agent {
-	public static final float VELOCITY = 0.05f;
+	public static final float VELOCITY = 0.005f;
 	public static final float DELTA = 0.001f;
 	private Codec codec;
 	private Ontology serviceOntology;
@@ -60,9 +60,10 @@ public class Lift extends Agent {
 	private final int maxWeight;
 	private int currentWeight;
 	private Map<Integer, ACLMessage> accepts;
+	private List<Human> insideHumans; // stores the humans that are currently inside this lift
+	private List<Human> floorHumans; // stores the humans that are assigned to this lift and waiting to be picked up
 	private int numFloors;
 	private AID buildingAID;
-	private List<Human> humans;
 	private God god;
 	private int id;
 	private LiftAlgorithm algorithm;
@@ -82,7 +83,8 @@ public class Lift extends Agent {
 		this.tasks = new ArrayList<Task<Direction>>();
 		this.accepts = new HashMap<Integer, ACLMessage>();
 		this.algorithm = new LookDiskAlgorithm();
-		this.humans = new ArrayList<Human>();
+		this.insideHumans = new ArrayList<Human>();
+		this.floorHumans = new ArrayList<Human>();
 	}
 
 	@Override
@@ -180,11 +182,10 @@ public class Lift extends Agent {
 			System.out.println(getLocalName() + ": Got accept proposal.");
 			ACLMessage result = accept.createReply();
 
-			DirectionalCall call;
 			try {
 				//TODO generalize to different calls
-				call = (DirectionalCall) ((ServiceProposalRequest) getContentManager().extractContent(cfp)).getCall();
-				addRequest(call, accept);
+				ServiceProposalRequest spr = (ServiceProposalRequest) getContentManager().extractContent(cfp);
+				addRequest((DirectionalCall) spr.getCall(), spr.getHumans(),  accept);
 				return null; // We'll send the response manually later
 			} catch (CodecException | OntologyException e) {
 				e.printStackTrace();
@@ -194,7 +195,8 @@ public class Lift extends Agent {
 			return result;
 		}
 
-		private void addRequest(DirectionalCall call, ACLMessage accept) {
+		private void addRequest(DirectionalCall call, List<Human> humans, ACLMessage accept) {
+			floorHumans.addAll(humans);
 			for (int i = 0; i < tasks.size(); i++) {
 				if (tasks.get(i).getFloor() == call.getOrigin() && tasks.get(i).getDestiny().equals(call.getDirection()))
 					return;
@@ -293,11 +295,32 @@ public class Lift extends Agent {
 	 * This method should be called when the lift opens its doors, for people to leave and enter.
 	 */
 	public void passengersInOut() {
-		this.humans.removeAll(god.dropoffHumans(getId(), getCurrentFloor()));
-		List<Human> newHumans = god.attendWaitingHumans(getCurrentFloor(), this.maxWeight - this.currentWeight, getId(), possibleDestinies(getCurrentFloor(), this.numFloors));
-		this.humans.addAll(newHumans);
-		this.currentWeight = calculateHumansWeight(this.humans);
-		for (Human human : humans) {
+		// Leaving
+		List<Human> leaving = new ArrayList<Human>();
+		for (int i = 0; i < this.insideHumans.size(); i++) {
+			Human human = this.insideHumans.get(i);
+			if (human.getDestinyFloor() == getCurrentFloor()) {
+				leaving.add(human);
+			}
+		}
+		this.insideHumans.removeAll(leaving);
+		
+		// Entering
+		List<Human> entering = new ArrayList<Human>();
+		for (int i = 0; i < this.floorHumans.size(); i++) {
+			Human human = this.floorHumans.get(i);
+			if (human.getOriginFloor() == getCurrentFloor()) { // TODO: check direction
+				entering.add(human);
+			}
+		}
+		this.floorHumans.removeAll(entering);
+		this.insideHumans.addAll(entering);
+		
+		// Update current weight
+		this.currentWeight = calculateHumansWeight(this.insideHumans);
+		
+		// Create tasks for humans that entered and reschedule the next ones
+		for (Human human : entering) {
 			Task task = new Task(getCurrentFloor(), human.getDestinyFloor());
 			if (!tasks.contains(task)) {
 				int pos = this.algorithm.attendRequest(tasks, human.getDestinyFloor(), this.numFloors, getCurrentFloor());
@@ -313,6 +336,8 @@ public class Lift extends Agent {
 				}
 			}
 		}
+		
+		// Log info
 		if (tasks.isEmpty()) 
 			System.out.println(getLocalName() + ": Closing doors. Idling");
 		else
@@ -355,7 +380,7 @@ public class Lift extends Agent {
 	}
 
 	public int getNumHumansInside() {
-		return this.humans.size();
+		return this.insideHumans.size();
 		//return god.getNumHumansInLift(getId());
 	}
 	

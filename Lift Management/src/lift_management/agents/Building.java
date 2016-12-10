@@ -90,8 +90,10 @@ public class Building extends Agent {
 					return;
 				}
 				
-				Call call = god.generateNewCall();
-				addCall(call);
+				List<Human> humans = god.generateNewCall();
+				Human human = humans.get(0);
+				Call call = new DirectionalCall(human.getOriginFloor(), human.getOriginFloor() < human.getDestinyFloor());
+				addCall(call, humans);
 			
 				ticksToNextRun = God.generateRandomTime(numFloors, config.callFrequency);
 			}
@@ -123,7 +125,7 @@ public class Building extends Agent {
 		getContentManager().registerOntology(serviceOntology);
 	}
 
-	public void addCall(Call call) {
+	public void addCall(Call call, List<Human> humans) {
 		try {
 			getCallSystem().makeCall(call);
 
@@ -132,7 +134,7 @@ public class Building extends Agent {
 			cfp.setOntology(serviceOntology.getName());
 			cfp.setProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET);
 
-			addBehaviour(new CNetInit(this, cfp, call));
+			addBehaviour(new CNetInit(this, cfp, call, humans));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -156,10 +158,12 @@ public class Building extends Agent {
 
 		private static final long serialVersionUID = 1L;
 		private Call call;
+		private List<Human> humans;
 
-		public CNetInit(Agent owner, ACLMessage cfp, Call call) {
+		public CNetInit(Agent owner, ACLMessage cfp, Call call, List<Human> humans) {
 			super(owner, cfp);
 			this.call = call;
+			this.humans = humans;
 		}
 
 		@Override
@@ -171,7 +175,7 @@ public class Building extends Agent {
 			template.addServices(sd);
 			
 			try {
-				getContentManager().fillContent(cfp, new ServiceProposalRequest("attend-request", call));
+				getContentManager().fillContent(cfp, new ServiceProposalRequest("attend-request", call, humans));
 
 				DFAgentDescription[] dfads = null;
 				try {
@@ -252,7 +256,7 @@ public class Building extends Agent {
 			cfp.setLanguage(codec.getName());
 			cfp.setOntology(serviceOntology.getName());
 			cfp.setProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET);
-			addBehaviour(new CNetInit(getAgent(), cfp, call));
+			addBehaviour(new CNetInit(getAgent(), cfp, call, humans));
 		}
 
 		@Override

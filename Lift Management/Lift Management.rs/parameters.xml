@@ -13,6 +13,6 @@
 		type="java.lang.String" defaultValue="500 450 500 500 500" isReadOnly="false"
 		converter="repast.simphony.parameter.StringConverterFactory$StringStringConverter" />
 	<parameter name="callFrequency" displayName="Call frequency"
-		type="int" defaultValue="100" isReadOnly="false"
+		type="int" defaultValue="10" isReadOnly="false"
 		converter="repast.simphony.parameter.StringConverterFactory$IntConverter" />
 </parameters>
