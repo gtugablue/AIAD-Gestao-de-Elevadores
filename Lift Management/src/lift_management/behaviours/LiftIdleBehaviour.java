@@ -13,11 +13,11 @@ public class LiftIdleBehaviour extends Behaviour {
 
 	@Override
 	public void action() {
-		System.out.println(lift.getLocalName() + ": ACTION START " + lift.getTasks());
+		//System.out.println(lift.getLocalName() + ": ACTION START " + lift.getTasks());
 		if (lift.getTasks().isEmpty()) {
-			block();
+			//block();
 		}
-		System.out.println(lift.getLocalName() + ": ACTION END " + lift.getTasks());
+		//System.out.println(lift.getLocalName() + ": ACTION END " + lift.getTasks());
 	}
 
 	@Override
