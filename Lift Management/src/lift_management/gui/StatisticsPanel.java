@@ -29,6 +29,7 @@ public class StatisticsPanel {
 
 	private JFrame frmPerformance;
 	public static XYSeries series;
+	public static boolean ready = false;
 
 	/**
 	 * Launch the application.
@@ -70,7 +71,7 @@ public class StatisticsPanel {
 		JButton btnNewButton2 = new JButton("New button2");
 		JButton btnNewButton3 = new JButton("New button3");
 		
-		final XYSeries series = new XYSeries( "Random Data" );         
+		series = new XYSeries( "Random Data" );         
 	      Second current = new Second( );         
 	      double value = 100.0;         
 	      for (int i = 0; i < 4000; i++)    
@@ -117,6 +118,7 @@ public class StatisticsPanel {
 		
 		//TODO show current and total number of requests, (no) use time of the lift, distance traveled, min/max/avg load
 		tabbedPane.addTab("Information by lift", null, btnNewButton3, null);
+		ready = true;
 	}
 
 }

@@ -22,6 +22,8 @@ import lift_management.DirectionCallSystem;
 import lift_management.DirectionalCall;
 import lift_management.God;
 import lift_management.Human;
+import lift_management.LiftManagementLauncher;
+import lift_management.gui.StatisticsPanel;
 import lift_management.onto.ServiceOntology;
 import lift_management.onto.ServiceProposal;
 import lift_management.onto.ServiceProposalRequest;
@@ -43,6 +45,8 @@ public class Building extends Agent {
 	private Codec codec;
 	private Ontology serviceOntology;
 	private God god;
+	
+	private long ticks = 0;
 	
 	public Building(God god, int numLifts, int numFloors) {
 		this.god = god;
@@ -79,7 +83,13 @@ public class Building extends Agent {
 			protected void onTick() {
 				Call call = god.generateNewCall();
 				addCall(call);
-			
+				ticks += getTickCount();
+
+				if (StatisticsPanel.ready) {
+					StatisticsPanel.series.add(ticks, LiftManagementLauncher.lifts.get(0).getTasks().size());
+					System.err.println(getTickCount());
+				}
+				
 				reset(God.generateRandomTime(numFloors));
 			}
 			

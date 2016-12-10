@@ -211,11 +211,11 @@ public class Lift extends Agent {
 		
 		tasks.remove(0);
 
-		ACLMessage inform = accepts.get(0).createReply();
-		accepts.remove(0);
-		inform.setPerformative(ACLMessage.INFORM);
-		send(inform);
-		System.out.println("SENT INFORM");
+		//ACLMessage inform = accepts.get(0).createReply();
+		//accepts.remove(0);
+		//inform.setPerformative(ACLMessage.INFORM);
+		//send(inform);
+		//System.out.println("SENT INFORM");
 	}
 	
 	public DoorState getDoorState() {

@@ -34,7 +34,7 @@ import sajas.wrapper.ContainerController;
 public class LiftManagementLauncher extends RepastSLauncher {
     private ContainerController mainContainer;
     private Building building;
-    private List<Lift> lifts;
+    public static List<Lift> lifts;
     private Config config;
     
 	public static void main(String[] args) {
