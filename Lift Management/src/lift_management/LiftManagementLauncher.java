@@ -57,8 +57,6 @@ public class LiftManagementLauncher extends RepastSLauncher {
 		} catch (StaleProxyException e) {
 			e.printStackTrace();
 		}
-        
-        StatisticsPanel.run();
     }
     
     private void launchAgents() throws StaleProxyException {

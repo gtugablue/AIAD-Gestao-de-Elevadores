@@ -28,17 +28,26 @@ import javax.swing.JButton;
 public class StatisticsPanel {
 
 	private JFrame frmPerformance;
-	public static XYSeries series;
-	public static boolean ready = false;
+	private XYSeries series;
+	private static StatisticsPanel window = null;
+	long ticks = 0;
+
+	public static StatisticsPanel getInstance() {
+		if (window == null) {
+			window = new StatisticsPanel();
+		}
+
+		return window;
+	}
 
 	/**
 	 * Launch the application.
 	 */
-	public static void run() {
+	public void run(/*info required by arg*/) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					StatisticsPanel window = new StatisticsPanel();
+					initialize();
 					window.frmPerformance.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -50,8 +59,7 @@ public class StatisticsPanel {
 	/**
 	 * Create the application.
 	 */
-	public StatisticsPanel() {
-		initialize();
+	private StatisticsPanel() {
 	}
 
 	/**
@@ -62,7 +70,7 @@ public class StatisticsPanel {
 		frmPerformance.setTitle("Performance");
 		frmPerformance.setBounds(100, 100, 450, 493);
 		frmPerformance.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
+
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		frmPerformance.getContentPane().add(tabbedPane, BorderLayout.NORTH);
 
@@ -70,55 +78,58 @@ public class StatisticsPanel {
 		JButton btnNewButton1 = new JButton("New button1");
 		JButton btnNewButton2 = new JButton("New button2");
 		JButton btnNewButton3 = new JButton("New button3");
-		
+
 		series = new XYSeries( "Random Data" );         
-	      Second current = new Second( );         
-	      double value = 100.0;         
-	      for (int i = 0; i < 4000; i++)    
-	      {
-	         try 
-	         {
-	            value = 1;//value + Math.random( ) - 0.5;                 
-	            series.add(current.getSecond(), new Double( value ) );                 
-	            current = ( Second ) current.next( ); 
-	         }
-	         catch ( SeriesException e ) 
-	         {
-	            System.err.println("Error adding to series");
-	         }
-	      }
-	      
-	     
+		Second current = new Second( );         
+		double value = 100.0;         
+		for (int i = 0; i < 4000; i++)    
+		{
+			try 
+			{
+				value = value + Math.random( ) - 0.5;                 
+				series.add(current.getSecond(), new Double( value ) );                 
+				current = ( Second ) current.next( ); 
+			}
+			catch ( SeriesException e ) 
+			{
+				System.err.println("Error adding to series");
+			}
+		}
+
+
 
 		final XYSeriesCollection dataset = new XYSeriesCollection();        
 		dataset.addSeries(series);
-	      final JFreeChart chart = ChartFactory.createTimeSeriesChart(             
-	    	      "Computing Test", 
-	    	      "Ticks",              
-	    	      "# requests",              
-	    	      dataset,             
-	    	      false,              
-	    	      false,              
-	    	      false);
-	    
-	      
-	      final ChartPanel chartPanel = new ChartPanel( chart );         
-	      chartPanel.setPreferredSize( new java.awt.Dimension( 560 , 370 ) );         
-	      chartPanel.setMouseZoomable( true , false );   
-	      
-	      
+		final JFreeChart chart = ChartFactory.createTimeSeriesChart(             
+				"Lift Performance", 
+				"Ticks",              
+				"# requests",              
+				dataset,             
+				false,              
+				false,              
+				false);
+
+		final ChartPanel chartPanel = new ChartPanel( chart );         
+		chartPanel.setPreferredSize( new java.awt.Dimension( 560 , 370 ) );         
+		chartPanel.setMouseZoomable( true , false );   
+
+
 		//TODO show a graph detailing the number of requests completed by each lift
 		tabbedPane.addTab("Requests by Lift", null, chartPanel, null);
-		
+
 		//TODO show the capacity of each lift
 		tabbedPane.addTab("Load by Lift", null, btnNewButton1, null);
-		
+
 		//TODO show the mean waiting time (also max and min)
 		tabbedPane.addTab("Wait time", null, btnNewButton2, null);
-		
+
 		//TODO show current and total number of requests, (no) use time of the lift, distance traveled, min/max/avg load
 		tabbedPane.addTab("Information by lift", null, btnNewButton3, null);
-		ready = true;
+	}
+
+	public void incOneTick() {
+		ticks++;
+		//TODO update info of the dataset
 	}
 
 }

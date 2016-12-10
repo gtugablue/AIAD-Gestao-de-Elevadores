@@ -86,6 +86,7 @@ public class Building extends Agent {
 
 			@Override
 			public void action() {
+				StatisticsPanel.getInstance().incOneTick();
 				if (ticksToNextRun > 0)
 				{
 					ticksToNextRun--;
