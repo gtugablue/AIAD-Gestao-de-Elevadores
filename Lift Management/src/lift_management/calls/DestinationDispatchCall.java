@@ -30,4 +30,9 @@ public class DestinationDispatchCall extends Call<Integer> {
 	public void setDestiny(int destiny) throws Exception{
 		setDestiny(Integer.valueOf(destiny));
 	}
+
+	@Override
+	public boolean isAscending() {
+		return this.origin < this.destiny;
+	}
 }

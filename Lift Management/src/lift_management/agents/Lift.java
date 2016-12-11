@@ -39,8 +39,8 @@ import sajas.core.behaviours.Behaviour;
 /**
  * Created by Gustavo on 06/10/2016.
  */
-public class Lift<T> extends Agent {
-	public static final float VELOCITY = 0.05f;
+public class Lift extends Agent {
+	public static final float VELOCITY = 0.005f;
 	public static final float DELTA = 0.001f;
 	private Codec codec;
 	private Ontology serviceOntology;
@@ -52,7 +52,7 @@ public class Lift<T> extends Agent {
 	private God god;
 	private int id;
 	private LiftAlgorithm algorithm;
-	private List<Task<T>> tasks = new ArrayList<Task<T>>();
+	private List<Task<Object>> tasks = new ArrayList<Task<Object>>();
 	private Map<Integer, ACLMessage> accepts = new HashMap<Integer, ACLMessage>();
 	private List<Human> humans = new ArrayList<Human>();
 
@@ -145,13 +145,13 @@ public class Lift<T> extends Agent {
 
 		@Override
 		protected ACLMessage handleCfp(ACLMessage cfp) {
-			System.out.println(getLocalName() + ": Got cfp.");
-			Lift<T> lift = (Lift)myAgent;
+			//System.out.println(getLocalName() + ": Got cfp.");
+			Lift lift = (Lift)myAgent;
 			lift.buildingAID = cfp.getSender();
 			ACLMessage reply = cfp.createReply();
 			reply.setPerformative(ACLMessage.PROPOSE);
 			try {
-				Call call = (Call<T>)((ServiceProposalRequest)getContentManager().extractContent(cfp)).getCall();
+				Call call = (Call) ((ServiceProposalRequest)getContentManager().extractContent(cfp)).getCall();
 				int price = lift.algorithm.evaluate(lift.tasks, call.getOrigin(), call.getDestiny(), numFloors, (int) Math.round(lift.getPosition().getY()));
 				getContentManager().fillContent(reply, new ServiceProposal("attend-request", price));
 			} catch (Exception e) {
@@ -164,12 +164,12 @@ public class Lift<T> extends Agent {
 
 		@Override
 		protected ACLMessage handleAcceptProposal(ACLMessage cfp, ACLMessage propose, ACLMessage accept) {
-			System.out.println(getLocalName() + ": Got accept proposal.");
+			//System.out.println(getLocalName() + ": Got accept proposal.");
 			ACLMessage result = accept.createReply();
 
-			Call<T> call;
+			Call call;
 			try {
-				call = (Call<T>) ((ServiceProposalRequest) getContentManager().extractContent(cfp)).getCall();
+				call = (Call) ((ServiceProposalRequest) getContentManager().extractContent(cfp)).getCall();
 				addRequest(call, accept);
 				return null; // We'll send the response manually later
 			} catch (CodecException | OntologyException e) {
@@ -180,7 +180,7 @@ public class Lift<T> extends Agent {
 			return result;
 		}
 
-		private void addRequest(Call<T> call, ACLMessage accept) {
+		private void addRequest(Call call, ACLMessage accept) {
 			for (int i = 0; i < tasks.size(); i++) {
 				if (tasks.get(i).getFloor() == call.getOrigin() && tasks.get(i).getDestiny().equals(call.getDestiny()))
 					return;
@@ -190,7 +190,7 @@ public class Lift<T> extends Agent {
 
 		@Override
 		protected void handleRejectProposal(ACLMessage cfp, ACLMessage propose, ACLMessage accept) {
-			System.out.println(getLocalName() + ": Got reject proposal.");
+			//System.out.println(getLocalName() + ": Got reject proposal.");
 		}
 
 	}
@@ -208,7 +208,7 @@ public class Lift<T> extends Agent {
 			accepts.remove(task.getId());
 			inform.setPerformative(ACLMessage.INFORM);
 			send(inform);
-			System.out.println(getLocalName() + ": INFORM " + task.getFloor());
+			//System.out.println(getLocalName() + ": INFORM " + task.getFloor());
 		}
 		
 		passengersInOut();
@@ -232,7 +232,7 @@ public class Lift<T> extends Agent {
 	 * @param destiny
 	 * @param accept The Accept Proposal message that originated this task.
 	 */
-	public void assignTask(int floor, T destiny, ACLMessage accept) {
+	public void assignTask(int floor, Object destiny, ACLMessage accept) {
 		try {
 			int pos = this.algorithm.addNewTask(this.tasks, floor, destiny, this.numFloors, (int)Math.round(this.getPosition().getY()));
 			if (accept != null)
@@ -267,7 +267,7 @@ public class Lift<T> extends Agent {
 			descend();
 	}
 
-	public List<Task<T>> getTasks() {
+	public List<Task<Object>> getTasks() {
 		return tasks;
 	}
 

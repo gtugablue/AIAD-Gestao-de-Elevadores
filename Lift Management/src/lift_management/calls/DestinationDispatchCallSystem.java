@@ -11,7 +11,16 @@ public class DestinationDispatchCallSystem extends CallSystem {
 		if (!(call != null && call instanceof DestinationDispatchCall)) {
 			throw new Exception("Expected DirectionalCall object instead got " + call.getClass());
 		}
-		//TODO add call to the system
+		DestinationDispatchCall newCall = (DestinationDispatchCall) call;
+		calls[newCall.getOrigin()][newCall.isAscending() ? 0 : 1] = true;
+	}
+
+	public boolean toClimb(int floor) {
+		return calls[floor][0];
+	}
+
+	public boolean toDescend(int floor) {
+		return calls[floor][1];
 	}
 
 	@Override
@@ -19,7 +28,9 @@ public class DestinationDispatchCallSystem extends CallSystem {
 		if (!(call != null && call instanceof DestinationDispatchCall)) {
 			throw new Exception("Expected DirectionalCall object instead got " + call.getClass());
 		}
-		//TODO remove call from the system
+		DestinationDispatchCall newCall = (DestinationDispatchCall) call;
+		calls[newCall.getOrigin()][newCall.isAscending() ? 0 : 1] = false;
+		System.out.println("Reseting: " + call);
 	}
 
 	@Override

@@ -1,12 +1,9 @@
 package lift_management.calls;
 
 public class DirectionalCallSystem extends CallSystem {
-	
-	boolean calls[][];
 
 	public DirectionalCallSystem(int numFloors) {
 		super(numFloors);
-		calls = new boolean[numFloors][2];
 	}
 
 	@Override

@@ -23,4 +23,6 @@ public abstract class Call<T> {
 	public abstract T getDestiny();
 	
 	public abstract void setDestiny(T Destiny) throws Exception;
+	
+	public abstract boolean isAscending();
 }

@@ -4,10 +4,10 @@ import lift_management.agents.Lift;
 import sajas.core.behaviours.Behaviour;
 import sajas.core.behaviours.TickerBehaviour;
 
-public class LiftMovingBehaviour<T> extends Behaviour {
-	private Lift<T> lift;
+public class LiftMovingBehaviour extends Behaviour {
+	private Lift lift;
 	
-	public LiftMovingBehaviour(Lift<T> lift, long period) {
+	public LiftMovingBehaviour(Lift lift, long period) {
 		super(lift);
 		this.lift = lift;
 	}

@@ -106,7 +106,9 @@ public class LiftManagementLauncher extends RepastSLauncher {
     private List<Lift> createLifts(God god, int numLifts, ContinuousSpace<Object> space, Context<Object> context, LiftAlgorithm algorithm) {
     	ArrayList<Lift> lifts = new ArrayList<Lift>();
     	for (int i = 0; i < numLifts; i++) {
-    		Lift<Integer> lift = new Lift<Integer>(i, god, space, config.numFloors, config.maxWeights[i], algorithm);
+    		Class<?> algClass = this.getAlgorithmClass();
+    		
+    		Lift lift =  new Lift(i, god, space, config.numFloors, config.maxWeights[i], algorithm);
     		lifts.add(lift);
     		context.add(lift);
     		space.moveTo(lift, i + 1, 0);
@@ -135,6 +137,14 @@ public class LiftManagementLauncher extends RepastSLauncher {
 			default:
 				throw new Exception ("Unknown algorithm");
 		}
+    }
+    
+    public Class<?> getAlgorithmClass(){
+    	if(algorithm.getClass().equals(DestinationDispatchAlgorithm.class)){
+    		return Integer.class;
+    	}else{
+    		return Direction.class;
+    	}
     }
 	
 }

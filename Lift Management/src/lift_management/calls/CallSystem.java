@@ -5,10 +5,12 @@ import java.util.List;
 
 public abstract class CallSystem {
 	private int numFloors;
+	boolean calls[][];
 	
 	public CallSystem(int numFloors)
 	{
 		this.numFloors = numFloors;
+		this.calls = new boolean[numFloors][2];
 	}
 	
 	public int getNumFloors() {
