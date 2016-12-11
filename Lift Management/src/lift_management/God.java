@@ -142,10 +142,9 @@ public class God {
 		int currWeight = 0;
 		synchronized (this.humans) {
 			for (Human human : this.humans) {
-				/*if (!possibleDestinies[human.getDestinyFloor()]) {
-					// TODO recall
+				if (!possibleDestinies[human.getDestinyFloor()]) {
 					continue; // The lift destination is different from the human destination
-				}*/
+				}
 				if (human.getLiftID() != null)
 					continue; // Human already in a lift
 				
@@ -162,6 +161,7 @@ public class God {
 			}
 		}
 		System.out.println("Lift " + liftID + ": Picked up " + humans.size() + " humans on floor " + floor + ", leaving " + getNumHumansInFloor(floor) + " waiting");
+		System.out.println("Humans in system: " + this.humans);
 		return humans;
 	}
 

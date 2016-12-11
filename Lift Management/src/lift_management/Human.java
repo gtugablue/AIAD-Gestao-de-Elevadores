@@ -46,4 +46,9 @@ public class Human {
 	public void setLiftID(Integer liftID) {
 		this.liftID = liftID;
 	}
+	
+	@Override
+	public String toString() {
+		return getOriginFloor() + "->" + getDestinyFloor() + ((liftID == null) ? "" : (" (L" + liftID + ")"));
+	}
 }

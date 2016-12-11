@@ -170,6 +170,7 @@ public class Lift extends Agent {
 			Call call;
 			try {
 				call = (Call) ((ServiceProposalRequest) getContentManager().extractContent(cfp)).getCall();
+				System.out.println(getLocalName() + ": Got accept proposal (" + call + ").");
 				addRequest(call, accept);
 				return null; // We'll send the response manually later
 			} catch (CodecException | OntologyException e) {
@@ -291,14 +292,16 @@ public class Lift extends Agent {
 					int taskID = tasks.get(i).getId();
 					tasks.remove(i);
 					if (accepts.containsKey(taskID)) {
-						ACLMessage accept = accepts.remove(taskID);
-						accept.setPerformative(ACLMessage.FAILURE);
-						send(accept);
+						ACLMessage response = accepts.remove(taskID).createReply();
+						response.setPerformative(ACLMessage.FAILURE);
+						send(response);
+						System.err.println("DERP");;
 					}
 					i--;
 				}
 			}
 		}
+		System.out.println(getLocalName() + ": tasks: " + this.tasks);
 		if (tasks.isEmpty()) 
 			System.out.println(getLocalName() + ": Closing doors. Idling");
 		else
