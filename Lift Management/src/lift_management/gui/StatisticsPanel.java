@@ -45,7 +45,6 @@ public class StatisticsPanel {
 
 	private static StatisticsPanel window = null;
 	List<Lift> lifts;
-	long ticks = 0;
 	//TODO it should be used something else
 	Color colors[] = {Color.BLACK, Color.BLUE, Color.CYAN, Color.GRAY, Color.GREEN, Color.MAGENTA, Color.ORANGE, Color.ORANGE, Color.RED};
 
@@ -96,11 +95,9 @@ public class StatisticsPanel {
 
 		tabbedPane.addTab("Wait time", null, waitTimePane(), null);
 
-		//TODO show current and total number of requests, (no) use time of the lift, distance traveled, min/max/avg load
-		tabbedPane.addTab("Information by lift", null, informationByLiftPane(), null);
-
 		frmPerformance.setVisible(true);
 	}
+	
 
 	private Component loadByLiftPane() {
 		DialPlot dialplot = new DialPlot();
@@ -152,22 +149,24 @@ public class StatisticsPanel {
 
 		ChartPanel chartpanel = new ChartPanel(jfreechart);
 		chartpanel.setPreferredSize(new Dimension(560, 370));
-		chartpanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		chartpanel.setLayout(null);
 
 		GridBagConstraints gbc_spinner = new GridBagConstraints();
 		gbc_spinner.anchor = GridBagConstraints.NORTH;
 		gbc_spinner.gridx = 1;
 		gbc_spinner.gridy = 0;
+		spinnerLoadLift.setBounds(31, 5, 55, 20);
 		spinnerLoadLift.setModel(new SpinnerNumberModel(0, 0, lifts.size()-1, 1));
-		chartpanel.add(spinnerLoadLift, gbc_spinner);
+		chartpanel.add(spinnerLoadLift);
+		lbAvgLoad.setBounds(96, 8, 126, 14);
 
 		chartpanel.add(lbAvgLoad);
+		
+		JLabel lblLift = new JLabel("Lift");
+		lblLift.setBounds(10, 8, 27, 14);
+		chartpanel.add(lblLift);
 
 		return chartpanel;
-	}
-
-	private Component informationByLiftPane() {
-		return null;
 	}
 
 	private Component waitTimePane() {
@@ -227,19 +226,19 @@ public class StatisticsPanel {
 		return chartPanel;
 	}
 
-	private void updateRequestsByLiftDataset() {
+	private void updateRequestsByLiftDataset(long ticks) {
 		for (int i = 0; i < lifts.size(); i++) {
 			datasetRequestsByLift.getSeries(i).add(ticks, lifts.get(i).getTasks().size());
 		}
 	}
 
-	private void updateLoadByLift() {
+	private void updateLoadByLift(long ticks) {
 		int liftIndex = (Integer) spinnerLoadLift.getValue();
 		datasetLiftLoad.setValue(lifts.get(liftIndex).getCurrentWeight());
-		lbAvgLoad.setText("Average load: " + lifts.get(liftIndex).getAvgLoad());
+		lbAvgLoad.setText("Average load: " + Math.round(lifts.get(liftIndex).getAvgLoad()));
 	}
 
-	private void updateAvgWaitingTime(double avgWaitingTime) {
+	private void updateAvgWaitingTime(double avgWaitingTime, long ticks) {
 		if (datasetAvgWaitingTime.getSeries().isEmpty())
 			return;
 		
@@ -247,11 +246,8 @@ public class StatisticsPanel {
 	}
 
 	public void incTick(long ticksToNextRun, double avgWaitingTime) {
-		ticks = ticksToNextRun;
-
-		//TODO update info of the dataset
-		updateRequestsByLiftDataset();
-		updateLoadByLift();
-		updateAvgWaitingTime(avgWaitingTime);
+		updateRequestsByLiftDataset(ticksToNextRun);
+		updateLoadByLift(ticksToNextRun);
+		updateAvgWaitingTime(avgWaitingTime, ticksToNextRun);
 	}
 }
