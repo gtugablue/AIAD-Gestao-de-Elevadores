@@ -286,7 +286,8 @@ public class Lift extends Agent {
 	 */
 	public void passengersInOut() {
 		this.humans.removeAll(god.dropoffHumans(getId(), getCurrentFloor()));
-		List<Human> newHumans = god.attendWaitingHumans(getCurrentFloor(), this.maxWeight - this.currentWeight, getId(), possibleDestinies(getCurrentFloor(), this.numFloors));
+		List<Human> newHumans = new ArrayList<Human>();
+		boolean full = god.attendWaitingHumans(getCurrentFloor(), this.maxWeight - this.currentWeight, getId(), possibleDestinies(getCurrentFloor(), this.numFloors), newHumans);
 		this.humans.addAll(newHumans);
 		this.currentWeight = calculateHumansWeight(this.humans);
 		

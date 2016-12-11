@@ -143,9 +143,18 @@ public class God {
 		}
 	}
 
-	public List<Human> attendWaitingHumans(int floor, int maxWeight, int liftID, boolean[] possibleDestinies) {
-		List<Human> humans = new ArrayList<Human>();
+	/**
+	 * 
+	 * @param floor
+	 * @param maxWeight
+	 * @param liftID
+	 * @param possibleDestinies
+	 * @param humansAttended Empty list where the humans that have been attended will be stored.
+	 * @return True if attended all humans that were waiting for the lift, or false if some weren't attended because the lift was full.
+	 */
+	public boolean attendWaitingHumans(int floor, int maxWeight, int liftID, boolean[] possibleDestinies, List<Human> humansAttended) {
 		int currWeight = 0;
+		boolean full = false;
 		synchronized (this.humans) {
 			for (Human human : this.humans) {
 				if (!possibleDestinies[human.getDestinyFloor()]) {
@@ -162,16 +171,17 @@ public class God {
 				
 				currWeight += human.getWeight();
 				if (currWeight > maxWeight) { // Lift is full
+					full = true;
 					break;
 				}
 
 				human.setLiftID(liftID);
-				humans.add(human);
+				humansAttended.add(human);
 			}
 		}
-		System.out.println("Lift " + liftID + ": Picked up " + humans.size() + " humans on floor " + floor + ", leaving " + getNumHumansInFloor(floor) + " waiting");
+		System.out.println("Lift " + liftID + ": Picked up " + humansAttended.size() + " humans on floor " + floor + ", leaving " + getNumHumansInFloor(floor) + " waiting");
 		System.out.println("Humans in system: " + this.humans);
-		return humans;
+		return full;
 	}
 
 	/**
