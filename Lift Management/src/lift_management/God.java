@@ -6,18 +6,28 @@ import java.util.List;
 import java.util.Random;
 
 import lift_management.agents.Lift.Direction;
+import lift_management.calls.Call;
+import lift_management.calls.CallSystem;
+import lift_management.calls.DirectionalCall;
 
 
 public class God {
 	private static final long serialVersionUID = 6602617123027622789L;
-	private List<Human> humans;
+	private List<Human> humans = Collections.synchronizedList(new ArrayList<Human>());
 	private int numFloors;
 	private int callFrequency;
+	private long totalCountWaits;
+	private long sumWaits;
+	private static double currentTime;
+	private CallSystem callSystem;
 
-	public God(int numFloors, int callFrequency) {
-		this.humans = Collections.synchronizedList(new ArrayList<Human>());
+	public God(int numFloors, int callFrequency, CallSystem callSystem) {
 		this.numFloors = numFloors;
 		this.callFrequency = callFrequency;
+		currentTime = 0;
+		totalCountWaits = 0;
+		sumWaits = 0;
+		this.callSystem = callSystem;
 	}
 
 	/**
@@ -54,7 +64,7 @@ public class God {
 		double groundFloorRate = 0.4;
 		double nFloorRate = (1-groundFloorRate)/(n-1);
 		double x = random.nextDouble();
-
+		
 		if(x <= groundFloorRate){
 			return 0;
 		}else{
@@ -100,7 +110,7 @@ public class God {
 		Human human;
 		for (int i = 0; i < numHumans; i++) {
 			double weight = generateWeight();
-			human = new Human(weight, originFloor, destinyFloor);
+			human = new Human(weight, originFloor, destinyFloor, currentTime);
 			humans.add(human);
 		}
 		System.out.println("God: generated " + numHumans + " humans (" + originFloor + "->" + destinyFloor + ").");
@@ -111,10 +121,15 @@ public class God {
 		System.out.println("Floor: " + generateOriginFloor(5));
 	}
 
-	public List<Human> generateNewCall() {
+	public List<Human> generateNewHumanGroup() {
 		List<Human> humans = generateRandomHumans(numFloors - 1, generateGroupSize());
-		addHumans(humans);		
+		addHumans(humans);	
 		return humans;
+	}
+	
+	public Call generateNewCall(List<Human> humans) {
+		Human human = humans.get(0);
+		return callSystem.newCall(human.getOriginFloor(), human.getDestinyFloor());
 	}
 
 	private static int generateGroupSize() {
@@ -131,32 +146,45 @@ public class God {
 		}
 	}
 
-	public List<Human> attendWaitingHumans(int floor, int maxWeight, int liftID, boolean[] possibleDestinies) {
-		List<Human> humans = new ArrayList<Human>();
+	/**
+	 * 
+	 * @param floor
+	 * @param maxWeight
+	 * @param liftID
+	 * @param possibleDestinies
+	 * @param humansAttended Empty list where the humans that have been attended will be stored.
+	 * @return True if attended all humans that were waiting for the lift, or false if some weren't attended because the lift was full.
+	 */
+	public boolean attendWaitingHumans(int floor, int maxWeight, int liftID, boolean[] possibleDestinies, List<Human> humansAttended) {
 		int currWeight = 0;
+		boolean full = false;
 		synchronized (this.humans) {
 			for (Human human : this.humans) {
-				/*if (!possibleDestinies[human.getDestinyFloor()]) {
-					// TODO recall
+				if (!possibleDestinies[human.getDestinyFloor()]) {
 					continue; // The lift destination is different from the human destination
-				}*/
+				}
 				if (human.getLiftID() != null)
 					continue; // Human already in a lift
 				
 				if (human.getOriginFloor() != floor)
 					continue; // Human not in the same floor as the lift
-
+				
+				totalCountWaits++;
+				sumWaits += (currentTime - human.getCallTick());
+				
 				currWeight += human.getWeight();
 				if (currWeight > maxWeight) { // Lift is full
+					full = true;
 					break;
 				}
 
 				human.setLiftID(liftID);
-				humans.add(human);
+				humansAttended.add(human);
 			}
 		}
-		System.out.println("Lift " + liftID + ": Picked up " + humans.size() + " humans on floor " + floor + ", leaving " + getNumHumansInFloor(floor) + " waiting");
-		return humans;
+		System.out.println("Lift " + liftID + ": Picked up " + humansAttended.size() + " humans on floor " + floor + ", leaving " + getNumHumansInFloor(floor) + " waiting");
+		System.out.println("Humans in system: " + this.humans);
+		return full;
 	}
 
 	/**
@@ -203,5 +231,16 @@ public class God {
 			}
 		}
 		return n;
+	}
+
+	public double getAvgWaitTime() {
+		if (totalCountWaits == 0) {
+			return 0;
+		}
+		return sumWaits / totalCountWaits;
+	}
+	
+	public static void setCurrentTime(long ticks) {
+		currentTime = ticks;
 	}
 }

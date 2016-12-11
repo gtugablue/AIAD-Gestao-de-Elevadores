@@ -11,34 +11,28 @@ import jade.content.onto.OntologyException;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
-import jade.domain.FIPAAgentManagement.NotUnderstoodException;
-import jade.domain.FIPAAgentManagement.RefuseException;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
-import jade.lang.acl.MessageTemplate;
-import lift_management.Call;
-import lift_management.CallSystem;
 import lift_management.Config;
-import lift_management.DirectionCallSystem;
-import lift_management.DirectionalCall;
 import lift_management.God;
 import lift_management.Human;
+import lift_management.LiftManagementLauncher;
+import lift_management.gui.StatisticsPanel;
+import lift_management.calls.Call;
+import lift_management.calls.CallSystem;
 import lift_management.onto.ServiceOntology;
 import lift_management.onto.ServiceProposal;
 import lift_management.onto.ServiceProposalRequest;
-import repast.simphony.engine.schedule.Schedule;
 import sajas.core.AID;
 import sajas.core.Agent;
 import sajas.core.behaviours.CyclicBehaviour;
-import sajas.core.behaviours.SimpleBehaviour;
-import sajas.core.behaviours.TickerBehaviour;
+import sajas.core.behaviours.WakerBehaviour;
 import sajas.domain.DFService;
-import sajas.proto.AchieveREResponder;
 import sajas.proto.ContractNetInitiator;
-import sajas.proto.ContractNetResponder;
 import sajas.proto.SubscriptionInitiator;
 
 public class Building extends Agent {
+	public static long START_DELAY = 1000;
 	public static float floorHeight = 1f;
 	private int numLifts;
 	private int numFloors;
@@ -48,12 +42,12 @@ public class Building extends Agent {
 	private Ontology serviceOntology;
 	private God god;
 	private Config config;
-	
-	public Building(God god, Config config) {
+
+	public Building(God god, Config config, CallSystem callSystem) {
 		this.god = god;
 		this.numLifts = config.numLifts;
 		this.numFloors = config.numFloors;
-		this.callSystem = new DirectionCallSystem(this.numFloors);
+		this.callSystem = callSystem;
 		this.config = config;
 	}
 
@@ -78,24 +72,33 @@ public class Building extends Agent {
 		register();
 		subscribeDf();
 		prepareCfpMessage();
-
-		addBehaviour(new CyclicBehaviour(this) {
-			private long ticksToNextRun;
-
+		Building building = this;
+		addBehaviour(new WakerBehaviour(this, START_DELAY) {
 			@Override
-			public void action() {
-				if (ticksToNextRun > 0)
-				{
-					ticksToNextRun--;
-					return;
-				}
-				
-				List<Human> humans = god.generateNewCall();
-				Human human = humans.get(0);
-				Call call = new DirectionalCall(human.getOriginFloor(), human.getOriginFloor() < human.getDestinyFloor());
-				addCall(call, humans);
-			
-				ticksToNextRun = God.generateRandomTime(numFloors, config.callFrequency);
+			public void onWake() {
+				addBehaviour(new CyclicBehaviour(building) {
+					private long ticksToNextRun;
+					private long totalTicks = 0;
+
+					@Override
+					public void action() {
+						totalTicks++;
+						StatisticsPanel.getInstance().updateLiftTimes();
+						if (ticksToNextRun > 0)
+						{
+							ticksToNextRun--;
+							return;
+						}
+
+						List<Human> humans = god.generateNewHumanGroup();
+						Call call = god.generateNewCall(humans);
+						addCall(call, humans);
+
+						ticksToNextRun = God.generateRandomTime(numFloors, config.callFrequency);
+						God.setCurrentTime(totalTicks);
+						StatisticsPanel.getInstance().incTick(totalTicks, god.getAvgWaitTime());
+					}
+				});
 			}
 		});
 	}
@@ -173,7 +176,7 @@ public class Building extends Agent {
 			ServiceDescription sd = new ServiceDescription();
 			sd.setType("lift");
 			template.addServices(sd);
-			
+
 			try {
 				getContentManager().fillContent(cfp, new ServiceProposalRequest("attend-request", call, humans));
 
@@ -256,11 +259,14 @@ public class Building extends Agent {
 			cfp.setLanguage(codec.getName());
 			cfp.setOntology(serviceOntology.getName());
 			cfp.setProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET);
+			
+			System.out.println("Building: Reassigning call " + call + ".");
 			addBehaviour(new CNetInit(getAgent(), cfp, call, humans));
 		}
 
 		@Override
 		protected void handleInform(ACLMessage inform) {
+			System.out.println("Building: Shutting down light for call " + call + ".");
 			try {
 				((Building)getAgent()).getCallSystem().resetCall(call);
 			} catch (Exception e) {

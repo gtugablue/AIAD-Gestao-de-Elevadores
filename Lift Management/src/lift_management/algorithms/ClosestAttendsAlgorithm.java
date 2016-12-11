@@ -1,4 +1,4 @@
-package lift_management.algorithms.strategy_algorithm;
+package lift_management.algorithms;
 
 import java.util.List;
 
@@ -29,6 +29,12 @@ public class ClosestAttendsAlgorithm extends LiftAlgorithm<Direction> {
 			int currentPosition) {
 		tasks.add(new Task<Direction>(requestedFloor, Direction.STOP));
 		return 0;
+	}
+
+	@Override
+	protected Direction getDirection(List<Task<Direction>> tasks, int i, int previousStop) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

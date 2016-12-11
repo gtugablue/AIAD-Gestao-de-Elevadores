@@ -1,4 +1,4 @@
-package lift_management.algorithms.strategy_algorithm;
+package lift_management.algorithms;
 
 import java.util.List;
 
@@ -50,13 +50,13 @@ public abstract class LiftAlgorithm<T>{
 	protected static boolean floorInBetween(int previous, int next, int n){
 		return (previous < n && n <= next) || (previous > n && n >= next);
 	}
-	
-	public static Direction getDirection(int previousStop, int nextStop){
+
+	public static Direction getDirection(int previousStop, int nextStop) {
 		Direction direction;
 		
-		if(previousStop > nextStop) {
+		if(previousStop < nextStop) {
 			direction = Direction.UP;
-		}else if(previousStop < nextStop){
+		}else if(previousStop > nextStop){
 			direction = Direction.DOWN;
 		}else{
 			direction = Direction.STOP;
@@ -64,5 +64,8 @@ public abstract class LiftAlgorithm<T>{
 		
 		return direction;
 	}
+
+
+	protected abstract Direction getDirection(List<Task<T>> tasks, int i, int previousStop);
 
 }

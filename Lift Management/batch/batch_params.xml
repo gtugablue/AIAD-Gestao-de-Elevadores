@@ -1,3 +1,1 @@
-<?xml version="1.0"?>
-<sweep runs="1">
-</sweep>
+<?xml version="1.0" ?><sweep runs="1"><parameter name="numLifts" type="constant" constant_type="int" value="3"></parameter><parameter name="maxWeights" type="constant" constant_type="java.lang.String" value="500 450 500"></parameter><parameter name="callFrequency" type="constant" constant_type="int" value="150"></parameter><parameter name="numFloors" type="constant" constant_type="int" value="6"></parameter><parameter name="algorithm" type="constant" constant_type="java.lang.String" value="LookDisk"></parameter></sweep>

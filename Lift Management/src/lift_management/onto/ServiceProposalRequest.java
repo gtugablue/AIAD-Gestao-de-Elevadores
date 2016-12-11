@@ -3,8 +3,8 @@ package lift_management.onto;
 import java.util.List;
 
 import jade.content.Predicate;
-import lift_management.Call;
 import lift_management.Human;
+import lift_management.calls.Call;
 
 public class ServiceProposalRequest implements Predicate {
 	

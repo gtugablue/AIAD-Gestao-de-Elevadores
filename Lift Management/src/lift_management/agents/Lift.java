@@ -1,19 +1,15 @@
 package lift_management.agents;
 
 import sajas.domain.DFService;
-import sajas.proto.AchieveREInitiator;
 import sajas.proto.ContractNetResponder;
 import sajas.proto.SSContractNetResponder;
 import sajas.proto.SSResponderDispatcher;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
-
 import jade.content.lang.Codec;
 import jade.content.lang.Codec.CodecException;
 import jade.content.lang.sl.SLCodec;
@@ -26,26 +22,19 @@ import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import javafx.util.Pair;
-import lift_management.Call;
-import lift_management.DirectionalCall;
 import lift_management.God;
 import lift_management.Human;
-import lift_management.behaviours.LiftBehaviour;
+import lift_management.agents.behaviours.LiftBehaviour;
+import lift_management.algorithms.LiftAlgorithm;
+import lift_management.calls.Call;
 import lift_management.models.Task;
-import lift_management.algorithms.strategy_algorithm.ClosestAttendsAlgorithm;
-import lift_management.algorithms.strategy_algorithm.LiftAlgorithm;
-import lift_management.algorithms.strategy_algorithm.LookDiskAlgorithm;
-import lift_management.onto.ServiceExecutionRequest;
 import lift_management.onto.ServiceOntology;
 import lift_management.onto.ServiceProposal;
 import lift_management.onto.ServiceProposalRequest;
-import repast.simphony.engine.schedule.ScheduledMethod;
 import repast.simphony.space.continuous.ContinuousSpace;
 import repast.simphony.space.continuous.NdPoint;
 import sajas.core.Agent;
 import sajas.core.behaviours.Behaviour;
-import sajas.core.behaviours.TickerBehaviour;
 
 /**
  * Created by Gustavo on 06/10/2016.
@@ -56,17 +45,21 @@ public class Lift extends Agent {
 	private Codec codec;
 	private Ontology serviceOntology;
 	private ContinuousSpace<Object> space;
-	private List<Task<Direction>> tasks;
 	private final int maxWeight;
 	private int currentWeight;
-	private Map<Integer, ACLMessage> accepts;
 	private List<Human> insideHumans; // stores the humans that are currently inside this lift
 	private List<Human> floorHumans; // stores the humans that are assigned to this lift and waiting to be picked up
+	private double totalCountLoad, sumLoad;
+	private long operatingTime;
 	private int numFloors;
 	private AID buildingAID;
 	private God god;
 	private int id;
 	private LiftAlgorithm algorithm;
+	private List<Task<Object>> tasks = new ArrayList<Task<Object>>();
+	private Map<Integer, ACLMessage> accepts = new HashMap<Integer, ACLMessage>();
+	private List<Human> humans = new ArrayList<Human>();
+
 	public enum DoorState {
 		OPEN,
 		CLOSED
@@ -74,17 +67,18 @@ public class Lift extends Agent {
 	public enum Direction {UP, DOWN, STOP};
 	private DoorState doorState = DoorState.CLOSED;
 
-	public Lift(int id, God god, ContinuousSpace<Object> space, int numFloors, int maxWeight) {
+	public Lift(int id, God god, ContinuousSpace<Object> space, int numFloors, int maxWeight, LiftAlgorithm algorithm) {
 		this.id = id;
 		this.god = god;
 		this.space = space;
 		this.numFloors = numFloors;
 		this.maxWeight = maxWeight;
-		this.tasks = new ArrayList<Task<Direction>>();
-		this.accepts = new HashMap<Integer, ACLMessage>();
-		this.algorithm = new LookDiskAlgorithm();
 		this.insideHumans = new ArrayList<Human>();
 		this.floorHumans = new ArrayList<Human>();
+		totalCountLoad = 0;
+		sumLoad = 0;
+		operatingTime = 0;
+		this.algorithm = algorithm;
 	}
 
 	@Override
@@ -160,14 +154,14 @@ public class Lift extends Agent {
 
 		@Override
 		protected ACLMessage handleCfp(ACLMessage cfp) {
-			System.out.println(getLocalName() + ": Got cfp.");
+			//System.out.println(getLocalName() + ": Got cfp.");
 			Lift lift = (Lift)myAgent;
 			lift.buildingAID = cfp.getSender();
 			ACLMessage reply = cfp.createReply();
 			reply.setPerformative(ACLMessage.PROPOSE);
 			try {
-				DirectionalCall call = (DirectionalCall)((ServiceProposalRequest)getContentManager().extractContent(cfp)).getCall();
-				int price = lift.algorithm.evaluate(lift.tasks, call.getOrigin(), call.isAscending() ? Direction.UP : Direction.DOWN, numFloors, (int) Math.round(lift.getPosition().getY()));
+				Call call = (Call) ((ServiceProposalRequest)getContentManager().extractContent(cfp)).getCall();
+				int price = lift.algorithm.evaluate(lift.tasks, call.getOrigin(), call.getDestiny(), numFloors, (int) Math.round(lift.getPosition().getY()));
 				getContentManager().fillContent(reply, new ServiceProposal("attend-request", price));
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -179,13 +173,15 @@ public class Lift extends Agent {
 
 		@Override
 		protected ACLMessage handleAcceptProposal(ACLMessage cfp, ACLMessage propose, ACLMessage accept) {
-			System.out.println(getLocalName() + ": Got accept proposal.");
+			//System.out.println(getLocalName() + ": Got accept proposal.");
 			ACLMessage result = accept.createReply();
 
+			Call call;
 			try {
-				//TODO generalize to different calls
 				ServiceProposalRequest spr = (ServiceProposalRequest) getContentManager().extractContent(cfp);
-				addRequest((DirectionalCall) spr.getCall(), spr.getHumans(),  accept);
+				call = (Call) ((ServiceProposalRequest) getContentManager().extractContent(cfp)).getCall();
+				System.out.println(getLocalName() + ": Got accept proposal (" + call + ").");
+				addRequest(spr.getCall(), spr.getHumans(), accept);
 				return null; // We'll send the response manually later
 			} catch (CodecException | OntologyException e) {
 				e.printStackTrace();
@@ -195,18 +191,18 @@ public class Lift extends Agent {
 			return result;
 		}
 
-		private void addRequest(DirectionalCall call, List<Human> humans, ACLMessage accept) {
+		private void addRequest(Call call, List<Human> humans, ACLMessage accept) {
 			floorHumans.addAll(humans);
 			for (int i = 0; i < tasks.size(); i++) {
-				if (tasks.get(i).getFloor() == call.getOrigin() && tasks.get(i).getDestiny().equals(call.getDirection()))
+				if (tasks.get(i).getFloor() == call.getOrigin() && tasks.get(i).getDestiny().equals(call.getDestiny()))
 					return;
 			}
-			assignTask(call.getOrigin(), call.getDirection(), accept);
+			assignTask(call.getOrigin(), call.getDestiny(), accept);
 		}
 
 		@Override
 		protected void handleRejectProposal(ACLMessage cfp, ACLMessage propose, ACLMessage accept) {
-			System.out.println(getLocalName() + ": Got reject proposal.");
+			//System.out.println(getLocalName() + ": Got reject proposal.");
 		}
 
 	}
@@ -224,7 +220,7 @@ public class Lift extends Agent {
 			accepts.remove(task.getId());
 			inform.setPerformative(ACLMessage.INFORM);
 			send(inform);
-			System.out.println(getLocalName() + ": INFORM " + task.getFloor());
+			//System.out.println(getLocalName() + ": INFORM " + task.getFloor());
 		}
 		
 		passengersInOut();
@@ -245,12 +241,12 @@ public class Lift extends Agent {
 	/**
 	 * Adds a new task by placing it in the correct spot in the task list.
 	 * @param floor
-	 * @param direction
+	 * @param destiny
 	 * @param accept The Accept Proposal message that originated this task.
 	 */
-	public void assignTask(int floor, Direction direction, ACLMessage accept) {
+	public void assignTask(int floor, Object destiny, ACLMessage accept) {
 		try {
-			int pos = this.algorithm.addNewTask(this.tasks, floor, direction, this.numFloors, (int)this.getPosition().getY());
+			int pos = this.algorithm.addNewTask(this.tasks, floor, destiny, this.numFloors, (int)Math.round(this.getPosition().getY()));
 			if (accept != null)
 				accepts.put(tasks.get(pos).getId(), accept);
 			System.out.println(getLocalName() + ": new task " + tasks.get(pos).getId() + ".");
@@ -283,7 +279,7 @@ public class Lift extends Agent {
 			descend();
 	}
 
-	public List<Task<Direction>> getTasks() {
+	public List<Task<Object>> getTasks() {
 		return tasks;
 	}
 
@@ -319,6 +315,9 @@ public class Lift extends Agent {
 		// Update current weight
 		this.currentWeight = calculateHumansWeight(this.insideHumans);
 		
+		totalCountLoad++;
+		sumLoad += this.currentWeight;
+		
 		// Create tasks for humans that entered and reschedule the next ones
 		for (Human human : entering) {
 			Task task = new Task(getCurrentFloor(), human.getDestinyFloor());
@@ -328,9 +327,9 @@ public class Lift extends Agent {
 					int taskID = tasks.get(i).getId();
 					tasks.remove(i);
 					if (accepts.containsKey(taskID)) {
-						ACLMessage accept = accepts.remove(taskID);
-						accept.setPerformative(ACLMessage.FAILURE);
-						send(accept);
+						ACLMessage response = accepts.remove(taskID).createReply();
+						response.setPerformative(ACLMessage.FAILURE);
+						send(response);
 					}
 					i--;
 				}
@@ -338,6 +337,7 @@ public class Lift extends Agent {
 		}
 		
 		// Log info
+		System.out.println(getLocalName() + ": tasks: " + this.tasks);
 		if (tasks.isEmpty()) 
 			System.out.println(getLocalName() + ": Closing doors. Idling");
 		else
@@ -390,5 +390,24 @@ public class Lift extends Agent {
 	
 	public void closeDoor() {
 		this.doorState = DoorState.CLOSED;
+	}
+	
+	public int getCurrentWeight() {
+		return currentWeight;
+	}
+
+	public double getAvgLoad() {
+		if (totalCountLoad == 0)
+			return 0;
+		return sumLoad / totalCountLoad;
+	}
+	
+	public long getOperatingTime() {
+		return operatingTime;
+	}
+	
+	public void updateOperatingTime() {
+		if (!tasks.isEmpty())
+			operatingTime++;
 	}
 }
