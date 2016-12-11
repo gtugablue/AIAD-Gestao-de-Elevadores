@@ -157,7 +157,7 @@ public class Lift extends Agent {
 			reply.setPerformative(ACLMessage.PROPOSE);
 			try {
 				Call call = (Call) ((ServiceProposalRequest)getContentManager().extractContent(cfp)).getCall();
-				int price = lift.algorithm.evaluate(lift.tasks, call.getOrigin(), call.getDestiny(), numFloors, (int) Math.round(lift.getPosition().getY()));
+				int price = lift.algorithm.evaluate(lift.tasks, call.getOrigin(), call.getDestiny(), numFloors, (int) Math.round(lift.getPosition().getY()), lift.getId());
 				getContentManager().fillContent(reply, new ServiceProposal("attend-request", price));
 			} catch (Exception e) {
 				// TODO Auto-generated catch block

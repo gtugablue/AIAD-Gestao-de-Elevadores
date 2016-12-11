@@ -18,6 +18,7 @@ import lift_management.algorithms.ClosestAttendsAlgorithm;
 import lift_management.algorithms.DestinationDispatchAlgorithm;
 import lift_management.algorithms.LiftAlgorithm;
 import lift_management.algorithms.LookDiskAlgorithm;
+import lift_management.algorithms.ZoningAlgorithm;
 import lift_management.calls.CallSystem;
 import lift_management.calls.DestinationDispatchCallSystem;
 import lift_management.calls.DirectionalCallSystem;
@@ -49,7 +50,7 @@ public class LiftManagementLauncher extends RepastSLauncher {
     private CallSystem callSystem;
     private LiftAlgorithm algorithm;
     
-    public enum Algorithm{DestinationDispatch, LookDisk, ClosestAttends}
+    public enum Algorithm{DestinationDispatch, LookDisk, ClosestAttends, Zoning}
     
 	public static void main(String[] args) {
         return;
@@ -136,8 +137,12 @@ public class LiftManagementLauncher extends RepastSLauncher {
 				this.callSystem = new DirectionalCallSystem(numFloors);
 				this.algorithm = new ClosestAttendsAlgorithm();
 				break;
+			case Zoning:
+				this.callSystem = new DirectionalCallSystem(numFloors);
+				// this.algorithm = new ZoningAlgorithm(); TODO
+				break;
 			default:
-				throw new Exception ("Unknown algorithm");
+				throw new Exception ("Unknown algorithm '" + algorithm + "'.");
 		}
     }
     
