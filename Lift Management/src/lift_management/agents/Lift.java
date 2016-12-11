@@ -47,6 +47,8 @@ public class Lift extends Agent {
 	private ContinuousSpace<Object> space;
 	private final int maxWeight;
 	private int currentWeight;
+	private double totalCountLoad, sumLoad;
+	private long operatingTime;
 	private int numFloors;
 	private AID buildingAID;
 	private God god;
@@ -69,6 +71,9 @@ public class Lift extends Agent {
 		this.space = space;
 		this.numFloors = numFloors;
 		this.maxWeight = maxWeight;
+		totalCountLoad = 0;
+		sumLoad = 0;
+		operatingTime = 0;
 		this.algorithm = algorithm;
 	}
 
@@ -284,6 +289,10 @@ public class Lift extends Agent {
 		List<Human> newHumans = god.attendWaitingHumans(getCurrentFloor(), this.maxWeight - this.currentWeight, getId(), possibleDestinies(getCurrentFloor(), this.numFloors));
 		this.humans.addAll(newHumans);
 		this.currentWeight = calculateHumansWeight(this.humans);
+		
+		totalCountLoad++;
+		sumLoad += this.currentWeight;
+		
 		for (Human human : humans) {
 			Task task = new Task(getCurrentFloor(), human.getDestinyFloor());
 			if (!tasks.contains(task)) {
@@ -353,5 +362,24 @@ public class Lift extends Agent {
 	
 	public void closeDoor() {
 		this.doorState = DoorState.CLOSED;
+	}
+	
+	public int getCurrentWeight() {
+		return currentWeight;
+	}
+
+	public double getAvgLoad() {
+		if (totalCountLoad == 0)
+			return 0;
+		return sumLoad / totalCountLoad;
+	}
+	
+	public long getOperatingTime() {
+		return operatingTime;
+	}
+	
+	public void updateOperatingTime() {
+		if (!tasks.isEmpty())
+			operatingTime++;
 	}
 }
