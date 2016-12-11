@@ -317,6 +317,9 @@ public class Lift extends Agent {
 			if (human.getOriginFloor() != getCurrentFloor())
 				continue; // Human not in the same floor as the lift
 			
+			if (this.currentWeight + human.getWeight() > this.maxWeight)
+				continue; // Lift full
+			
 			human.setLiftID(this.id);
 			entering.add(human);
 		}
@@ -332,7 +335,7 @@ public class Lift extends Agent {
 		sumLoad += this.currentWeight;
 		
 		// Create tasks for humans that entered and reschedule the next ones
-		for (Human human : entering) {
+		for (Human human : insideHumans) {
 			Task task = new Task(getCurrentFloor(), human.getDestinyFloor());
 			if (!tasks.contains(task)) {
 				int pos = this.algorithm.attendRequest(tasks, human.getDestinyFloor(), this.numFloors, getCurrentFloor());
