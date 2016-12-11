@@ -1,5 +1,6 @@
 package lift_management.onto;
 
+
 import jade.content.onto.BeanOntology;
 import jade.content.onto.BeanOntologyException;
 import jade.content.onto.Ontology;

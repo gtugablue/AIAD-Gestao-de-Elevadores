@@ -2,7 +2,6 @@ package lift_management.algorithms;
 
 import java.util.List;
 
-import javafx.util.Pair;
 import lift_management.TravelTimes;
 import lift_management.agents.Lift.Direction;
 import lift_management.models.Task;

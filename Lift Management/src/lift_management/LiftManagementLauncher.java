@@ -1,11 +1,7 @@
 package lift_management;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
-
-//import javax.swing.JFrame;
 
 //import lift_management.gui.StatisticsPanel;
 import jade.core.Profile;
@@ -31,9 +27,6 @@ import repast.simphony.space.continuous.ContinuousSpace;
 import repast.simphony.space.continuous.PointTranslator;
 import repast.simphony.space.continuous.SimpleCartesianAdder;
 import repast.simphony.space.continuous.StrictBorders;
-import repast.simphony.ui.RSApplication;
-import repast.simphony.visualization.visualization2D.Display2D;
-import repast.simphony.visualization.visualization3D.Display3D;
 import sajas.core.Runtime;
 import sajas.sim.repasts.RepastSLauncher;
 import sajas.wrapper.ContainerController;

@@ -5,10 +5,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
-import lift_management.agents.Lift.Direction;
 import lift_management.calls.Call;
 import lift_management.calls.CallSystem;
-import lift_management.calls.DirectionalCall;
 
 
 public class God {
