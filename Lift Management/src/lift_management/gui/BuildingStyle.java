@@ -36,8 +36,7 @@ public class BuildingStyle extends DefaultStyleOGL2D {
 		if (agent instanceof Building) {
 			Building building = (Building)agent;
 			VComposite composite = new VLayer();
-			VComposite imageLayer = new TextureLayer();
-			VComposite labelLayer = new VLayer();
+			VComposite layer = new TextureLayer();
 			CallSystem callSystem = building.getCallSystem();
 			if (callSystem instanceof DirectionalCallSystem) {
 				DirectionalCallSystem directionCallSystem = (DirectionalCallSystem) callSystem;				
@@ -59,17 +58,10 @@ public class BuildingStyle extends DefaultStyleOGL2D {
 							
 							liftImage.translate(SCALE * (i + 1f), SCALE * (j * Building.floorHeight + LIFT_HEIGHT * Building.floorHeight / 2), 0);
 							liftImage.scale(SCALE * 0.8f * Building.floorHeight / LIFT_DOOR_IMAGE_HEIGHT);
-							imageLayer.addChild(translateButtonLiftImage(i, j, liftUpButtonImage, LiftButton.UP));
-							imageLayer.addChild(translateButtonLiftImage(i, j, liftDownButtonImage, LiftButton.DOWN));
-							imageLayer.addChild(liftImage);
+							layer.addChild(translateButtonLiftImage(i, j, liftUpButtonImage, LiftButton.UP));
+							layer.addChild(translateButtonLiftImage(i, j, liftDownButtonImage, LiftButton.DOWN));
+							layer.addChild(liftImage);
 						}
-						
-						Font font = new JLabel().getFont();
-						VLabelLayer layer = new VLabelLayer(font);
-						Label label = new Label("" + building.getGod().getNumHumansInFloor(j), labelLayer, Position.WEST);
-						label.setColor(Color.BLACK);
-						layer.addLabel(label);
-						labelLayer.addChild(layer);
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -94,17 +86,16 @@ public class BuildingStyle extends DefaultStyleOGL2D {
 							
 							liftImage.translate(SCALE * (i + 1f), SCALE * (j * Building.floorHeight + LIFT_HEIGHT * Building.floorHeight / 2), 0);
 							liftImage.scale(SCALE * 0.8f * Building.floorHeight / LIFT_DOOR_IMAGE_HEIGHT);
-							composite.addChild(translateButtonLiftImage(i, j, liftUpButtonImage, LiftButton.UP));
-							composite.addChild(translateButtonLiftImage(i, j, liftDownButtonImage, LiftButton.DOWN));
-							composite.addChild(liftImage);
+							layer.addChild(translateButtonLiftImage(i, j, liftUpButtonImage, LiftButton.UP));
+							layer.addChild(translateButtonLiftImage(i, j, liftDownButtonImage, LiftButton.DOWN));
+							layer.addChild(liftImage);
 						}
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
-			composite.addChild(imageLayer);
-			//composite.addChild(labelLayer);
+			composite.addChild(layer);
 			spatial = composite;
 		}
 		return spatial;
