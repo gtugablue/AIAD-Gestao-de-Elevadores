@@ -138,7 +138,7 @@ public class LiftManagementLauncher extends RepastSLauncher {
 				this.algorithm = new ClosestAttendsAlgorithm();
 				break;
 			case Zoning:
-				this.callSystem = new DirectionalCallSystem(numFloors);
+				this.callSystem = new DestinationDispatchCallSystem(numFloors);
 				// this.algorithm = new ZoningAlgorithm(); TODO
 				break;
 			default:
