@@ -65,7 +65,7 @@ public class BuildingStyle extends DefaultStyleOGL2D {
 						int n = building.getGod().getNumHumansInFloor(j);
 						BufferedImage labelImage = StyleUtils.textToImage("" + n, new JLabel().getFont(), 100);
 						VImage2D label = shapeFactory.createImage("Number " + n, labelImage);
-						label.translate(0, StyleUtils.SCALE * (j * Building.floorHeight + 0.4f), 0);
+						label.translate(- 0.1f * labelImage.getWidth() / 2, StyleUtils.SCALE * (j * Building.floorHeight + 0.4f), 0);
 						label.scale(0.1f);
 						layer.addChild(label);
 					}
