@@ -39,14 +39,15 @@ public class StatisticsPanel {
 	DefaultValueDataset datasetLiftLoad = new DefaultValueDataset(0);
 	JLabel lbAvgLoad = new JLabel("Average load: 0");
 	JSpinner spinnerLoadLift = new JSpinner();
-
+	JLabel lblAverageOccupation = new JLabel("Average Occupation: 0%");
+	
 	//Average Waiting Time
 	XYSeriesCollection datasetAvgWaitingTime = new XYSeriesCollection();
 
 	private static StatisticsPanel window = null;
 	List<Lift> lifts;
-	//TODO it should be used something else
-	Color colors[] = {Color.BLACK, Color.BLUE, Color.CYAN, Color.GRAY, Color.GREEN, Color.MAGENTA, Color.ORANGE, Color.ORANGE, Color.RED};
+	Color colors[] = {Color.BLACK, Color.BLUE, Color.CYAN, Color.GRAY,
+					Color.GREEN, Color.MAGENTA, Color.ORANGE, Color.ORANGE, Color.RED};
 
 	private StatisticsPanel() {
 	}
@@ -91,7 +92,7 @@ public class StatisticsPanel {
 
 		tabbedPane.addTab("Requests by Lift", null, requestsByLiftPane(), null);
 
-		tabbedPane.addTab("Load by Lift", null, loadByLiftPane(), null);
+		tabbedPane.addTab("Information by Lift", null, loadByLiftPane(), null);
 
 		tabbedPane.addTab("Wait time", null, waitTimePane(), null);
 
@@ -116,7 +117,7 @@ public class StatisticsPanel {
 		dialbackground.setGradientPaintTransformer(new StandardGradientPaintTransformer(GradientPaintTransformType.VERTICAL));
 		dialplot.setBackground(dialbackground);
 
-		DialTextAnnotation dialtextannotation = new DialTextAnnotation("Lift Load");
+		DialTextAnnotation dialtextannotation = new DialTextAnnotation("Current Lift Load");
 		dialtextannotation.setFont(new Font("Dialog", 1, 14));
 		dialtextannotation.setRadius(0.69999999999999996D);
 		dialplot.addLayer(dialtextannotation);
@@ -165,6 +166,9 @@ public class StatisticsPanel {
 		JLabel lblLift = new JLabel("Lift");
 		lblLift.setBounds(10, 8, 27, 14);
 		chartpanel.add(lblLift);
+		
+		lblAverageOccupation.setBounds(245, 8, 147, 14);
+		chartpanel.add(lblAverageOccupation);
 
 		return chartpanel;
 	}
@@ -236,6 +240,8 @@ public class StatisticsPanel {
 		int liftIndex = (Integer) spinnerLoadLift.getValue();
 		datasetLiftLoad.setValue(lifts.get(liftIndex).getCurrentWeight());
 		lbAvgLoad.setText("Average load: " + Math.round(lifts.get(liftIndex).getAvgLoad()));
+		double operationTime = lifts.get(liftIndex).getOperatingTime();
+		lblAverageOccupation.setText("Average Occupation: " + Math.round((operationTime / ticks) * 100) + "%");
 	}
 
 	private void updateAvgWaitingTime(double avgWaitingTime, long ticks) {
@@ -249,5 +255,10 @@ public class StatisticsPanel {
 		updateRequestsByLiftDataset(ticksToNextRun);
 		updateLoadByLift(ticksToNextRun);
 		updateAvgWaitingTime(avgWaitingTime, ticksToNextRun);
+	}
+
+	public void updateLiftTimes() {
+		for (Lift lf : lifts)
+			lf.updateOperatingTime();
 	}
 }

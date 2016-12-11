@@ -88,6 +88,7 @@ public class Building extends Agent {
 			@Override
 			public void action() {
 				totalTicks++;
+				StatisticsPanel.getInstance().updateLiftTimes();
 				if (ticksToNextRun > 0)
 				{
 					ticksToNextRun--;

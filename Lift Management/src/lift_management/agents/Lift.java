@@ -60,6 +60,7 @@ public class Lift extends Agent {
 	private final int maxWeight;
 	private int currentWeight;
 	private double totalCountLoad, sumLoad;
+	private long operatingTime;
 	private Map<Integer, ACLMessage> accepts;
 	private int numFloors;
 	private AID buildingAID;
@@ -86,6 +87,7 @@ public class Lift extends Agent {
 		this.humans = new ArrayList<Human>();
 		totalCountLoad = 0;
 		sumLoad = 0;
+		operatingTime = 0;
 	}
 
 	@Override
@@ -382,5 +384,14 @@ public class Lift extends Agent {
 		if (totalCountLoad == 0)
 			return 0;
 		return sumLoad / totalCountLoad;
+	}
+	
+	public long getOperatingTime() {
+		return operatingTime;
+	}
+	
+	public void updateOperatingTime() {
+		if (!tasks.isEmpty())
+			operatingTime++;
 	}
 }
