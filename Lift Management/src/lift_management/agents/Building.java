@@ -25,11 +25,13 @@ import lift_management.onto.ServiceProposalRequest;
 import sajas.core.AID;
 import sajas.core.Agent;
 import sajas.core.behaviours.CyclicBehaviour;
+import sajas.core.behaviours.WakerBehaviour;
 import sajas.domain.DFService;
 import sajas.proto.ContractNetInitiator;
 import sajas.proto.SubscriptionInitiator;
 
 public class Building extends Agent {
+	public static long START_DELAY = 1000;
 	public static float floorHeight = 1f;
 	private int numLifts;
 	private int numFloors;
@@ -39,7 +41,7 @@ public class Building extends Agent {
 	private Ontology serviceOntology;
 	private God god;
 	private Config config;
-	
+
 	public Building(God god, Config config, CallSystem callSystem) {
 		this.god = god;
 		this.numLifts = config.numLifts;
@@ -69,26 +71,31 @@ public class Building extends Agent {
 		register();
 		subscribeDf();
 		prepareCfpMessage();
-
-		addBehaviour(new CyclicBehaviour(this) {
-			private long ticksToNextRun;
-			private long totalTicks = 0;
-
+		Building building = this;
+		addBehaviour(new WakerBehaviour(this, START_DELAY) {
 			@Override
-			public void action() {
-				totalTicks++;
-				StatisticsPanel.getInstance().updateLiftTimes();
-				if (ticksToNextRun > 0)
-				{
-					ticksToNextRun--;
-					return;
-				}
-				Call call = god.generateNewCall();
-				addCall(call);
-				
-				ticksToNextRun = God.generateRandomTime(numFloors, config.callFrequency);
-				God.setCurrentTime(totalTicks);
-				StatisticsPanel.getInstance().incTick(totalTicks, god.getAvgWaitTime());
+			public void onWake() {
+				addBehaviour(new CyclicBehaviour(building) {
+					private long ticksToNextRun;
+					private long totalTicks = 0;
+
+					@Override
+					public void action() {
+						totalTicks++;
+						StatisticsPanel.getInstance().updateLiftTimes();
+						if (ticksToNextRun > 0)
+						{
+							ticksToNextRun--;
+							return;
+						}
+						Call call = god.generateNewCall();
+						addCall(call);
+
+						ticksToNextRun = God.generateRandomTime(numFloors, config.callFrequency);
+						God.setCurrentTime(totalTicks);
+						StatisticsPanel.getInstance().incTick(totalTicks, god.getAvgWaitTime());
+					}
+				});
 			}
 		});
 	}
@@ -164,7 +171,7 @@ public class Building extends Agent {
 			ServiceDescription sd = new ServiceDescription();
 			sd.setType("lift");
 			template.addServices(sd);
-			
+
 			try {
 				getContentManager().fillContent(cfp, new ServiceProposalRequest("attend-request", call));
 
