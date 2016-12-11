@@ -10,7 +10,7 @@ import lift_management.models.Task;
 public class DestinationDispatchAlgorithm extends LiftAlgorithm<Integer>{
 	public static final int STOP = -1;
 	@Override
-	public int evaluate(List<Task<Integer>> tasks, int requestedFloor, Integer requestedDestiny, int maxBuildingFloor, int currentPosition) throws Exception {
+	public int evaluate(List<Task<Integer>> tasks, int requestedFloor, Integer requestedDestiny, int maxBuildingFloor, int currentPosition, int liftID) throws Exception {
 		if(requestedDestiny == -1 || requestedDestiny > maxBuildingFloor){
 			throw new Exception("Invalid requestedDestiny");
 		}
