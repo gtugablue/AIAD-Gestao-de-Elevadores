@@ -1,5 +1,5 @@
 <repast.simphony.data2.engine.DataSetDescriptor>
-  <name>A Data Set</name>
+  <name>Average Lift Load</name>
   <type>AGGREGATE</type>
   <inclTick>true</inclTick>
   <inclBatchRun>true</inclBatchRun>
@@ -11,17 +11,17 @@
     <pType>LAST</pType>
     <duration>-1.0</duration>
     <frequency>REPEAT</frequency>
-    <hashCode>1014031713</hashCode>
+    <hashCode>-371288803</hashCode>
   </scheduleParams>
   <atEnd>false</atEnd>
   <methodDataSources class="linked-hash-map">
     <entry>
-      <string>Avg waiting time</string>
+      <string>Average Lift Load</string>
       <repast.simphony.data2.engine.MethodDataSourceDefinition>
-        <id>Avg waiting time</id>
-        <className>lift_management.God</className>
-        <methodName>getAvgWaitTime</methodName>
-        <aggType>SUM</aggType>
+        <id>Average Lift Load</id>
+        <className>lift_management.agents.Lift</className>
+        <methodName>getAvgLoad</methodName>
+        <aggType>MEAN</aggType>
       </repast.simphony.data2.engine.MethodDataSourceDefinition>
     </entry>
   </methodDataSources>
