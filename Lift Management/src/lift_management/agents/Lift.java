@@ -208,16 +208,16 @@ public class Lift extends Agent {
 		Task task = tasks.get(0);
 		tasks.remove(0);
 
+		boolean success = passengersInOut();
+		
 		ACLMessage accept = accepts.get(task.getId());
 		if (accept != null) {
 			ACLMessage inform = accept.createReply();
 			accepts.remove(task.getId());
-			inform.setPerformative(ACLMessage.INFORM);
+			inform.setPerformative(success ? ACLMessage.INFORM : ACLMessage.FAILURE);
 			send(inform);
 			//System.out.println(getLocalName() + ": INFORM " + task.getFloor());
 		}
-		
-		passengersInOut();
 	}
 
 	public DoorState getDoorState() {
@@ -283,8 +283,9 @@ public class Lift extends Agent {
 
 	/**
 	 * This method should be called when the lift opens its doors, for people to leave and enter.
+	 * @return False if the lift didn't attend all humans because it was full, true otherwise.
 	 */
-	public void passengersInOut() {
+	public boolean passengersInOut() {
 		this.humans.removeAll(god.dropoffHumans(getId(), getCurrentFloor()));
 		List<Human> newHumans = new ArrayList<Human>();
 		boolean full = god.attendWaitingHumans(getCurrentFloor(), this.maxWeight - this.currentWeight, getId(), possibleDestinies(getCurrentFloor(), this.numFloors), newHumans);
@@ -293,7 +294,7 @@ public class Lift extends Agent {
 		
 		totalCountLoad++;
 		sumLoad += this.currentWeight;
-		
+
 		for (Human human : humans) {
 			Task task = new Task(getCurrentFloor(), human.getDestinyFloor());
 			if (!tasks.contains(task)) {
@@ -315,6 +316,7 @@ public class Lift extends Agent {
 			System.out.println(getLocalName() + ": Closing doors. Idling");
 		else
 			System.out.println(getLocalName() + ": Closing doors. Heading to floor " + tasks.get(0).getFloor());
+		return !full;
 	}
 
 	public boolean[] possibleDestinies(int currFloor, int numFloors) {
