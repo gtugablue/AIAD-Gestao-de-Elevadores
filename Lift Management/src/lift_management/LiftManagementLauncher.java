@@ -139,7 +139,8 @@ public class LiftManagementLauncher extends RepastSLauncher {
 				break;
 			case Zoning:
 				this.callSystem = new DestinationDispatchCallSystem(numFloors);
-				// this.algorithm = new ZoningAlgorithm(); TODO
+				List<List<Integer>> zoning = ZoningAlgorithm.generateZoningByLifts(this.config.numLifts,this.config.numFloors);
+				this.algorithm = new ZoningAlgorithm(zoning);
 				break;
 			default:
 				throw new Exception ("Unknown algorithm '" + algorithm + "'.");

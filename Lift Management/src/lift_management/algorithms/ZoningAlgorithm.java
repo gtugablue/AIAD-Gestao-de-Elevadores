@@ -12,15 +12,15 @@ public class ZoningAlgorithm extends LiftAlgorithm<Integer> {
 	private DestinationDispatchAlgorithm ddAlgorithm = new DestinationDispatchAlgorithm();
 	
 	public ZoningAlgorithm(List<List<Integer>> liftFloors) {
-		this.liftFloors = new ArrayList<List<Integer>>();
+		this.liftFloors = liftFloors;
 	}
 	
 	@Override
-	public int evaluate(List<Task<Integer>> tasks, int requestedFloor, Integer requestedTask, int maxBuildingFloor, int currentPosition, int liftID) throws Exception {
-		if (!liftFloors.get(liftID).contains(requestedFloor))
+	public int evaluate(List<Task<Integer>> tasks, int requestedFloor, Integer requestedDestiny, int maxBuildingFloor, int currentPosition, int liftID) throws Exception {
+		if (!liftFloors.get(liftID).contains(requestedFloor) || !liftFloors.get(liftID).contains(requestedDestiny) )
 			return Integer.MAX_VALUE;
 		else
-			return ddAlgorithm.evaluate(tasks, requestedFloor, requestedTask, maxBuildingFloor, currentPosition, liftID);
+			return ddAlgorithm.evaluate(tasks, requestedFloor, requestedDestiny, maxBuildingFloor, currentPosition, liftID);
 	}
 
 	@Override
@@ -80,7 +80,7 @@ List<List<Integer>> zones = new ArrayList<List<Integer>>(numLifts);
     				zones.get(lift).add(floor);
         			
         			floor++;
-        			if(floor == nFloorsNumber){
+        			if(floor > nFloorsNumber){
         			    break;
         			}
     			}
@@ -90,7 +90,7 @@ List<List<Integer>> zones = new ArrayList<List<Integer>>(numLifts);
 			
 		}
 		
-        System.out.println(zones.toString());
+        System.out.println("ZONES " + zones.toString());
 		
 		
 		return zones;
