@@ -1,7 +1,7 @@
 package lift_management.onto;
 
 import jade.content.Predicate;
-import lift_management.Call;
+import lift_management.calls.Call;
 
 public class ServiceProposalRequest implements Predicate {
 	
