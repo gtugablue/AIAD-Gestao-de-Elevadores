@@ -5,15 +5,22 @@ public class Human {
 	protected double weight=0;
 	protected int destinyFloor=0;
 	protected int originFloor=0;
+	protected double callTick;
+
 	protected final int id = ++currentId;
-	protected Integer liftID; /** The ID of the lift the human is in, or null if still waiting for one. **/
+	protected Integer liftID; /** The ID of the lift the human is in, or null if still waiting for one. 
+	 * @param currentTick **/
 	
-	public Human(double weight, int originFloor, int destinyFloor){
+	public Human(double weight, int originFloor, int destinyFloor, double currentTick){
 		this.weight = weight;
 		this.originFloor = originFloor;
 		this.destinyFloor = destinyFloor;
+		callTick = currentTick;
 	}
-	
+
+	public double getCallTick() {
+		return callTick;
+	}
 	public double getWeight() {
 		return weight;
 	}

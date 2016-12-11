@@ -22,7 +22,10 @@ import javax.swing.*;
 import org.jfree.chart.plot.dial.*;
 import org.jfree.ui.StandardGradientPaintTransformer;
 
+import com.sun.media.format.AviVideoFormat;
+
 import lift_management.agents.Lift;
+import repast.simphony.engine.schedule.Schedule;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -36,6 +39,9 @@ public class StatisticsPanel {
 	DefaultValueDataset datasetLiftLoad = new DefaultValueDataset(0);
 	JLabel lbAvgLoad = new JLabel("Average load: 0");
 	JSpinner spinnerLoadLift = new JSpinner();
+
+	//Average Waiting Time
+	XYSeriesCollection datasetAvgWaitingTime = new XYSeriesCollection();
 
 	private static StatisticsPanel window = null;
 	List<Lift> lifts;
@@ -88,7 +94,6 @@ public class StatisticsPanel {
 
 		tabbedPane.addTab("Load by Lift", null, loadByLiftPane(), null);
 
-		//TODO show the mean waiting time (also max and min)
 		tabbedPane.addTab("Wait time", null, waitTimePane(), null);
 
 		//TODO show current and total number of requests, (no) use time of the lift, distance traveled, min/max/avg load
@@ -148,7 +153,7 @@ public class StatisticsPanel {
 		ChartPanel chartpanel = new ChartPanel(jfreechart);
 		chartpanel.setPreferredSize(new Dimension(560, 370));
 		chartpanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-		
+
 		GridBagConstraints gbc_spinner = new GridBagConstraints();
 		gbc_spinner.anchor = GridBagConstraints.NORTH;
 		gbc_spinner.gridx = 1;
@@ -166,7 +171,29 @@ public class StatisticsPanel {
 	}
 
 	private Component waitTimePane() {
-		return null;
+		datasetAvgWaitingTime.addSeries(new XYSeries("Average Waiting Time"));
+
+		//create the chart
+		final JFreeChart chart = ChartFactory.createXYLineChart(
+				"Average Waiting Time",
+				"Ticks",
+				"Time Ticks",
+				datasetAvgWaitingTime,             
+				PlotOrientation.VERTICAL, true, false, false);
+
+		final XYPlot plot = chart.getXYPlot();
+		XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
+		
+		renderer.setSeriesPaint(0, Color.RED);
+
+		plot.setRenderer(renderer);
+
+		//chart pane size
+		final ChartPanel chartPanel = new ChartPanel(chart);
+		chartPanel.setPreferredSize(new java.awt.Dimension(560, 370));
+		chartPanel.setMouseZoomable(true, false);
+
+		return chartPanel;
 	}
 
 	private Component requestsByLiftPane() {
@@ -212,11 +239,19 @@ public class StatisticsPanel {
 		lbAvgLoad.setText("Average load: " + lifts.get(liftIndex).getAvgLoad());
 	}
 
-	public void incTick(long ticksToNextRun) {
-		ticks += ticksToNextRun;
+	private void updateAvgWaitingTime(double avgWaitingTime) {
+		if (datasetAvgWaitingTime.getSeries().isEmpty())
+			return;
+		
+		datasetAvgWaitingTime.getSeries(0).add(ticks, avgWaitingTime);
+	}
+
+	public void incTick(long ticksToNextRun, double avgWaitingTime) {
+		ticks = ticksToNextRun;
+
 		//TODO update info of the dataset
 		updateRequestsByLiftDataset();
 		updateLoadByLift();
+		updateAvgWaitingTime(avgWaitingTime);
 	}
-
 }

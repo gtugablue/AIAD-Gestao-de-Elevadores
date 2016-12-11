@@ -59,7 +59,7 @@ public class Lift extends Agent {
 	private List<Task<Direction>> tasks;
 	private final int maxWeight;
 	private int currentWeight;
-	private double avgLoad;
+	private double totalCountLoad, sumLoad;
 	private Map<Integer, ACLMessage> accepts;
 	private int numFloors;
 	private AID buildingAID;
@@ -84,6 +84,8 @@ public class Lift extends Agent {
 		this.accepts = new HashMap<Integer, ACLMessage>();
 		this.algorithm = new LookDiskAlgorithm();
 		this.humans = new ArrayList<Human>();
+		totalCountLoad = 0;
+		sumLoad = 0;
 	}
 
 	@Override
@@ -298,7 +300,10 @@ public class Lift extends Agent {
 		List<Human> newHumans = god.attendWaitingHumans(getCurrentFloor(), this.maxWeight - this.currentWeight, getId(), possibleDestinies(getCurrentFloor(), this.numFloors));
 		this.humans.addAll(newHumans);
 		this.currentWeight = calculateHumansWeight(this.humans);
-		avgLoad = (avgLoad + this.currentWeight) / 2;
+		
+		totalCountLoad++;
+		sumLoad += this.currentWeight;
+		
 		for (Human human : humans) {
 			Task task = new Task(getCurrentFloor(), human.getDestinyFloor());
 			if (!tasks.contains(task)) {
@@ -374,6 +379,8 @@ public class Lift extends Agent {
 	}
 
 	public double getAvgLoad() {
-		return avgLoad;
+		if (totalCountLoad == 0)
+			return 0;
+		return sumLoad / totalCountLoad;
 	}
 }

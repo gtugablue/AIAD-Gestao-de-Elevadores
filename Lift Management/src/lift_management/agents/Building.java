@@ -83,20 +83,22 @@ public class Building extends Agent {
 
 		addBehaviour(new CyclicBehaviour(this) {
 			private long ticksToNextRun;
+			private long totalTicks = 0;
 
 			@Override
 			public void action() {
+				totalTicks++;
 				if (ticksToNextRun > 0)
 				{
 					ticksToNextRun--;
 					return;
 				}
-				
 				Call call = god.generateNewCall();
 				addCall(call);
 				
 				ticksToNextRun = God.generateRandomTime(numFloors, config.callFrequency);
-				StatisticsPanel.getInstance().incTick(ticksToNextRun);
+				God.setCurrentTime(totalTicks);
+				StatisticsPanel.getInstance().incTick(totalTicks, god.getAvgWaitTime());
 			}
 		});
 	}

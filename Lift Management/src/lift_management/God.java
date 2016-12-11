@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Random;
 
 import lift_management.agents.Lift.Direction;
+import repast.simphony.engine.schedule.Schedule;
 
 
 public class God {
@@ -13,11 +14,17 @@ public class God {
 	private List<Human> humans;
 	private int numFloors;
 	private int callFrequency;
+	private long totalCountWaits;
+	private long sumWaits;
+	private static double currentTime;
 
 	public God(int numFloors, int callFrequency) {
 		this.humans = Collections.synchronizedList(new ArrayList<Human>());
 		this.numFloors = numFloors;
 		this.callFrequency = callFrequency;
+		currentTime = 0;
+		totalCountWaits = 0;
+		sumWaits = 0;
 	}
 
 	/**
@@ -54,7 +61,7 @@ public class God {
 		double groundFloorRate = 0.4;
 		double nFloorRate = (1-groundFloorRate)/(n-1);
 		double x = random.nextDouble();
-
+		
 		if(x <= groundFloorRate){
 			return 0;
 		}else{
@@ -100,7 +107,7 @@ public class God {
 		Human human;
 		for (int i = 0; i < numHumans; i++) {
 			double weight = generateWeight();
-			human = new Human(weight, originFloor, destinyFloor);
+			human = new Human(weight, originFloor, destinyFloor, currentTime);
 			humans.add(human);
 		}
 		System.out.println("God: generated " + numHumans + " humans (" + originFloor + "->" + destinyFloor + ").");
@@ -148,7 +155,10 @@ public class God {
 				
 				if (human.getOriginFloor() != floor)
 					continue; // Human not in the same floor as the lift
-
+				
+				totalCountWaits++;
+				sumWaits += (currentTime - human.getCallTick());
+				
 				currWeight += human.getWeight();
 				if (currWeight > maxWeight) { // Lift is full
 					break;
@@ -206,5 +216,16 @@ public class God {
 			}
 		}
 		return n;
+	}
+
+	public double getAvgWaitTime() {
+		if (totalCountWaits == 0) {
+			return 0;
+		}
+		return sumWaits / totalCountWaits;
+	}
+	
+	public static void setCurrentTime(long ticks) {
+		currentTime = ticks;
 	}
 }
