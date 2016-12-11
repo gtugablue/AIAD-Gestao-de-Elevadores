@@ -7,7 +7,7 @@ import java.util.List;
 
 import javax.swing.JFrame;
 
-import lift_management.gui.StatisticsPanel;
+//import lift_management.gui.StatisticsPanel;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.wrapper.StaleProxyException;
@@ -72,7 +72,7 @@ public class LiftManagementLauncher extends RepastSLauncher {
 			e.printStackTrace();
 		}
         
-        StatisticsPanel.getInstance().run(lifts);
+        //StatisticsPanel.getInstance().run(lifts);
     }
     
     private void launchAgents() throws StaleProxyException {
