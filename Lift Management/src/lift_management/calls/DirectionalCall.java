@@ -82,4 +82,26 @@ public class DirectionalCall extends Call<Direction> {
 		}
 		
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + (ascending ? 1231 : 1237);
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DirectionalCall other = (DirectionalCall) obj;
+		if (ascending != other.ascending)
+			return false;
+		return true;
+	}
 }

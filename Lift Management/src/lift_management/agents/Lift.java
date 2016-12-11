@@ -180,7 +180,7 @@ public class Lift extends Agent {
 			try {
 				ServiceProposalRequest spr = (ServiceProposalRequest) getContentManager().extractContent(cfp);
 				call = (Call) ((ServiceProposalRequest) getContentManager().extractContent(cfp)).getCall();
-				System.out.println(getLocalName() + ": Got accept proposal (" + call + ").");
+				//System.out.println(getLocalName() + ": Got accept proposal (" + call + ").");
 				addRequest(spr.getCall(), spr.getHumans(), accept);
 				return null; // We'll send the response manually later
 			} catch (CodecException | OntologyException e) {
@@ -249,7 +249,7 @@ public class Lift extends Agent {
 			int pos = this.algorithm.addNewTask(this.tasks, floor, destiny, this.numFloors, (int)Math.round(this.getPosition().getY()));
 			if (accept != null)
 				accepts.put(tasks.get(pos).getId(), accept);
-			System.out.println(getLocalName() + ": new task " + tasks.get(pos).getId() + ".");
+			//System.out.println(getLocalName() + ": new task " + tasks.get(pos).getId() + ".");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -323,6 +323,8 @@ public class Lift extends Agent {
 		this.floorHumans.removeAll(entering);
 		this.insideHumans.addAll(entering);
 		
+		System.out.println(getLocalName() + ": entering: " + entering + "; leaving: " + leaving + ".");
+		
 		// Update current weight
 		this.currentWeight = calculateHumansWeight(this.insideHumans);
 		
@@ -355,13 +357,14 @@ public class Lift extends Agent {
 			}
 		}
 		
+		/*
 		// Log info
 		System.out.println(getLocalName() + ": tasks: " + this.tasks);
 		if (tasks.isEmpty()) 
 			System.out.println(getLocalName() + ": Closing doors. Idling");
 		else
 			System.out.println(getLocalName() + ": Closing doors. Heading to floor " + tasks.get(0).getFloor());
-		god.printHumansInSystem();
+		*/
 	}
 
 	public boolean[] possibleDestinies(int currFloor, int numFloors) {
@@ -402,6 +405,14 @@ public class Lift extends Agent {
 	public int getNumHumansInside() {
 		return this.insideHumans.size();
 		//return god.getNumHumansInLift(getId());
+	}
+	
+	public List<Human> getHumansInside() {
+		return this.insideHumans;
+	}
+	
+	public List<Human> getHumansWaiting() {
+		return this.floorHumans;
 	}
 	
 	public void openDoor() {

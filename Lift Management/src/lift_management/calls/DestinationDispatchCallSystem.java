@@ -30,7 +30,7 @@ public class DestinationDispatchCallSystem extends CallSystem {
 		}
 		DestinationDispatchCall newCall = (DestinationDispatchCall) call;
 		calls[newCall.getOrigin()][newCall.isAscending() ? 0 : 1] = false;
-		System.out.println("Reseting: " + call);
+		//System.out.println("Reseting: " + call);
 	}
 
 	@Override

@@ -238,6 +238,18 @@ public class God {
 		}
 		return n;
 	}
+	
+	public int getNumHumansWaitingForCall(Call call) {
+		int n = 0;
+		synchronized (this.humans) {
+			for (Human human : this.humans) {
+				Call humanCall = callSystem.newCall(human.getOriginFloor(), human.getDestinyFloor());
+				if (human.getLiftID() == null && humanCall.equals(call))
+					n++;
+			}
+		}
+		return n;
+	}
 
 	public double getAvgWaitTime() {
 		if (totalCountWaits == 0) {

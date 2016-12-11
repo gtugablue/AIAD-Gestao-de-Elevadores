@@ -248,7 +248,7 @@ public class Building extends Agent {
 				accept.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
 				acceptances.add(accept);
 			} else {
-				System.err.println(myAgent.getLocalName() + ": no proposal received");
+				//System.err.println(myAgent.getLocalName() + ": no proposal received");
 			}
 		}
 
@@ -260,16 +260,17 @@ public class Building extends Agent {
 			cfp.setOntology(serviceOntology.getName());
 			cfp.setProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET);
 			
-			System.out.println("Building: Reassigning call " + call + ".");
+			//System.out.println("Building: Reassigning call " + call + ".");
 			addBehaviour(new CNetInit(getAgent(), cfp, call, humans));
 		}
 
 		@Override
 		protected void handleInform(ACLMessage inform) {
 			god.removeHumans(humans);
-			System.out.println("Building: Shutting down light for call " + call + ".");
+			//System.out.println("Building: Shutting down light for call " + call + ".");
 			try {
-				((Building)getAgent()).getCallSystem().resetCall(call);
+				if (god.getNumHumansWaitingForCall(call) == 0)
+					((Building)getAgent()).getCallSystem().resetCall(call);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
