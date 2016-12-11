@@ -145,6 +145,12 @@ public class God {
 			this.humans.addAll(humans);
 		}
 	}
+	
+	public void removeHumans(List<Human> humans) {
+		synchronized (this.humans) {
+			this.humans.removeAll(humans);
+		}
+	}
 
 	/**
 	 * 

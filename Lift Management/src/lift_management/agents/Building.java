@@ -266,6 +266,7 @@ public class Building extends Agent {
 
 		@Override
 		protected void handleInform(ACLMessage inform) {
+			god.removeHumans(humans);
 			System.out.println("Building: Shutting down light for call " + call + ".");
 			try {
 				((Building)getAgent()).getCallSystem().resetCall(call);
