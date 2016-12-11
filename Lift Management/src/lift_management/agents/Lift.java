@@ -309,7 +309,6 @@ public class Lift extends Agent {
 						ACLMessage response = accepts.remove(taskID).createReply();
 						response.setPerformative(ACLMessage.FAILURE);
 						send(response);
-						System.err.println("DERP");;
 					}
 					i--;
 				}

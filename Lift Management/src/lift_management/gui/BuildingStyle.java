@@ -1,8 +1,11 @@
 package lift_management.gui;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.io.IOException;
+
+import javax.swing.JLabel;
 
 import com.jogamp.opengl.util.awt.TextRenderer;
 
@@ -13,10 +16,12 @@ import lift_management.agents.Building;
 import lift_management.agents.Lift;
 import repast.simphony.visualizationOGL2D.DefaultStyleOGL2D;
 import saf.v3d.scene.Label;
+import saf.v3d.scene.Position;
 import saf.v3d.scene.TextureLayer;
 import saf.v3d.scene.VComposite;
 import saf.v3d.scene.VImage2D;
 import saf.v3d.scene.VLabelLayer;
+import saf.v3d.scene.VLayer;
 import saf.v3d.scene.VSpatial;
 
 public class BuildingStyle extends DefaultStyleOGL2D {
@@ -30,13 +35,15 @@ public class BuildingStyle extends DefaultStyleOGL2D {
 	public VSpatial getVSpatial(Object agent, VSpatial spatial) {
 		if (agent instanceof Building) {
 			Building building = (Building)agent;
-			VComposite composite = new TextureLayer();
+			VComposite composite = new VLayer();
+			VComposite imageLayer = new TextureLayer();
+			VComposite labelLayer = new VLayer();
 			CallSystem callSystem = building.getCallSystem();
 			if (callSystem instanceof DirectionCallSystem) {
 				DirectionCallSystem directionCallSystem = (DirectionCallSystem) callSystem;				
 				try {
-					for (int i = 0; i < building.getNumLifts(); i++) {
-						for (int j = 0; j < building.getNumFloors(); j++) {
+					for (int j = 0; j < building.getNumFloors(); j++) {
+						for (int i = 0; i < building.getNumLifts(); i++) {
 							VImage2D liftImage = shapeFactory.createImage("icons/lift_open.jpg");
 							VImage2D liftUpButtonImage, liftDownButtonImage;
 							
@@ -52,10 +59,17 @@ public class BuildingStyle extends DefaultStyleOGL2D {
 							
 							liftImage.translate(SCALE * (i + 1f), SCALE * (j * Building.floorHeight + LIFT_HEIGHT * Building.floorHeight / 2), 0);
 							liftImage.scale(SCALE * 0.8f * Building.floorHeight / LIFT_DOOR_IMAGE_HEIGHT);
-							composite.addChild(translateButtonLiftImage(i, j, liftUpButtonImage, LiftButton.UP));
-							composite.addChild(translateButtonLiftImage(i, j, liftDownButtonImage, LiftButton.DOWN));
-							composite.addChild(liftImage);
+							imageLayer.addChild(translateButtonLiftImage(i, j, liftUpButtonImage, LiftButton.UP));
+							imageLayer.addChild(translateButtonLiftImage(i, j, liftDownButtonImage, LiftButton.DOWN));
+							imageLayer.addChild(liftImage);
 						}
+						
+						Font font = new JLabel().getFont();
+						VLabelLayer layer = new VLabelLayer(font);
+						Label label = new Label("" + building.getGod().getNumHumansInFloor(j), labelLayer, Position.WEST);
+						label.setColor(Color.BLACK);
+						layer.addLabel(label);
+						labelLayer.addChild(layer);
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -64,6 +78,8 @@ public class BuildingStyle extends DefaultStyleOGL2D {
 				FloorIndicatorCallSystem floorIndicatorCallSystem = (FloorIndicatorCallSystem) callSystem;
 				// TODO
 			}
+			composite.addChild(imageLayer);
+			//composite.addChild(labelLayer);
 			spatial = composite;
 		}
 		return spatial;
