@@ -301,6 +301,7 @@ public class Lift extends Agent {
 			}
 		}
 		this.insideHumans.removeAll(leaving);
+		god.removeHumans(leaving);
 		
 		// Entering
 		List<Human> entering = new ArrayList<Human>();
@@ -336,6 +337,14 @@ public class Lift extends Agent {
 				for (int i = pos + 1; i < tasks.size(); i++) {
 					int taskID = tasks.get(i).getId();
 					tasks.remove(i);
+					
+					for (int j = 0; j < floorHumans.size(); j++) {
+						if (floorHumans.get(j).getOriginFloor() == getCurrentFloor()) {
+							floorHumans.remove(j);
+							j--;
+						}
+					}
+					
 					if (accepts.containsKey(taskID)) {
 						ACLMessage response = accepts.remove(taskID).createReply();
 						response.setPerformative(ACLMessage.FAILURE);
@@ -352,6 +361,7 @@ public class Lift extends Agent {
 			System.out.println(getLocalName() + ": Closing doors. Idling");
 		else
 			System.out.println(getLocalName() + ": Closing doors. Heading to floor " + tasks.get(0).getFloor());
+		god.printHumansInSystem();
 	}
 
 	public boolean[] possibleDestinies(int currFloor, int numFloors) {

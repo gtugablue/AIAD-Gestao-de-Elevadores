@@ -249,4 +249,10 @@ public class God {
 	public static void setCurrentTime(long ticks) {
 		currentTime = ticks;
 	}
+	
+	public void printHumansInSystem() {
+		synchronized (this.humans) {
+			System.out.println("Humans in system: " + this.humans);
+		}
+	}
 }
