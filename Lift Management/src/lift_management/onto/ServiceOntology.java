@@ -30,8 +30,6 @@ public class ServiceOntology extends BeanOntology {
 			add(ServiceProposal.class);
 			add(ServiceProposalRequest.class);
 			add(ServiceExecutionRequest.class);
-			add(ContractOutcome.class);
-			add(Results.class);
 			add(DirectionalCall.class);
 			add(DestinationDispatchCall.class);
 			add(Lift.Direction.class);

@@ -1,4 +1,4 @@
-package lift_management.behaviours;
+package lift_management.agents.behaviours;
 
 import lift_management.agents.Lift;
 import sajas.core.behaviours.Behaviour;
