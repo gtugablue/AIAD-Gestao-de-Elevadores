@@ -2,4 +2,7 @@
 <Scenario>
 <repast.simphony.dataLoader.engine.ClassNameDataLoaderAction context="Lift Management" file="repast.simphony.dataLoader.engine.ClassNameDataLoaderAction_0.xml" />
 <repast.simphony.action.display context="Lift Management" file="repast.simphony.action.display_1.xml" />
+<jvm-options>
+    org.apache.catalina.loader.WebappClassLoader.ENABLE_CLEAR_REFEREN‌​CES=false
+</jvm-options>
 </Scenario>

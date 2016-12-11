@@ -22,6 +22,7 @@ import lift_management.calls.CallSystem;
 import lift_management.onto.ServiceOntology;
 import lift_management.onto.ServiceProposal;
 import lift_management.onto.ServiceProposalRequest;
+import repast.simphony.engine.environment.RunEnvironment;
 import sajas.core.AID;
 import sajas.core.Agent;
 import sajas.core.behaviours.CyclicBehaviour;
@@ -97,7 +98,7 @@ public class Building extends Agent {
 					}
 				});
 			}
-		});
+		});		
 	}
 
 	private void prepareCfpMessage() {
