@@ -10,10 +10,13 @@ public class Config {
 	public final int numLifts;
 	public final int[] maxWeights;
 	public final int callFrequency;
+	public final String algorithm;
+	
 	
 	public Config(Parameters p) throws IllegalParameterException {
 		this.numFloors = (int) p.getValue("numFloors");
 		this.numLifts = (int) p.getValue("numLifts");
+		this.algorithm = p.getValueAsString("algorithm");
 		String maxWeightsString = (String) p.getValue("maxWeights");
 		this.maxWeights = new int[this.numLifts];
 		Scanner s = new Scanner(maxWeightsString);

@@ -6,25 +6,28 @@ import java.util.List;
 import java.util.Random;
 
 import lift_management.agents.Lift.Direction;
-import repast.simphony.engine.schedule.Schedule;
+import lift_management.calls.Call;
+import lift_management.calls.CallSystem;
+import lift_management.calls.DirectionalCall;
 
 
 public class God {
 	private static final long serialVersionUID = 6602617123027622789L;
-	private List<Human> humans;
+	private List<Human> humans = Collections.synchronizedList(new ArrayList<Human>());
 	private int numFloors;
 	private int callFrequency;
 	private long totalCountWaits;
 	private long sumWaits;
 	private static double currentTime;
+	private CallSystem callSystem;
 
-	public God(int numFloors, int callFrequency) {
-		this.humans = Collections.synchronizedList(new ArrayList<Human>());
+	public God(int numFloors, int callFrequency, CallSystem callSystem) {
 		this.numFloors = numFloors;
 		this.callFrequency = callFrequency;
 		currentTime = 0;
 		totalCountWaits = 0;
 		sumWaits = 0;
+		this.callSystem = callSystem;
 	}
 
 	/**
@@ -123,8 +126,7 @@ public class God {
 		addHumans(humans);		
 		Human human = humans.get(0);
 
-		//TODO the type of call depends the algorithm
-		return new DirectionalCall(human.getOriginFloor(), human.getOriginFloor() < human.getDestinyFloor());
+		return callSystem.newCall(human.getOriginFloor(), human.getDestinyFloor());
 	}
 
 	private static int generateGroupSize() {
@@ -146,10 +148,9 @@ public class God {
 		int currWeight = 0;
 		synchronized (this.humans) {
 			for (Human human : this.humans) {
-				/*if (!possibleDestinies[human.getDestinyFloor()]) {
-					// TODO recall
+				if (!possibleDestinies[human.getDestinyFloor()]) {
 					continue; // The lift destination is different from the human destination
-				}*/
+				}
 				if (human.getLiftID() != null)
 					continue; // Human already in a lift
 				
@@ -169,6 +170,7 @@ public class God {
 			}
 		}
 		System.out.println("Lift " + liftID + ": Picked up " + humans.size() + " humans on floor " + floor + ", leaving " + getNumHumansInFloor(floor) + " waiting");
+		System.out.println("Humans in system: " + this.humans);
 		return humans;
 	}
 
