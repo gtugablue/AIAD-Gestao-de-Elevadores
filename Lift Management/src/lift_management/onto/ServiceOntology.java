@@ -3,6 +3,7 @@ package lift_management.onto;
 import jade.content.onto.BeanOntology;
 import jade.content.onto.BeanOntologyException;
 import jade.content.onto.Ontology;
+import lift_management.agents.Lift;
 import lift_management.calls.DestinationDispatchCall;
 import lift_management.calls.DirectionalCall;
 
@@ -33,6 +34,7 @@ public class ServiceOntology extends BeanOntology {
 			add(Results.class);
 			add(DirectionalCall.class);
 			add(DestinationDispatchCall.class);
+			add(Lift.Direction.class);
 			
 		} catch(BeanOntologyException boe) {
 			boe.printStackTrace();
