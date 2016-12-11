@@ -32,7 +32,6 @@ import saf.v3d.scene.VSpatial;
 
 
 public class LiftStyle extends DefaultStyleOGL2D {
-	public static final float scale = 15;
 	public static final int liftDoorImageWidth = 200;
 	public static final int liftDoorImageHeight = 342;
 
@@ -54,12 +53,12 @@ public class LiftStyle extends DefaultStyleOGL2D {
 					liftImage = shapeFactory.createImage("icons/lift_closed.jpg");
 				}
 
-				liftImage.translate(0, scale * 0.8f * Building.floorHeight / 2, 0);
-				liftImage.scale(scale * 0.8f * Building.floorHeight / liftDoorImageHeight);
+				liftImage.translate(0, StyleUtils.SCALE * 0.8f * Building.floorHeight / 2, 0);
+				liftImage.scale(StyleUtils.SCALE * 0.8f * Building.floorHeight / liftDoorImageHeight);
 
-				BufferedImage labelImage = textToImage(getLabel(agent), new JLabel().getFont(), 100);
+				BufferedImage labelImage = StyleUtils.textToImage(getLabel(agent), new JLabel().getFont(), 100);
 				VImage2D label = shapeFactory.createImage("Number " + lift.getNumHumansInside(), labelImage);
-				label.translate(scale * 0.4f, scale * 0.8f * Building.floorHeight / 2, 0);
+				label.translate(StyleUtils.SCALE * 0.4f, StyleUtils.SCALE * 0.8f * Building.floorHeight / 2, 0);
 				label.scale(0.1f);
 				
 				layer.addChild(liftImage);
@@ -71,44 +70,6 @@ public class LiftStyle extends DefaultStyleOGL2D {
 			spatial = composite;
 		}
 		return spatial;
-	}
-	
-	public static BufferedImage textToImage(String Text, Font f, float Size){
-	    //Derives font to new specified size, can be removed if not necessary.
-	    f = f.deriveFont(Size);
-
-	    FontRenderContext frc = new FontRenderContext(null, true, true);
-
-	    //Calculate size of buffered image.
-	    LineMetrics lm = f.getLineMetrics(Text, frc);
-
-	    Rectangle2D r2d = f.getStringBounds(Text, frc);
-
-	    BufferedImage img = new BufferedImage((int)Math.ceil(r2d.getWidth()), (int)Math.ceil(r2d.getHeight()), BufferedImage.TYPE_INT_ARGB);
-
-	    Graphics2D g2d = img.createGraphics();
-
-	    g2d.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2d.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
-        g2d.setRenderingHint(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_ENABLE);
-        g2d.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
-        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-        g2d.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-
-	    g2d.setBackground(Color.WHITE);
-	    g2d.setColor(Color.BLACK);
-
-	    g2d.clearRect(0, 0, img.getWidth(), img.getHeight());
-
-	    g2d.setFont(f);
-
-	    g2d.drawString(Text, 0, lm.getAscent());
-
-	    g2d.dispose();
-
-	    return img;
 	}
 
 	@Override
