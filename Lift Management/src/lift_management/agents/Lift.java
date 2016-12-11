@@ -296,6 +296,7 @@ public class Lift extends Agent {
 		for (int i = 0; i < this.insideHumans.size(); i++) {
 			Human human = this.insideHumans.get(i);
 			if (human.getDestinyFloor() == getCurrentFloor()) {
+				human.setLiftID(null);
 				leaving.add(human);
 			}
 		}
@@ -303,11 +304,20 @@ public class Lift extends Agent {
 		
 		// Entering
 		List<Human> entering = new ArrayList<Human>();
+		boolean[] possibleDestinies = possibleDestinies(getCurrentFloor(), numFloors);
 		for (int i = 0; i < this.floorHumans.size(); i++) {
 			Human human = this.floorHumans.get(i);
-			if (human.getOriginFloor() == getCurrentFloor()) { // TODO: check direction
-				entering.add(human);
+			if (!possibleDestinies[human.getDestinyFloor()]) {
+				continue; // The lift destination is different from the human destination
 			}
+			if (human.getLiftID() != null)
+				continue; // Human already in a lift
+			
+			if (human.getOriginFloor() != getCurrentFloor())
+				continue; // Human not in the same floor as the lift
+			
+			human.setLiftID(this.id);
+			entering.add(human);
 		}
 		this.floorHumans.removeAll(entering);
 		this.insideHumans.addAll(entering);
