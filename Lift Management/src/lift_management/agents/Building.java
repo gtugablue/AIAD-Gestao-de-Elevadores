@@ -14,7 +14,7 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import lift_management.Config;
 import lift_management.God;
-//import lift_management.gui.StatisticsPanel;
+import lift_management.gui.StatisticsPanel;
 import lift_management.calls.Call;
 import lift_management.calls.CallSystem;
 import lift_management.onto.ServiceOntology;
@@ -80,7 +80,7 @@ public class Building extends Agent {
 					@Override
 					public void action() {
 						totalTicks++;
-						//StatisticsPanel.getInstance().updateLiftTimes();
+						StatisticsPanel.getInstance().updateLiftTimes();
 						if (ticksToNextRun > 0)
 						{
 							ticksToNextRun--;
@@ -91,7 +91,7 @@ public class Building extends Agent {
 
 						ticksToNextRun = God.generateRandomTime(numFloors, config.callFrequency);
 						God.setCurrentTime(totalTicks);
-						//StatisticsPanel.getInstance().incTick(totalTicks, god.getAvgWaitTime());
+						StatisticsPanel.getInstance().incTick(totalTicks, god.getAvgWaitTime());
 					}
 				});
 			}

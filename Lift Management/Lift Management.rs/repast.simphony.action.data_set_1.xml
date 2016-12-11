@@ -1,9 +1,9 @@
 <repast.simphony.data2.engine.DataSetDescriptor>
-  <name>Average Lift Load</name>
+  <name>Lift Load Data Set</name>
   <type>AGGREGATE</type>
   <inclTick>true</inclTick>
-  <inclBatchRun>true</inclBatchRun>
-  <inclRandomSeed>true</inclRandomSeed>
+  <inclBatchRun>false</inclBatchRun>
+  <inclRandomSeed>false</inclRandomSeed>
   <scheduleParams>
     <start>1.0</start>
     <interval>1.0</interval>
@@ -11,16 +11,25 @@
     <pType>LAST</pType>
     <duration>-1.0</duration>
     <frequency>REPEAT</frequency>
-    <hashCode>-371288803</hashCode>
+    <hashCode>-2053077469</hashCode>
   </scheduleParams>
   <atEnd>false</atEnd>
   <methodDataSources class="linked-hash-map">
     <entry>
-      <string>Average Lift Load</string>
+      <string>Avg Load</string>
       <repast.simphony.data2.engine.MethodDataSourceDefinition>
-        <id>Average Lift Load</id>
+        <id>Avg Load</id>
         <className>lift_management.agents.Lift</className>
         <methodName>getAvgLoad</methodName>
+        <aggType>MEAN</aggType>
+      </repast.simphony.data2.engine.MethodDataSourceDefinition>
+    </entry>
+    <entry>
+      <string>Current Weight</string>
+      <repast.simphony.data2.engine.MethodDataSourceDefinition>
+        <id>Current Weight</id>
+        <className>lift_management.agents.Lift</className>
+        <methodName>getCurrentWeight</methodName>
         <aggType>MEAN</aggType>
       </repast.simphony.data2.engine.MethodDataSourceDefinition>
     </entry>
