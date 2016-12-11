@@ -6,11 +6,11 @@ import java.io.IOException;
 
 import com.jogamp.opengl.util.awt.TextRenderer;
 
-import lift_management.CallSystem;
-import lift_management.DirectionCallSystem;
-import lift_management.FloorIndicatorCallSystem;
 import lift_management.agents.Building;
 import lift_management.agents.Lift;
+import lift_management.calls.CallSystem;
+import lift_management.calls.DestinationDispatchCallSystem;
+import lift_management.calls.DirectionalCallSystem;
 import repast.simphony.visualizationOGL2D.DefaultStyleOGL2D;
 import saf.v3d.scene.Label;
 import saf.v3d.scene.TextureLayer;
@@ -32,8 +32,8 @@ public class BuildingStyle extends DefaultStyleOGL2D {
 			Building building = (Building)agent;
 			VComposite composite = new TextureLayer();
 			CallSystem callSystem = building.getCallSystem();
-			if (callSystem instanceof DirectionCallSystem) {
-				DirectionCallSystem directionCallSystem = (DirectionCallSystem) callSystem;				
+			if (callSystem instanceof DirectionalCallSystem) {
+				DirectionalCallSystem directionCallSystem = (DirectionalCallSystem) callSystem;				
 				try {
 					for (int i = 0; i < building.getNumLifts(); i++) {
 						for (int j = 0; j < building.getNumFloors(); j++) {
@@ -60,9 +60,34 @@ public class BuildingStyle extends DefaultStyleOGL2D {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-			} else if (callSystem instanceof FloorIndicatorCallSystem){
-				FloorIndicatorCallSystem floorIndicatorCallSystem = (FloorIndicatorCallSystem) callSystem;
-				// TODO
+			} else if (callSystem instanceof DestinationDispatchCallSystem){
+				DestinationDispatchCallSystem destinationDispatchCallSystem = (DestinationDispatchCallSystem) callSystem;				
+				try {
+					for (int i = 0; i < building.getNumLifts(); i++) {
+						for (int j = 0; j < building.getNumFloors(); j++) {
+							VImage2D liftImage = shapeFactory.createImage("icons/lift_open.jpg");
+							VImage2D liftUpButtonImage, liftDownButtonImage;
+							
+							if (destinationDispatchCallSystem.toClimb(j))
+								liftUpButtonImage = shapeFactory.createImage("icons/up_activated.png");
+							else
+								liftUpButtonImage = shapeFactory.createImage("icons/up_deactivated.png");
+							
+							if (destinationDispatchCallSystem.toDescend(j))
+								liftDownButtonImage = shapeFactory.createImage("icons/down_activated.png");
+							else
+								liftDownButtonImage = shapeFactory.createImage("icons/down_deactivated.png");
+							
+							liftImage.translate(SCALE * (i + 1f), SCALE * (j * Building.floorHeight + LIFT_HEIGHT * Building.floorHeight / 2), 0);
+							liftImage.scale(SCALE * 0.8f * Building.floorHeight / LIFT_DOOR_IMAGE_HEIGHT);
+							composite.addChild(translateButtonLiftImage(i, j, liftUpButtonImage, LiftButton.UP));
+							composite.addChild(translateButtonLiftImage(i, j, liftDownButtonImage, LiftButton.DOWN));
+							composite.addChild(liftImage);
+						}
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 			spatial = composite;
 		}

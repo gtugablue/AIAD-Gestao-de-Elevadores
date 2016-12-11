@@ -80,10 +80,9 @@ public class LookDiskAlgorithm extends LiftAlgorithm<Direction>{
 		}
 		
 	}
-
 	
-	
-	protected static Direction getDirection(List<Task<Direction>> tasks,int i, int previousStop){		
+	@Override
+	protected Direction getDirection(List<Task<Direction>> tasks, int i, int previousStop) {		
 		Direction direction;
 		
 		while(i < tasks.size() - 1 && previousStop == tasks.get(i).getFloor()){
@@ -91,26 +90,10 @@ public class LookDiskAlgorithm extends LiftAlgorithm<Direction>{
 		}
 		
 		int nextStop = tasks.get(i).getFloor();
-		if(previousStop < nextStop) {
-			direction = Direction.UP;
-		}else if(previousStop > nextStop){
-			direction = Direction.DOWN;
-		}else{
+		direction = getDirection(previousStop, nextStop);
+		
+		if(direction.equals(Direction.STOP)){
 			direction = tasks.get(i).getDestiny();
-		}
-		
-		return direction;
-	}
-	
-	public static Direction getDirection(int previousStop, int nextStop){
-		Direction direction;
-		
-		if(previousStop < nextStop) {
-			direction = Direction.UP;
-		}else if(previousStop > nextStop){
-			direction = Direction.DOWN;
-		}else{
-			direction = Direction.STOP;
 		}
 		
 		return direction;

@@ -1,7 +1,7 @@
 package lift_management.onto;
 
 import jade.content.AgentAction;
-import lift_management.Call;
+import lift_management.calls.Call;
 
 public class ServiceExecutionRequest implements AgentAction {
 	

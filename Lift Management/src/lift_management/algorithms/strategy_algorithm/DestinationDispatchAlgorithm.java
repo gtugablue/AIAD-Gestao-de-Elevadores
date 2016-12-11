@@ -67,7 +67,8 @@ public class DestinationDispatchAlgorithm extends LiftAlgorithm<Integer>{
 		return floorsTraveled*TravelTimes.FLOOR+TravelTimes.getStopsExtraTime(numStops);
 	}
 
-	protected static Direction getDirection(List<Task<Integer>> tasks,int i, int previousStop){		
+	@Override
+	protected Direction getDirection(List<Task<Integer>> tasks,int i, int previousStop){		
 		Direction direction;
 		
 		while(i < tasks.size() - 1 && previousStop == tasks.get(i).getFloor()){
@@ -75,29 +76,13 @@ public class DestinationDispatchAlgorithm extends LiftAlgorithm<Integer>{
 		}
 		
 		int nextStop = tasks.get(i).getFloor();
-		if(previousStop > nextStop) {
-			direction = Direction.UP;
-		}else if(previousStop < nextStop){
-			direction = Direction.DOWN;
-		}else if(tasks.get(i).getDestiny() == -1){
-			direction = Direction.STOP;
-		}else{
+
+		direction = getDirection(previousStop, nextStop);
+		
+		if(direction.equals(Direction.STOP) && tasks.get(i).getDestiny() != -1){
 			direction = tasks.get(i).getDestiny() < nextStop? Direction.DOWN : Direction.UP;
 		}
 		
-		return direction;
-	}
-
-	public static Direction getDirection(int previousStop, int nextStop){
-		Direction direction;
-		
-		if(previousStop > nextStop) {
-			direction = Direction.UP;
-		}else if(previousStop < nextStop){
-			direction = Direction.DOWN;
-		}else{
-			direction = Direction.STOP;
-		}
 		
 		return direction;
 	}
