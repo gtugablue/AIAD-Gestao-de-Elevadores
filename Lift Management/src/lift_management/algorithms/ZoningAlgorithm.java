@@ -17,7 +17,7 @@ public class ZoningAlgorithm extends LiftAlgorithm<Integer> {
 	
 	@Override
 	public int evaluate(List<Task<Integer>> tasks, int requestedFloor, Integer requestedDestiny, int maxBuildingFloor, int currentPosition, int liftID) throws Exception {
-		if (!liftFloors.get(liftID).contains(requestedFloor) || !liftFloors.get(liftID).contains(requestedDestiny) )
+		if (!liftFloors.get(liftID).contains(requestedDestiny))
 			return Integer.MAX_VALUE;
 		else
 			return ddAlgorithm.evaluate(tasks, requestedFloor, requestedDestiny, maxBuildingFloor, currentPosition, liftID);
@@ -40,7 +40,7 @@ public class ZoningAlgorithm extends LiftAlgorithm<Integer> {
 
 	
 	public static List<List<Integer>> generateZoningByLifts(int numLifts, int numFloors){
-List<List<Integer>> zones = new ArrayList<List<Integer>>(numLifts);
+		List<List<Integer>> zones = new ArrayList<List<Integer>>(numLifts);
 		
 		for(int i = 0; i<numLifts; i++){
 		    ArrayList<Integer> zone = new ArrayList<Integer>();
