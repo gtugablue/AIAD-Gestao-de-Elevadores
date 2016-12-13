@@ -1,0 +1,40 @@
+<repast.simphony.data2.engine.DataSetDescriptor>
+  <name>Lift Load</name>
+  <type>AGGREGATE</type>
+  <inclTick>true</inclTick>
+  <inclBatchRun>false</inclBatchRun>
+  <inclRandomSeed>false</inclRandomSeed>
+  <scheduleParams>
+    <start>1.0</start>
+    <interval>1.0</interval>
+    <priority>-Infinity</priority>
+    <pType>LAST</pType>
+    <duration>-1.0</duration>
+    <frequency>REPEAT</frequency>
+    <hashCode>-1656836501</hashCode>
+  </scheduleParams>
+  <atEnd>false</atEnd>
+  <methodDataSources class="linked-hash-map">
+    <entry>
+      <string>Lift Load</string>
+      <repast.simphony.data2.engine.MethodDataSourceDefinition>
+        <id>Lift Load</id>
+        <className>lift_management.agents.Lift</className>
+        <methodName>getAvgLoad</methodName>
+        <aggType>MEAN</aggType>
+      </repast.simphony.data2.engine.MethodDataSourceDefinition>
+    </entry>
+    <entry>
+      <string>Current Weight</string>
+      <repast.simphony.data2.engine.MethodDataSourceDefinition>
+        <id>Current Weight</id>
+        <className>lift_management.agents.Lift</className>
+        <methodName>getCurrentWeight</methodName>
+        <aggType>SUM</aggType>
+      </repast.simphony.data2.engine.MethodDataSourceDefinition>
+    </entry>
+  </methodDataSources>
+  <countSources class="linked-hash-map"/>
+  <customNADataSources class="linked-hash-map"/>
+  <customAggDataSources class="linked-hash-map"/>
+</repast.simphony.data2.engine.DataSetDescriptor>
