@@ -9,7 +9,7 @@ import lift_management.models.Task;
 public class ClosestAttendsAlgorithm extends LiftAlgorithm<Direction> {
 
 	@Override
-	public int evaluate(List<Task<Direction>> tasks, int requestedFloor, Direction requestedTask, int maxBuildingFloor, int currentPosition, int liftID) throws Exception {
+	public float evaluate(List<Task<Direction>> tasks, int requestedFloor, Direction requestedTask, int maxBuildingFloor, int currentPosition, int liftID) throws Exception {
 		if (tasks.isEmpty())
 			return Math.abs((int)Math.round(currentPosition) - requestedFloor);
 		else {

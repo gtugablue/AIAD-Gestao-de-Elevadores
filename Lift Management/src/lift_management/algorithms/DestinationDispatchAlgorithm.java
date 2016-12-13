@@ -10,7 +10,7 @@ import lift_management.models.Task;
 public class DestinationDispatchAlgorithm extends LiftAlgorithm<Integer>{
 	public static final int STOP = -1;
 	@Override
-	public int evaluate(List<Task<Integer>> tasks, int requestedFloor, Integer requestedDestiny, int maxBuildingFloor, int currentPosition, int liftID) throws Exception {
+	public float evaluate(List<Task<Integer>> tasks, int requestedFloor, Integer requestedDestiny, int maxBuildingFloor, int currentPosition, int liftID) throws Exception {
 		if(requestedDestiny == -1 || requestedDestiny > maxBuildingFloor){
 			throw new Exception("Invalid requestedDestiny");
 		}
@@ -35,7 +35,7 @@ public class DestinationDispatchAlgorithm extends LiftAlgorithm<Integer>{
 			nextDestiny = task.getDestiny();
 			direction = getDirection(tasks,tasks.indexOf(task), previousStop);
 			
-			if( floorInBetween(previousStop, nextStop, requestedFloor) && (direction.equals(requestedDestiny))){
+			if( floorInBetween(previousStop, nextStop, requestedFloor) && direction.equals(getDirection(nextStop, nextDestiny))){
 				
 				if(!(floorInBetween(previousStop, previousDestiny, nextStop) || previousDestiny == STOP)){	//Se a direção do elevador é não for igual à direção de próxima tarefa e não for STOP, quer dizer que o elevador vai fazer uma paragem entre esta tarefa e a próxima tarefa que involve andar no sentido oposto.													
 					numStops++;
@@ -106,7 +106,7 @@ public class DestinationDispatchAlgorithm extends LiftAlgorithm<Integer>{
 			nextDestiny = task.getDestiny();
 			direction = getDirection(tasks,tasks.indexOf(task), previousStop);
 			
-			if( floorInBetween(previousStop, nextStop, requestedFloor) && (direction.equals(requestedDestiny))){
+			if( floorInBetween(previousStop, nextStop, requestedFloor) && direction.equals(getDirection(nextStop, nextDestiny))){
 				int i = tasks.indexOf(task);
 				tasks.add(i, new Task<Integer>(requestedFloor, requestedDestiny));
 				return i;
@@ -133,16 +133,17 @@ public class DestinationDispatchAlgorithm extends LiftAlgorithm<Integer>{
 		int previousStop = currentPosition;
 		
 		int nextStop;
-		Integer nextDirection;
+		Integer nextDestiny;
 		Direction direction;
 		
 		//Percorrer todo o caminho do elevador e tentar encaixar o maior número de paragens no caminho entre a posição inicial e nova paragem
 		for(Task<Integer> task : tasks){
 			nextStop = task.getFloor();
-			nextDirection = task.getDestiny();
+			nextDestiny = task.getDestiny();
 			direction = getDirection(previousStop, requestedFloor);
 			
-			if(!(floorInBetween(previousStop, requestedFloor, nextStop) && (floorInBetween(previousStop, nextStop,requestedFloor)))){
+			//Coloca já aqui se o próximo destino não estiver entre o destino actual e o destino pedido ou se não tiverem a mesma direção
+			if(!(floorInBetween(previousStop, requestedFloor, nextStop) && direction.equals(getDirection(nextStop, nextDestiny)) )){
 				int i = tasks.indexOf(task);
 				tasks.add(i, newTask);
 				return i;

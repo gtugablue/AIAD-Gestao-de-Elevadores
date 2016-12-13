@@ -20,7 +20,7 @@ public abstract class LiftAlgorithm<T>{
 	 * @return Retorna a quantidade de pisos percorridos até parar o requestedFloor e atender o pedido do Human
 	 * @throws Exception 
 	 */
-	public abstract int evaluate(List<Task<T>> tasks, int requestedFloor, T requestedDestiny, int maxBuildingFloor, int currentPosition, int liftID) throws Exception;
+	public abstract float evaluate(List<Task<T>> tasks, int requestedFloor, T requestedDestiny, int maxBuildingFloor, int currentPosition, int liftID) throws Exception;
 	
 	
 	/**

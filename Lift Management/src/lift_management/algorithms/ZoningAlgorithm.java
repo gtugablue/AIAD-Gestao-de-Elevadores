@@ -10,17 +10,25 @@ import lift_management.models.Task;
 public class ZoningAlgorithm extends LiftAlgorithm<Integer> {
 	private List<List<Integer>> liftFloors;
 	private DestinationDispatchAlgorithm ddAlgorithm = new DestinationDispatchAlgorithm();
+	public static final float ORIGIN_PENALTY = Float.MAX_VALUE/10;
 	
 	public ZoningAlgorithm(List<List<Integer>> liftFloors) {
 		this.liftFloors = liftFloors;
 	}
 	
 	@Override
-	public int evaluate(List<Task<Integer>> tasks, int requestedFloor, Integer requestedDestiny, int maxBuildingFloor, int currentPosition, int liftID) throws Exception {
+	public float evaluate(List<Task<Integer>> tasks, int requestedFloor, Integer requestedDestiny, int maxBuildingFloor, int currentPosition, int liftID) throws Exception {
 		if (!liftFloors.get(liftID).contains(requestedDestiny))
-			return Integer.MAX_VALUE;
-		else
-			return ddAlgorithm.evaluate(tasks, requestedFloor, requestedDestiny, maxBuildingFloor, currentPosition, liftID);
+			return Float.MAX_VALUE;
+		else{
+			float pontuation =  ddAlgorithm.evaluate(tasks, requestedFloor, requestedDestiny, maxBuildingFloor, currentPosition, liftID);
+			
+			if(!liftFloors.get(liftID).contains(requestedFloor)){
+				pontuation += ORIGIN_PENALTY;
+			}
+			
+			return pontuation;
+		}	
 	}
 
 	@Override
