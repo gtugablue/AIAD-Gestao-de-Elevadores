@@ -157,7 +157,8 @@ public class Lift extends Agent {
 			reply.setPerformative(ACLMessage.PROPOSE);
 			try {
 				Call call = (Call) ((ServiceProposalRequest)getContentManager().extractContent(cfp)).getCall();
-				int price = lift.algorithm.evaluate(lift.tasks, call.getOrigin(), call.getDestiny(), numFloors, (int) Math.round(lift.getPosition().getY()));
+				float price = lift.algorithm.evaluate(lift.tasks, call.getOrigin(), call.getDestiny(), numFloors, (int) Math.round(lift.getPosition().getY()), lift.getId());
+				System.out.println("EVALUATION call: ("+call.getOrigin()+"->"+call.getDestiny() + ") lift: "+lift.getId()+" price: "+ price );
 				getContentManager().fillContent(reply, new ServiceProposal("attend-request", price));
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -208,16 +209,16 @@ public class Lift extends Agent {
 		Task task = tasks.get(0);
 		tasks.remove(0);
 
+		boolean success = passengersInOut();
+		
 		ACLMessage accept = accepts.get(task.getId());
 		if (accept != null) {
 			ACLMessage inform = accept.createReply();
 			accepts.remove(task.getId());
-			inform.setPerformative(ACLMessage.INFORM);
+			inform.setPerformative(success ? ACLMessage.INFORM : ACLMessage.FAILURE);
 			send(inform);
 			//System.out.println(getLocalName() + ": INFORM " + task.getFloor());
 		}
-		
-		passengersInOut();
 	}
 
 	public DoorState getDoorState() {
@@ -283,17 +284,19 @@ public class Lift extends Agent {
 
 	/**
 	 * This method should be called when the lift opens its doors, for people to leave and enter.
+	 * @return False if the lift didn't attend all humans because it was full, true otherwise.
 	 */
-	public void passengersInOut() {
+	public boolean passengersInOut() {
 		this.humans.removeAll(god.dropoffHumans(getId(), getCurrentFloor()));
 		List<Human> newHumans = new ArrayList<Human>();
+		
 		boolean full = god.attendWaitingHumans(getCurrentFloor(), this.maxWeight - this.currentWeight, getId(), possibleDestinies(getCurrentFloor(), this.numFloors), newHumans);
 		this.humans.addAll(newHumans);
 		this.currentWeight = calculateHumansWeight(this.humans);
 		
 		totalCountLoad++;
 		sumLoad += this.currentWeight;
-		
+
 		for (Human human : humans) {
 			Task task = new Task(getCurrentFloor(), human.getDestinyFloor());
 			if (!tasks.contains(task)) {
@@ -315,16 +318,20 @@ public class Lift extends Agent {
 			System.out.println(getLocalName() + ": Closing doors. Idling");
 		else
 			System.out.println(getLocalName() + ": Closing doors. Heading to floor " + tasks.get(0).getFloor());
+		return !full;
 	}
 
 	public boolean[] possibleDestinies(int currFloor, int numFloors) {
 		boolean[] possibleDestinies = new boolean[numFloors];
+		System.out.print("Lift: "+this.getId()+" ");
+		System.out.print("currFloor: " + currFloor + " numFloors: "+numFloors+" ");
 		if (tasks.isEmpty()) {
 			for (int i = 0; i < numFloors; i++) {
 				possibleDestinies[i] = true;
 			}
 		} else {
 			int dest = tasks.get(0).getFloor();
+			System.out.print("dest: "+dest+" ");
 			Direction liftDirection = LiftAlgorithm.getDirection(currFloor, dest);
 			for (int i = 0; i < numFloors; i++) {
 				if (liftDirection.equals(Direction.STOP))
@@ -333,10 +340,11 @@ public class Lift extends Agent {
 					possibleDestinies[i] = liftDirection.equals(LiftAlgorithm.getDirection(currFloor, i));
 			}
 		}
-		/*for (int i = 0; i < numFloors; i++) {
+		
+		for (int i = 0; i < numFloors; i++) {
 			System.out.print(possibleDestinies[i]);
 		}
-		System.out.println();*/
+		System.out.println();
 		return possibleDestinies;
 	}
 

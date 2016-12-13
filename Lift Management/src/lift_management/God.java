@@ -166,14 +166,14 @@ public class God {
 				if (human.getOriginFloor() != floor)
 					continue; // Human not in the same floor as the lift
 				
-				totalCountWaits++;
-				sumWaits += (currentTime - human.getCallTick());
-				
 				currWeight += human.getWeight();
 				if (currWeight > maxWeight) { // Lift is full
 					full = true;
 					break;
 				}
+				
+				totalCountWaits++;
+				sumWaits += (currentTime - human.getCallTick());
 
 				human.setLiftID(liftID);
 				humansAttended.add(human);

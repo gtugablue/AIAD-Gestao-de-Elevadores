@@ -10,7 +10,7 @@ import lift_management.models.Task;
 public class LookDiskAlgorithm extends LiftAlgorithm<Direction>{
 	
 	@Override
-	public int evaluate(List<Task<Direction>> tasks, int requestedFloor, Direction requestedDirection, int maxBuildingFloor, int currentPosition) throws Exception{
+	public float evaluate(List<Task<Direction>> tasks, int requestedFloor, Direction requestedDirection, int maxBuildingFloor, int currentPosition, int liftID) throws Exception{
 		if(requestedDirection.equals(Direction.STOP)){
 			throw new Exception("requestedTask cannot be STOP. Only UP or DOWN");
 		}
